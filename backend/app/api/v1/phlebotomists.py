@@ -1,0 +1,355 @@
+"""Phlebotomist CRUD endpoints — task 4.4."""
+
+from __future__ import annotations
+
+import logging
+import os
+import secrets
+import uuid
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.deps import require_roles
+from app.core.database import get_db
+from app.models.phlebotomist_documents import PhlebotomistDocument
+from app.models.phlebotomists import Phlebotomist
+from app.models.users import User, UserRole
+from app.schemas.phlebotomist import (
+    PhlebotomistCreate,
+    PhlebotomistDocumentListResponse,
+    PhlebotomistDocumentResponse,
+    PhlebotomistListResponse,
+    PhlebotomistResponse,
+    PhlebotomistUpdate,
+)
+
+logger = logging.getLogger(__name__)
+
+router = APIRouter(prefix="/phlebotomists", tags=["phlebotomists"])
+
+_admin_roles = require_roles("super_admin", "city_admin")
+
+# ── S3 upload helper ─────────────────────────────────────────────────────
+
+ALLOWED_CONTENT_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "application/pdf",
+}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+
+async def _upload_to_s3(
+    file: UploadFile,
+    phlebotomist_id: uuid.UUID,
+    doc_type: str,
+) -> str:
+    """Upload file to S3 or fall back to local storage."""
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="File size exceeds 5MB limit",
+        )
+
+    timestamp = int(datetime.now(timezone.utc).timestamp())
+    filename = f"{timestamp}_{file.filename}"
+    s3_key = f"phlebotomists/{phlebotomist_id}/{doc_type}/{filename}"
+
+    bucket = os.environ.get("S3_BUCKET_NAME")
+    region = os.environ.get("AWS_REGION", "ap-south-1")
+
+    if bucket:
+        try:
+            import boto3
+
+            s3_client = boto3.client(
+                "s3",
+                region_name=region,
+                aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+            )
+            s3_client.put_object(
+                Bucket=bucket,
+                Key=s3_key,
+                Body=content,
+                ContentType=file.content_type or "application/octet-stream",
+            )
+            return f"https://{bucket}.s3.{region}.amazonaws.com/{s3_key}"
+        except (ImportError, Exception):
+            logger.warning("S3 upload failed, falling back to local storage")
+
+    # Local fallback
+    local_dir = f"/tmp/phlebotomists/{phlebotomist_id}/{doc_type}"  # noqa: S108
+    os.makedirs(local_dir, exist_ok=True)
+    local_path = f"{local_dir}/{filename}"
+    with open(local_path, "wb") as f:
+        f.write(content)
+    return local_path
+
+
+# ── CRUD endpoints ───────────────────────────────────────────────────────
+
+
+@router.post(
+    "",
+    response_model=PhlebotomistResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_phlebotomist(
+    body: PhlebotomistCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> Phlebotomist:
+    # Check employee_id uniqueness
+    existing = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.employee_id == body.employee_id)
+    )
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Employee ID already exists")
+
+    # Check phone uniqueness in users
+    existing_user = await db.execute(select(User).where(User.phone == body.phone))
+    if existing_user.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Phone already registered")
+
+    # Generate temp password and create user
+    temp_password = secrets.token_urlsafe(12)
+    email = f"phleb_{body.employee_id}@prickncare.local"
+    logger.info("Temp password for phlebotomist %s: %s", body.employee_id, temp_password)
+
+    user = User(
+        email=email,
+        phone=body.phone,
+        role=UserRole.PHLEBOTOMIST,
+    )
+    user.set_password(temp_password)
+    db.add(user)
+    await db.flush()
+
+    phlebotomist = Phlebotomist(
+        user_id=user.id,
+        employee_id=body.employee_id,
+        name=body.name,
+        phone=body.phone,
+        working_hours_start=body.working_hours_start,
+        working_hours_end=body.working_hours_end,
+    )
+    db.add(phlebotomist)
+    await db.commit()
+    await db.refresh(phlebotomist)
+    return phlebotomist
+
+
+@router.get("", response_model=PhlebotomistListResponse)
+async def list_phlebotomists(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    search: str | None = Query(None),
+    is_available: bool | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    query = select(Phlebotomist)
+    count_query = select(func.count()).select_from(Phlebotomist)
+
+    if search:
+        pattern = f"%{search}%"
+        condition = (
+            Phlebotomist.name.ilike(pattern)
+            | Phlebotomist.employee_id.ilike(pattern)
+            | Phlebotomist.phone.ilike(pattern)
+        )
+        query = query.where(condition)
+        count_query = count_query.where(condition)
+
+    if is_available is not None:
+        query = query.where(Phlebotomist.is_available == is_available)
+        count_query = count_query.where(Phlebotomist.is_available == is_available)
+
+    total = (await db.execute(count_query)).scalar_one()
+    items = (
+        (
+            await db.execute(
+                query.order_by(Phlebotomist.created_at.desc()).offset(skip).limit(limit)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    return {
+        "items": items,
+        "total": total,
+        "page": (skip // limit) + 1,
+        "page_size": limit,
+    }
+
+
+@router.get("/{phlebotomist_id}", response_model=PhlebotomistResponse)
+async def get_phlebotomist(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> Phlebotomist:
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    phlebotomist = result.scalar_one_or_none()
+    if not phlebotomist:
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+    return phlebotomist
+
+
+@router.put("/{phlebotomist_id}", response_model=PhlebotomistResponse)
+async def update_phlebotomist(
+    phlebotomist_id: uuid.UUID,
+    body: PhlebotomistUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> Phlebotomist:
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    phlebotomist = result.scalar_one_or_none()
+    if not phlebotomist:
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+
+    for field, value in body.model_dump(exclude_unset=True).items():
+        setattr(phlebotomist, field, value)
+
+    await db.commit()
+    await db.refresh(phlebotomist)
+    return phlebotomist
+
+
+@router.delete("/{phlebotomist_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_phlebotomist(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> None:
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    phlebotomist = result.scalar_one_or_none()
+    if not phlebotomist:
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+
+    # Soft delete: deactivate user and mark unavailable
+    user_result = await db.execute(
+        select(User).where(User.id == phlebotomist.user_id)
+    )
+    user = user_result.scalar_one_or_none()
+    if user:
+        user.is_active = False
+
+    phlebotomist.is_available = False
+    await db.commit()
+
+
+# ── Document endpoints ───────────────────────────────────────────────────
+
+
+@router.post(
+    "/{phlebotomist_id}/documents",
+    response_model=PhlebotomistDocumentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_document(
+    phlebotomist_id: uuid.UUID,
+    doc_type: str = Query(..., regex="^(id_proof|certification|photo)$"),
+    file: UploadFile = ...,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> PhlebotomistDocument:
+    # Verify phlebotomist exists
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+
+    # Validate file type
+    if file.content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail="File type not allowed. Accepted: jpg, png, pdf",
+        )
+
+    s3_url = await _upload_to_s3(file, phlebotomist_id, doc_type)
+
+    doc = PhlebotomistDocument(
+        phlebotomist_id=phlebotomist_id,
+        doc_type=doc_type,
+        s3_url=s3_url,
+        original_filename=file.filename or "unknown",
+        uploaded_at=datetime.now(timezone.utc),
+    )
+    db.add(doc)
+    await db.commit()
+    await db.refresh(doc)
+    return doc
+
+
+@router.get(
+    "/{phlebotomist_id}/documents",
+    response_model=PhlebotomistDocumentListResponse,
+)
+async def list_documents(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    # Verify phlebotomist exists
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+
+    items = (
+        (
+            await db.execute(
+                select(PhlebotomistDocument).where(
+                    PhlebotomistDocument.phlebotomist_id == phlebotomist_id
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    return {"items": items}
+
+
+@router.put(
+    "/{phlebotomist_id}/documents/{doc_id}/verify",
+    response_model=PhlebotomistDocumentResponse,
+)
+async def verify_document(
+    phlebotomist_id: uuid.UUID,
+    doc_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> PhlebotomistDocument:
+    result = await db.execute(
+        select(PhlebotomistDocument).where(
+            PhlebotomistDocument.id == doc_id,
+            PhlebotomistDocument.phlebotomist_id == phlebotomist_id,
+        )
+    )
+    doc = result.scalar_one_or_none()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    doc.verified = True
+    doc.verified_by = current_user.id
+    doc.verified_at = datetime.now(timezone.utc)
+
+    await db.commit()
+    await db.refresh(doc)
+    return doc
