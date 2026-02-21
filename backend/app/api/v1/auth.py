@@ -1,4 +1,4 @@
-"""Authentication endpoints: login, refresh, logout — task 3.3."""
+"""Authentication endpoints: login, OTP, refresh, logout — tasks 3.3 & 3.4."""
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
@@ -8,15 +8,28 @@ from app.core.config import settings
 from app.core.dependencies import get_db
 from app.core.security import (
     blacklist_token,
+    check_otp_rate_limit,
     clear_session,
     create_access_token,
     create_refresh_token,
+    generate_otp,
+    increment_otp_rate_limit,
     revoke_refresh_token,
+    store_otp,
+    verify_otp,
     verify_password,
     verify_refresh_token,
 )
+from app.core.sms_gateway import get_sms_provider
 from app.models.users import User
-from app.schemas.auth import LoginRequest, LogoutRequest, RefreshRequest, TokenResponse
+from app.schemas.auth import (
+    LoginRequest,
+    LogoutRequest,
+    OTPRequestSchema,
+    OTPVerifyRequest,
+    RefreshRequest,
+    TokenResponse,
+)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -104,3 +117,73 @@ async def logout(data: LogoutRequest) -> None:
     if data.refresh_token:
         await revoke_refresh_token(data.user_id, data.jti)
     await clear_session(data.user_id)
+
+
+# ---------------------------------------------------------------------------
+# POST /auth/otp/request
+# ---------------------------------------------------------------------------
+
+
+@router.post("/otp/request", status_code=status.HTTP_200_OK)
+async def otp_request(data: OTPRequestSchema) -> dict:
+    """Generate and send a 6-digit OTP to the given phone number."""
+    if not await check_otp_rate_limit(data.phone):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=(
+                f"Too many OTP requests. "
+                f"Limit: {settings.OTP_RATE_LIMIT_PER_HOUR}/hour."
+            ),
+        )
+
+    otp = generate_otp()
+    await store_otp(data.phone, otp)
+    await increment_otp_rate_limit(data.phone)
+
+    provider = get_sms_provider()
+    sent = await provider.send_otp(data.phone, otp)
+    if not sent:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Failed to send OTP. Please try again.",
+        )
+
+    return {"message": "OTP sent successfully"}
+
+
+# ---------------------------------------------------------------------------
+# POST /auth/otp/verify
+# ---------------------------------------------------------------------------
+
+
+@router.post("/otp/verify", response_model=TokenResponse)
+async def otp_verify(
+    data: OTPVerifyRequest,
+    db: AsyncSession = Depends(get_db),
+) -> TokenResponse:
+    """Verify OTP and issue JWT tokens if valid."""
+    valid = await verify_otp(data.phone, data.otp)
+    if not valid:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired OTP",
+        )
+
+    result = await db.execute(
+        select(User).where(User.phone == data.phone, User.is_active.is_(True))
+    )
+    user: User | None = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active user found for this phone number",
+        )
+
+    access_token, jti = create_access_token(str(user.id), user.role.value)
+    refresh_token = await create_refresh_token(str(user.id), jti)
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+    )

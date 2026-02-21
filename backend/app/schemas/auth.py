@@ -25,3 +25,14 @@ class LogoutRequest(BaseModel):
     jti: str
     user_id: str
     refresh_token: str | None = None
+
+
+class OTPRequestSchema(BaseModel):
+    phone: str = Field(
+        ..., pattern=r"^\+?[1-9]\d{7,14}$", description="E.164 phone number"
+    )
+
+
+class OTPVerifyRequest(BaseModel):
+    phone: str = Field(..., pattern=r"^\+?[1-9]\d{7,14}$")
+    otp: str = Field(..., min_length=6, max_length=6, pattern=r"^\d{6}$")

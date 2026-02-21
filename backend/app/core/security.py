@@ -137,6 +137,70 @@ async def clear_session(user_id: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# OTP (one-time password)
+# ---------------------------------------------------------------------------
+
+_OTP_PREFIX = "otp:"  # otp:<phone>           → OTP value
+_OTP_ATTEMPTS_PREFIX = "otp_attempts:"  # otp_attempts:<phone> → attempt count
+_OTP_RATE_PREFIX = "otp_rate:"  # otp_rate:<phone>      → requests per hour
+
+
+def generate_otp() -> str:
+    """Return a zero-padded 6-digit numeric OTP."""
+    return str(secrets.randbelow(10**settings.OTP_LENGTH)).zfill(settings.OTP_LENGTH)
+
+
+async def store_otp(phone: str, otp: str) -> None:
+    """Save OTP in Redis and reset attempt counter. TTL = OTP_EXPIRE_MINUTES."""
+    ttl = settings.OTP_EXPIRE_MINUTES * 60
+    await redis_set(f"{_OTP_PREFIX}{phone}", otp, ex=ttl)
+    await redis_set(f"{_OTP_ATTEMPTS_PREFIX}{phone}", "0", ex=ttl)
+
+
+async def verify_otp(phone: str, otp: str) -> bool:
+    """Check OTP and increment attempts. Deletes OTP after max attempts or success."""
+    stored = await redis_get(f"{_OTP_PREFIX}{phone}")
+    if stored is None:
+        return False  # expired or never requested
+
+    attempts_raw = await redis_get(f"{_OTP_ATTEMPTS_PREFIX}{phone}") or "0"
+    attempts = int(attempts_raw) + 1
+    ttl = settings.OTP_EXPIRE_MINUTES * 60
+
+    if attempts >= settings.OTP_MAX_ATTEMPTS:
+        # Burn the OTP regardless of correctness on final attempt
+        await redis_delete(f"{_OTP_PREFIX}{phone}")
+        await redis_delete(f"{_OTP_ATTEMPTS_PREFIX}{phone}")
+        return secrets.compare_digest(stored, otp)
+
+    await redis_set(f"{_OTP_ATTEMPTS_PREFIX}{phone}", str(attempts), ex=ttl)
+
+    if secrets.compare_digest(stored, otp):
+        # Valid — delete so it cannot be reused
+        await redis_delete(f"{_OTP_PREFIX}{phone}")
+        await redis_delete(f"{_OTP_ATTEMPTS_PREFIX}{phone}")
+        return True
+
+    return False
+
+
+async def check_otp_rate_limit(phone: str) -> bool:
+    """Return True if the phone has NOT exceeded the hourly OTP request limit."""
+    count_raw = await redis_get(f"{_OTP_RATE_PREFIX}{phone}")
+    if count_raw is None:
+        return True
+    return int(count_raw) < settings.OTP_RATE_LIMIT_PER_HOUR
+
+
+async def increment_otp_rate_limit(phone: str) -> None:
+    """Increment the hourly OTP request counter, setting 1-hour TTL on first hit."""
+    key = f"{_OTP_RATE_PREFIX}{phone}"
+    exists = await redis_exists(key)
+    current = int(await redis_get(key) or "0")
+    await redis_set(key, str(current + 1), ex=3600 if not exists else None)
+
+
+# ---------------------------------------------------------------------------
 # High-level: validate incoming access token for route dependencies
 # ---------------------------------------------------------------------------
 
