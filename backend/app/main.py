@@ -12,6 +12,7 @@ from app.middleware.audit import AuditMiddleware
 from app.middleware.error_handler import register_exception_handlers
 from app.middleware.logging import RequestLoggingMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
+from app.middleware.security import SecurityHeadersMiddleware
 
 
 @asynccontextmanager
@@ -45,6 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(RateLimitMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(AuditMiddleware)
 app.add_middleware(RequestLoggingMiddleware)
 
