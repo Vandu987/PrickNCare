@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, timedelta
+from datetime import UTC, date, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -14,7 +14,6 @@ from app.models.nsa import NSARecord
 from app.models.orders import Order, OrderStatus, OrderStatusHistory
 from app.models.users import User, UserRole
 from app.models.zones import Pincode
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -115,7 +114,7 @@ def _mock_pincode():
 
 
 def _mock_order(booking_id: str = "PNC-20260223-0001") -> MagicMock:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     order = MagicMock(spec=Order)
     order.id = uuid.uuid4()
@@ -139,7 +138,7 @@ def _mock_order(booking_id: str = "PNC-20260223-0001") -> MagicMock:
     order.payment_mode = "cash"
     order.payment_status = "pending"
     order.assigned_phlebotomist_id = None
-    order.created_at = datetime.now(timezone.utc)
+    order.created_at = datetime.now(UTC)
     order.status_history = []
     return order
 
@@ -172,9 +171,7 @@ def _setup_db_mock(
     count_result = MagicMock()
     count_result.scalar_one.return_value = order_count
 
-    db.execute = AsyncMock(
-        side_effect=[pincode_result, nsa_result, count_result]
-    )
+    db.execute = AsyncMock(side_effect=[pincode_result, nsa_result, count_result])
     db.add = MagicMock()
     db.commit = AsyncMock()
 
@@ -214,9 +211,7 @@ async def test_create_order_valid(admin_client: AsyncClient):
         count_result = MagicMock()
         count_result.scalar_one.return_value = 0
 
-        db.execute = AsyncMock(
-            side_effect=[pincode_result, nsa_result, count_result]
-        )
+        db.execute = AsyncMock(side_effect=[pincode_result, nsa_result, count_result])
         db.add = MagicMock()
         db.commit = AsyncMock()
         db.refresh = AsyncMock()
@@ -302,9 +297,7 @@ async def test_booking_id_format(admin_client: AsyncClient):
     count_result = MagicMock()
     count_result.scalar_one.return_value = 5
 
-    db.execute = AsyncMock(
-        side_effect=[pincode_result, nsa_result, count_result]
-    )
+    db.execute = AsyncMock(side_effect=[pincode_result, nsa_result, count_result])
     db.add = MagicMock()
     db.commit = AsyncMock()
     db.refresh = AsyncMock()
@@ -337,9 +330,7 @@ async def test_status_history_created(admin_client: AsyncClient):
     count_result = MagicMock()
     count_result.scalar_one.return_value = 0
 
-    db.execute = AsyncMock(
-        side_effect=[pincode_result, nsa_result, count_result]
-    )
+    db.execute = AsyncMock(side_effect=[pincode_result, nsa_result, count_result])
     db.add = MagicMock()
     db.commit = AsyncMock()
     db.refresh = AsyncMock()
@@ -381,9 +372,7 @@ async def test_create_order_client_user_allowed(client_user_client: AsyncClient)
     count_result = MagicMock()
     count_result.scalar_one.return_value = 0
 
-    db.execute = AsyncMock(
-        side_effect=[pincode_result, nsa_result, count_result]
-    )
+    db.execute = AsyncMock(side_effect=[pincode_result, nsa_result, count_result])
     db.add = MagicMock()
     db.commit = AsyncMock()
     db.refresh = AsyncMock()

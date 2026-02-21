@@ -109,3 +109,11 @@ class OrderResponse(BaseModel):
 
 class OrderDetailResponse(OrderResponse):
     status_history: list[StatusHistoryResponse] = []
+
+
+class OrderListResponse(BaseModel):
+    items: list[OrderResponse]
+    total: int
+    skip: int
+    limit: int
+    has_more: bool

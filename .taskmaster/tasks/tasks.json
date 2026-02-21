@@ -528,10 +528,10 @@
             "description": "Build the POST /orders endpoint that handles order creation with pincode validation, amount calculation based on packages and priority, unique booking_id generation, and initial status logging.",
             "dependencies": [],
             "details": "Create OrderCreate schema with patient_details, address, appointment_datetime, package_ids, priority, special_instructions, and payment_mode. Implement pincode serviceability check by querying zone/pincode tables from Task 5. Calculate total amount by summing package prices and applying priority multipliers. Generate unique booking_id using format like 'PNC-{YYYYMMDD}-{sequential_number}'. Create order with PENDING status. Insert initial entry into OrderStatusHistory table with timestamp, status, and actor_id. Implement optional auto-assignment trigger flag. Use transactions to ensure atomicity of order creation and history logging.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test order creation with valid data returns 201 with booking_id. Test invalid pincode returns 400 with NSA error. Test amount calculation with multiple packages and priority levels. Verify booking_id uniqueness under concurrent creation. Test OrderStatusHistory entry is created. Test validation errors for missing required fields.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T20:05:43.514Z"
+            "updatedAt": "2026-02-21T20:09:11.895Z"
           },
           {
             "id": 2,
@@ -541,9 +541,10 @@
               1
             ],
             "details": "Create PaginatedResponse schema with items, total, skip, limit, and has_more fields. Implement query builder pattern to dynamically construct SQL based on provided filters. Add status filter supporting OrderStatus enum values. Add date_from/date_to filters on appointment_datetime. Add client_id and phlebotomist_id UUID filters. Add priority filter (normal, urgent, critical). Implement search using ILIKE for booking_id, patient_name, and patient_phone fields. Apply RBAC: clients see only their orders, phlebotomists see assigned orders, admins see all with optional filters. Order results by appointment_datetime descending by default.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test pagination returns correct subset and total count. Test each filter independently returns correct results. Test combined filters work correctly. Test search finds orders by booking_id, patient name, and phone. Test RBAC - client cannot see other clients' orders. Test empty results return empty array with total=0.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T20:09:51.121Z"
           },
           {
             "id": 3,
@@ -635,7 +636,7 @@
         "complexity": 8,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the order management into: 1) Order creation with pincode validation, amount calculation, and unique booking_id generation, 2) Order listing with comprehensive filters (status, date range, client, phlebotomist, priority, search), 3) Order status management with valid transition enforcement and history logging, 4) Manual assignment API with phlebotomist validation (zone coverage, availability), 5) Auto-assignment algorithm based on zone matching and workload balancing, 6) Re-routing and bulk assignment APIs, 7) Phlebotomist order actions (accept, reject, start-transit, collect with proof), 8) Order cancellation and rescheduling with history tracking, 9) Bulk order upload from Excel with validation and error reporting. This is the core workflow of the platform.",
-        "updatedAt": "2026-02-21T20:05:43.514Z"
+        "updatedAt": "2026-02-21T20:09:51.121Z"
       },
       {
         "id": "7",
@@ -1691,7 +1692,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T20:05:43.514Z",
+      "lastModified": "2026-02-21T20:09:51.122Z",
       "taskCount": 18,
       "completedCount": 5,
       "tags": [
