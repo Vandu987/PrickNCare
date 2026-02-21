@@ -6,13 +6,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import router as v1_router
 from app.core.config import settings
+from app.core.database import close_db, init_db
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # Startup logic (DB engine, Redis pool) will be added in task 3.2
+    await init_db()
     yield
-    # Shutdown logic will be added in task 3.2
+    await close_db()
 
 
 app = FastAPI(
