@@ -72,6 +72,13 @@ class Settings(BaseSettings):
     CLOUDFRONT_DOMAIN: str = ""
     LOCAL_STORAGE_DIR: str = "uploads"
 
+    # File Upload
+    MAX_FILE_SIZE_MB: int = 10
+    ALLOWED_EXTENSIONS_DOCUMENTS: str = "pdf,doc,docx,xls,xlsx,csv,txt"
+    ALLOWED_EXTENSIONS_COLLECTION_PHOTOS: str = "jpg,jpeg,png,webp"
+    ALLOWED_EXTENSIONS_SIGNATURES: str = "jpg,jpeg,png,svg"
+    ALLOWED_EXTENSIONS_REPORTS: str = "pdf,jpg,jpeg,png"
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
 
