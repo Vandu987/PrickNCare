@@ -100,6 +100,18 @@ class CashSubmissionResponse(BaseModel):
     status: str
 
 
+class ReconciliationReportResponse(BaseModel):
+    date_from: date
+    date_to: date
+    total_cash_collected: float
+    total_handed_over: float
+    discrepancies_by_type: dict[str, float]
+    outstanding_dues: float
+    total_online_collected: float
+    reconciliation_count: int
+    pending_count: int
+
+
 class ReconciliationVerifyResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

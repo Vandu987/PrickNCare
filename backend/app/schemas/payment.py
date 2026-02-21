@@ -35,3 +35,12 @@ class PaymentListResponse(BaseModel):
     total: int
     page: int
     size: int
+
+
+class PaymentReportResponse(BaseModel):
+    date_from: datetime
+    date_to: datetime
+    total_amount: float
+    breakdown_by_mode: dict[str, float]
+    breakdown_by_status: dict[str, float]
+    count: int

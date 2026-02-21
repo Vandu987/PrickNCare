@@ -28,6 +28,7 @@ from app.schemas.reconciliation import (
     PendingReconciliationResponse,
     PhlebotomistSummary,
     ReconciliationCreate,
+    ReconciliationReportResponse,
     ReconciliationResponse,
     ReconciliationUpdate,
     ReconciliationVerifyResponse,
@@ -236,6 +237,107 @@ async def create_reconciliation(
     rec = reloaded.scalar_one()
 
     return ReconciliationResponse.model_validate(rec)
+
+
+# ── GET /reconciliation/report (task 9.6) ─────────────────────────────
+
+
+@router.get(
+    "/reconciliation/report",
+    response_model=ReconciliationReportResponse,
+)
+async def get_reconciliation_report(
+    date_from: date = Query(...),
+    date_to: date = Query(...),
+    phlebotomist_id: uuid.UUID | None = Query(None),
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> ReconciliationReportResponse:
+    """Aggregated reconciliation report for a date range."""
+
+    # Base filters for reconciliations
+    rec_filters = [
+        Reconciliation.date >= date_from,
+        Reconciliation.date <= date_to,
+    ]
+    if phlebotomist_id:
+        rec_filters.append(Reconciliation.phlebotomist_id == phlebotomist_id)
+
+    # Aggregate reconciliation data
+    rec_stmt = select(
+        func.coalesce(func.sum(Reconciliation.expected_cash), 0).label(
+            "total_cash_collected"
+        ),
+        func.coalesce(func.sum(Reconciliation.cash_handed_over), 0).label(
+            "total_handed_over"
+        ),
+        func.count().label("total_count"),
+        func.sum(
+            case(
+                (
+                    Reconciliation.status != ReconciliationStatus.CONFIRMED,
+                    1,
+                ),
+                else_=0,
+            )
+        ).label("pending_count"),
+    ).where(*rec_filters)
+
+    rec_result = (await db.execute(rec_stmt)).one()
+
+    # Discrepancies by type
+    disc_stmt = (
+        select(
+            ReconciliationDiscrepancy.type,
+            func.coalesce(func.sum(ReconciliationDiscrepancy.amount), 0).label("total"),
+        )
+        .join(
+            Reconciliation,
+            ReconciliationDiscrepancy.reconciliation_id == Reconciliation.id,
+        )
+        .where(*rec_filters)
+        .group_by(ReconciliationDiscrepancy.type)
+    )
+    disc_rows = (await db.execute(disc_stmt)).all()
+    discrepancies_by_type = {str(row.type.value): float(row.total) for row in disc_rows}
+
+    # Online collected from payments in the date range
+    pay_filters = [
+        Payment.mode.in_(_ONLINE_MODES),
+        cast(Payment.collected_at, Date) >= date_from,
+        cast(Payment.collected_at, Date) <= date_to,
+    ]
+    if phlebotomist_id:
+        # Need to join to phlebotomist to filter by collected_by
+        phleb = await db.get(Phlebotomist, phlebotomist_id)
+        if phleb:
+            pay_filters.append(Payment.collected_by == phleb.user_id)
+
+    online_stmt = select(func.coalesce(func.sum(Payment.amount), 0)).where(*pay_filters)
+    total_online = float((await db.execute(online_stmt)).scalar_one())
+
+    # Outstanding dues = expected_cash - cash_handed_over for non-confirmed
+    outstanding_stmt = select(
+        func.coalesce(
+            func.sum(Reconciliation.expected_cash - Reconciliation.cash_handed_over), 0
+        )
+    ).where(
+        *rec_filters,
+        Reconciliation.status != ReconciliationStatus.CONFIRMED,
+    )
+    outstanding_dues = float((await db.execute(outstanding_stmt)).scalar_one())
+
+    return ReconciliationReportResponse(
+        date_from=date_from,
+        date_to=date_to,
+        total_cash_collected=float(rec_result.total_cash_collected),
+        total_handed_over=float(rec_result.total_handed_over),
+        discrepancies_by_type=discrepancies_by_type,
+        outstanding_dues=outstanding_dues,
+        total_online_collected=total_online,
+        reconciliation_count=int(rec_result.total_count),
+        pending_count=int(rec_result.pending_count),
+    )
 
 
 # ── GET /reconciliation/{id} (task 9.3) ──────────────────────────────

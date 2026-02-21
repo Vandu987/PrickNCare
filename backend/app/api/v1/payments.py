@@ -14,7 +14,12 @@ from app.core.database import get_db
 from app.models.orders import Order, OrderStatus
 from app.models.payments import OrderPaymentMode, OrderPaymentStatus, Payment
 from app.models.users import User, UserRole
-from app.schemas.payment import PaymentCreate, PaymentListResponse, PaymentResponse
+from app.schemas.payment import (
+    PaymentCreate,
+    PaymentListResponse,
+    PaymentReportResponse,
+    PaymentResponse,
+)
 
 router = APIRouter(tags=["payments"])
 
@@ -156,4 +161,70 @@ async def list_payments(
         total=total,
         page=page,
         size=size,
+    )
+
+
+# ── GET /payments/report (task 9.6) ──────────────────────────────────
+
+
+@router.get("/payments/report", response_model=PaymentReportResponse)
+async def get_payment_report(
+    date_from: datetime = Query(...),
+    date_to: datetime = Query(...),
+    client_id: uuid.UUID | None = Query(None),
+    phlebotomist_id: uuid.UUID | None = Query(None),
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> PaymentReportResponse:
+    """Aggregated payment report for a date range."""
+
+    filters: list = [
+        Payment.collected_at >= date_from,
+        Payment.collected_at <= date_to,
+    ]
+    needs_order_join = False
+
+    if phlebotomist_id:
+        filters.append(Payment.collected_by == phlebotomist_id)
+    if client_id:
+        filters.append(Order.client_id == client_id)
+        needs_order_join = True
+
+    # Total + count
+    base = select(
+        func.coalesce(func.sum(Payment.amount), 0).label("total_amount"),
+        func.count().label("count"),
+    )
+    if needs_order_join:
+        base = base.join(Order, Payment.order_id == Order.id)
+    base = base.where(*filters)
+    agg = (await db.execute(base)).one()
+
+    # Breakdown by mode
+    mode_stmt = select(
+        Payment.mode, func.coalesce(func.sum(Payment.amount), 0).label("total")
+    )
+    if needs_order_join:
+        mode_stmt = mode_stmt.join(Order, Payment.order_id == Order.id)
+    mode_stmt = mode_stmt.where(*filters).group_by(Payment.mode)
+    mode_rows = (await db.execute(mode_stmt)).all()
+    breakdown_by_mode = {str(r.mode.value): float(r.total) for r in mode_rows}
+
+    # Breakdown by status
+    status_stmt = select(
+        Payment.status, func.coalesce(func.sum(Payment.amount), 0).label("total")
+    )
+    if needs_order_join:
+        status_stmt = status_stmt.join(Order, Payment.order_id == Order.id)
+    status_stmt = status_stmt.where(*filters).group_by(Payment.status)
+    status_rows = (await db.execute(status_stmt)).all()
+    breakdown_by_status = {str(r.status.value): float(r.total) for r in status_rows}
+
+    return PaymentReportResponse(
+        date_from=date_from,
+        date_to=date_to,
+        total_amount=float(agg.total_amount),
+        breakdown_by_mode=breakdown_by_mode,
+        breakdown_by_status=breakdown_by_status,
+        count=int(agg.count),
     )
