@@ -1,11 +1,12 @@
-"""Client schemas — task 4.1."""
+"""Client schemas — tasks 4.1 & 4.2."""
 
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.clients import PaymentTerms
 
@@ -64,6 +65,53 @@ class ClientResponse(BaseModel):
 
 class ClientListResponse(BaseModel):
     items: list[ClientResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+# ── Rate schemas (task 4.2) ──────────────────────────────────────────────
+
+
+class ClientRateUpdate(BaseModel):
+    rate_first_collection: Decimal | None = None
+    rate_second_collection: Decimal | None = None
+    rate_priority: Decimal | None = None
+    credit_limit: Decimal | None = None
+
+    @field_validator(
+        "rate_first_collection",
+        "rate_second_collection",
+        "rate_priority",
+        "credit_limit",
+        mode="before",
+    )
+    @classmethod
+    def validate_rate(cls, v: Decimal | None) -> Decimal | None:
+        if v is None:
+            return v
+        v = Decimal(str(v))
+        if v <= 0:
+            raise ValueError("Value must be greater than 0")
+        if v.as_tuple().exponent is not None and abs(int(v.as_tuple().exponent)) > 2:
+            raise ValueError("Maximum 2 decimal places allowed")
+        return v
+
+
+class ClientRateHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    client_id: uuid.UUID
+    field_name: str
+    previous_value: float
+    new_value: float
+    effective_date: datetime
+    changed_by: uuid.UUID
+
+
+class ClientRateHistoryListResponse(BaseModel):
+    items: list[ClientRateHistoryResponse]
     total: int
     page: int
     page_size: int

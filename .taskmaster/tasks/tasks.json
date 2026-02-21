@@ -365,9 +365,10 @@
               1
             ],
             "details": "Add `PUT /clients/{client_id}/rates` endpoint in `api/v1/clients.py`. Create `ClientRateUpdate` Pydantic schema with fields: rate_first_collection (Decimal, positive), rate_second_collection (Decimal, positive), rate_priority (Decimal, positive). All rates should be validated to be greater than zero and have maximum 2 decimal places. Implement partial update support - only update provided fields. Store rate history in a separate `client_rate_history` table for audit trail with effective_date, previous_rate, new_rate, and changed_by fields. Add `GET /clients/{client_id}/rates` to retrieve current rates. Add `GET /clients/{client_id}/rates/history` to retrieve rate change history with pagination. Ensure rate changes are logged in audit system. Include credit_limit validation if payment_terms is 'postpaid'.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test rate update with valid decimal values. Verify negative rate values are rejected. Test partial updates only modify specified fields. Verify rate history is created on each update. Test rate history endpoint returns chronological changes. Verify credit_limit is required for postpaid clients. Test unauthorized access is blocked.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:27:22.250Z"
           },
           {
             "id": 3,
@@ -420,7 +421,7 @@
         "complexity": 6,
         "recommendedSubtasks": 6,
         "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
-        "updatedAt": "2026-02-21T19:22:58.370Z"
+        "updatedAt": "2026-02-21T19:27:22.250Z"
       },
       {
         "id": "5",
@@ -1678,7 +1679,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:22:58.370Z",
+      "lastModified": "2026-02-21T19:27:22.251Z",
       "taskCount": 18,
       "completedCount": 3,
       "tags": [
