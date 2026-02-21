@@ -1,7 +1,8 @@
+import enum
 import uuid
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Boolean, ForeignKey, Index, Integer, Numeric, String
+from sqlalchemy import Boolean, ForeignKey, Index, Integer, Numeric, String, Text
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -11,6 +12,15 @@ if TYPE_CHECKING:
     from .orders import Order
 
 
+class SampleType(enum.StrEnum):
+    BLOOD_EDTA = "BLOOD_EDTA"
+    BLOOD_SST = "BLOOD_SST"
+    BLOOD_FLUORIDE = "BLOOD_FLUORIDE"
+    URINE = "URINE"
+    STOOL = "STOOL"
+    SWAB = "SWAB"
+
+
 class Package(UUIDMixin, TimestampMixin, Base):
     __tablename__ = "packages"
 
@@ -18,7 +28,10 @@ class Package(UUIDMixin, TimestampMixin, Base):
     code: Mapped[str] = mapped_column(
         String(50), unique=True, nullable=False, index=True
     )
-    # JSON array of sample type strings e.g. ["serum", "plasma"]
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    preparation_instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
+    tat_hours: Mapped[int] = mapped_column(Integer, nullable=False, default=24)
+    # JSON array of sample type strings e.g. ["BLOOD_EDTA", "URINE"]
     sample_types: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     base_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
@@ -35,6 +48,7 @@ class Package(UUIDMixin, TimestampMixin, Base):
         kwargs.setdefault("is_active", True)
         kwargs.setdefault("base_price", 0)
         kwargs.setdefault("sample_types", [])
+        kwargs.setdefault("tat_hours", 24)
         super().__init__(**kwargs)
 
     def __repr__(self) -> str:
