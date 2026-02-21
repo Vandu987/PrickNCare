@@ -4,8 +4,10 @@ from app.api.v1.accessioning import router as accessioning_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.clients import router as clients_router
 from app.api.v1.health import router as health_router
+from app.api.v1.invoices import router as invoices_router
 from app.api.v1.orders import router as orders_router
 from app.api.v1.packages import router as packages_router
+from app.api.v1.payments import router as payments_router
 from app.api.v1.phlebotomists import router as phlebotomists_router
 from app.api.v1.pricing import router as pricing_router
 from app.api.v1.zones import locality_router, nsa_router, pincode_router, zone_router
@@ -26,3 +28,5 @@ router.include_router(orders_router)
 router.include_router(packages_router)
 router.include_router(pricing_router)
 router.include_router(accessioning_router)
+router.include_router(invoices_router)
+router.include_router(payments_router)

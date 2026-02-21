@@ -11,6 +11,7 @@ from sqlalchemy import (
     Index,
     Integer,
     Numeric,
+    String,
     Text,
     UniqueConstraint,
 )
@@ -21,8 +22,73 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base, TimestampMixin, UUIDMixin
 
 if TYPE_CHECKING:
+    from .orders import Order
     from .phlebotomists import Phlebotomist
     from .users import User
+
+
+class OrderPaymentMode(str, enum.Enum):
+    CASH = "cash"
+    UPI = "upi"
+    CARD = "card"
+    WALLET = "wallet"
+    POSTPAID = "postpaid"
+
+
+class OrderPaymentStatus(str, enum.Enum):
+    PENDING = "pending"
+    COLLECTED = "collected"
+    VERIFIED = "verified"
+    RECONCILED = "reconciled"
+
+
+class Payment(UUIDMixin, TimestampMixin, Base):
+    __tablename__ = "payments"
+
+    order_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("orders.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
+    mode: Mapped[OrderPaymentMode] = mapped_column(
+        Enum(OrderPaymentMode, name="order_payment_mode"),
+        nullable=False,
+    )
+    status: Mapped[OrderPaymentStatus] = mapped_column(
+        Enum(OrderPaymentStatus, name="order_payment_status"),
+        nullable=False,
+        default=OrderPaymentStatus.COLLECTED,
+    )
+    transaction_ref: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    collected_by: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=False,
+    )
+    collected_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Relationships
+    order: Mapped["Order"] = relationship("Order", foreign_keys=[order_id])
+    collector: Mapped["User"] = relationship("User", foreign_keys=[collected_by])
+
+    __table_args__ = (
+        Index("ix_payments_collected_by", "collected_by"),
+        Index("ix_payments_collected_at", "collected_at"),
+    )
+
+    def __init__(self, **kwargs: Any) -> None:
+        kwargs.setdefault("id", uuid.uuid4())
+        kwargs.setdefault("status", OrderPaymentStatus.COLLECTED)
+        super().__init__(**kwargs)
+
+    def __repr__(self) -> str:
+        return f"<Payment {self.id} order={self.order_id} amount={self.amount}>"
 
 
 class DiscrepancyType(str, enum.Enum):

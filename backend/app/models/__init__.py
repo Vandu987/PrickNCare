@@ -2,6 +2,7 @@ from .audit import AuditLog
 from .base import Base, TimestampMixin, UUIDMixin
 from .client_rate_history import ClientRateHistory
 from .clients import Client, ClientUser, PaymentTerms
+from .invoices import Invoice, InvoiceLineItem, InvoiceStatus
 from .nsa import NSARecord
 from .orders import (
     Order,
@@ -14,7 +15,13 @@ from .orders import (
     PaymentStatus,
 )
 from .packages import OrderPackage, Package
-from .payments import DiscrepancyType, PhlebotomistCashReconciliation
+from .payments import (
+    DiscrepancyType,
+    OrderPaymentMode,
+    OrderPaymentStatus,
+    Payment,
+    PhlebotomistCashReconciliation,
+)
 from .phlebotomist_documents import PhlebotomistDocument
 from .phlebotomist_leaves import PhlebotomistLeave
 from .phlebotomist_locations import PhlebotomistLocation
@@ -55,9 +62,15 @@ __all__ = [
     "SampleIntegrity",
     "SampleStatus",
     "VialType",
+    "Payment",
+    "OrderPaymentMode",
+    "OrderPaymentStatus",
     "PhlebotomistCashReconciliation",
     "DiscrepancyType",
     "AuditLog",
     "ClientRateHistory",
+    "Invoice",
+    "InvoiceLineItem",
+    "InvoiceStatus",
     "NSARecord",
 ]
