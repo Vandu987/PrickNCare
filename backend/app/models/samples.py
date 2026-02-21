@@ -14,6 +14,14 @@ if TYPE_CHECKING:
     from .users import User
 
 
+class VialType(str, enum.Enum):
+    EDTA_PURPLE = "edta_purple"
+    SST_YELLOW = "sst_yellow"
+    FLUORIDE_GREY = "fluoride_grey"
+    URINE_CONTAINER = "urine_container"
+    OTHER = "other"
+
+
 class SampleIntegrity(str, enum.Enum):
     OK = "ok"
     LIPEMIC = "lipemic"
@@ -52,8 +60,14 @@ class SampleAccessioning(UUIDMixin, TimestampMixin, Base):
         index=True,
     )
     rejection_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    # Receiving
+    # Receiving / accessioning
+    accessioned_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
     received_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
@@ -67,6 +81,9 @@ class SampleAccessioning(UUIDMixin, TimestampMixin, Base):
     order: Mapped["Order"] = relationship("Order", back_populates="samples")
     received_by_user: Mapped["User | None"] = relationship(
         "User", foreign_keys=[received_by]
+    )
+    accessioned_by_user: Mapped["User | None"] = relationship(
+        "User", foreign_keys=[accessioned_by]
     )
 
     __table_args__ = (Index("ix_sample_accessionings_status", "status"),)

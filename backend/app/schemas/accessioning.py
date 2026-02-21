@@ -67,6 +67,52 @@ class SampleAccessioningSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# ── Task 8.2 — Accessioning CRUD ─────────────────────────────────────────
+
+
+class SampleItemCreate(BaseModel):
+    vial_type: str
+    quantity: int = 1
+    integrity: str = "ok"
+    status: str = "accepted"
+    rejection_reason: str | None = None
+
+
+class AccessioningCreate(BaseModel):
+    samples: list[SampleItemCreate]
+    notes: str | None = None
+
+
+class SampleItemUpdate(BaseModel):
+    vial_type: str | None = None
+    quantity: int | None = None
+    integrity: str | None = None
+    status: str | None = None
+    rejection_reason: str | None = None
+    notes: str | None = None
+
+
+class AccessioningDetailItem(BaseModel):
+    id: uuid.UUID
+    order_id: uuid.UUID
+    vial_type: str
+    quantity: int
+    integrity: str
+    status: str
+    rejection_reason: str | None
+    notes: str | None
+    accessioned_by: uuid.UUID | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AccessioningDetailResponse(BaseModel):
+    order_id: uuid.UUID
+    items: list[AccessioningDetailItem]
+
+
 class OrderSummaryResponse(BaseModel):
     order_id: uuid.UUID
     booking_id: str

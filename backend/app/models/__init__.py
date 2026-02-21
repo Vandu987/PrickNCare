@@ -19,7 +19,7 @@ from .phlebotomist_documents import PhlebotomistDocument
 from .phlebotomist_leaves import PhlebotomistLeave
 from .phlebotomist_locations import PhlebotomistLocation
 from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
-from .samples import SampleAccessioning, SampleIntegrity, SampleStatus
+from .samples import SampleAccessioning, SampleIntegrity, SampleStatus, VialType
 from .users import User, UserRole
 from .zones import City, Locality, Pincode, Zone
 
@@ -54,6 +54,7 @@ __all__ = [
     "SampleAccessioning",
     "SampleIntegrity",
     "SampleStatus",
+    "VialType",
     "PhlebotomistCashReconciliation",
     "DiscrepancyType",
     "AuditLog",

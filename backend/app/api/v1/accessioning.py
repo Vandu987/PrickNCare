@@ -14,9 +14,12 @@ from app.api.deps import RoleChecker, require_roles
 from app.core.database import get_db
 from app.models.orders import Order, OrderStatus
 from app.models.packages import OrderPackage
-from app.models.samples import SampleAccessioning
+from app.models.samples import SampleAccessioning, SampleIntegrity, SampleStatus
 from app.models.users import User
 from app.schemas.accessioning import (
+    AccessioningCreate,
+    AccessioningDetailItem,
+    AccessioningDetailResponse,
     ClientInfo,
     OrderSummaryResponse,
     OrderTestSummary,
@@ -24,6 +27,7 @@ from app.schemas.accessioning import (
     PendingSampleItem,
     PhlebotomistInfo,
     SampleAccessioningSummary,
+    SampleItemUpdate,
 )
 
 router = APIRouter(prefix="/accessioning", tags=["accessioning"])
@@ -107,6 +111,197 @@ async def list_pending_samples(
         )
 
     return PendingAccessioningResponse(total=total, items=items)
+
+
+# ── Task 8.2 — Accessioning CRUD ────────────────────────────────────────
+
+
+@router.post("/{order_id}", status_code=status.HTTP_201_CREATED)
+async def create_accessioning(
+    order_id: uuid.UUID,
+    payload: AccessioningCreate,
+    user: User = Depends(_admin_only),
+    db: AsyncSession = Depends(get_db),
+) -> AccessioningDetailResponse:
+    """Create accessioning records for an order."""
+    # Validate order exists and is COLLECTED
+    order = await db.get(Order, order_id)
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+    if order.status != OrderStatus.COLLECTED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Order status must be COLLECTED, got {order.status.value}",
+        )
+
+    # Validate enums and create records
+    created: list[SampleAccessioning] = []
+    for sample in payload.samples:
+        try:
+            integrity_val = SampleIntegrity(sample.integrity)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid integrity value: {sample.integrity}",
+            ) from None
+        try:
+            status_val = SampleStatus(sample.status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid status value: {sample.status}",
+            ) from None
+
+        if status_val == SampleStatus.REJECTED and not sample.rejection_reason:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="rejection_reason is required when status is rejected",
+            )
+
+        record = SampleAccessioning(
+            order_id=order_id,
+            vial_type=sample.vial_type,
+            quantity=sample.quantity,
+            integrity=integrity_val,
+            status=status_val,
+            rejection_reason=sample.rejection_reason,
+            notes=payload.notes,
+            accessioned_by=user.id,
+        )
+        db.add(record)
+        created.append(record)
+
+    await db.commit()
+    for r in created:
+        await db.refresh(r)
+
+    return AccessioningDetailResponse(
+        order_id=order_id,
+        items=[
+            AccessioningDetailItem(
+                id=r.id,
+                order_id=r.order_id,
+                vial_type=r.vial_type,
+                quantity=r.quantity,
+                integrity=r.integrity.value,
+                status=r.status.value,
+                rejection_reason=r.rejection_reason,
+                notes=r.notes,
+                accessioned_by=r.accessioned_by,
+                created_at=r.created_at,
+                updated_at=r.updated_at,
+            )
+            for r in created
+        ],
+    )
+
+
+@router.get("/{order_id}", response_model=AccessioningDetailResponse)
+async def get_accessioning(
+    order_id: uuid.UUID,
+    user: User = Depends(_admin_only),
+    db: AsyncSession = Depends(get_db),
+) -> AccessioningDetailResponse:
+    """Get accessioning details for an order."""
+    result = await db.execute(
+        select(SampleAccessioning).where(SampleAccessioning.order_id == order_id)
+    )
+    items = result.scalars().all()
+
+    if not items:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No accessioning records found for this order",
+        )
+
+    return AccessioningDetailResponse(
+        order_id=order_id,
+        items=[
+            AccessioningDetailItem(
+                id=r.id,
+                order_id=r.order_id,
+                vial_type=r.vial_type,
+                quantity=r.quantity,
+                integrity=r.integrity.value,
+                status=r.status.value,
+                rejection_reason=r.rejection_reason,
+                notes=r.notes,
+                accessioned_by=r.accessioned_by,
+                created_at=r.created_at,
+                updated_at=r.updated_at,
+            )
+            for r in items
+        ],
+    )
+
+
+@router.put("/record/{accessioning_id}", response_model=AccessioningDetailItem)
+async def update_accessioning(
+    accessioning_id: uuid.UUID,
+    payload: SampleItemUpdate,
+    user: User = Depends(_admin_only),
+    db: AsyncSession = Depends(get_db),
+) -> AccessioningDetailItem:
+    """Update a single accessioning record."""
+    record = await db.get(SampleAccessioning, accessioning_id)
+    if not record:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Accessioning record not found",
+        )
+
+    if payload.vial_type is not None:
+        record.vial_type = payload.vial_type
+    if payload.quantity is not None:
+        record.quantity = payload.quantity
+    if payload.integrity is not None:
+        try:
+            record.integrity = SampleIntegrity(payload.integrity)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid integrity value: {payload.integrity}",
+            ) from None
+    if payload.status is not None:
+        try:
+            new_status = SampleStatus(payload.status)
+        except ValueError:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Invalid status value: {payload.status}",
+            ) from None
+        if new_status == SampleStatus.REJECTED and not (
+            payload.rejection_reason or record.rejection_reason
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="rejection_reason is required when status is rejected",
+            )
+        record.status = new_status
+    if payload.rejection_reason is not None:
+        record.rejection_reason = payload.rejection_reason
+    if payload.notes is not None:
+        record.notes = payload.notes
+
+    await db.commit()
+    await db.refresh(record)
+
+    return AccessioningDetailItem(
+        id=record.id,
+        order_id=record.order_id,
+        vial_type=record.vial_type,
+        quantity=record.quantity,
+        integrity=record.integrity.value,
+        status=record.status.value,
+        rejection_reason=record.rejection_reason,
+        notes=record.notes,
+        accessioned_by=record.accessioned_by,
+        created_at=record.created_at,
+        updated_at=record.updated_at,
+    )
 
 
 # ── Task 8.4 — Barcode scan ─────────────────────────────────────────────
