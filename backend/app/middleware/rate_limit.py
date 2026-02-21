@@ -1,4 +1,4 @@
-"""Redis-backed sliding-window rate limiting middleware — task 3.6.
+"""Redis-backed sliding-window rate limiting middleware — task 3.6 / 16.4.
 
 Limits are applied in this priority order (most specific wins):
   1. Per-endpoint override (registered via ``add_endpoint_limit``)
@@ -12,13 +12,19 @@ Responses include standard headers::
     X-RateLimit-Reset     – UNIX timestamp when the window resets
     Retry-After           – seconds to wait (only on 429)
 
+When Redis is unavailable an **in-memory** sliding-window fallback is used
+so the service stays protected even without Redis.
+
 Whitelisted IPs (e.g. internal services) bypass all limits.
 """
 
 from __future__ import annotations
 
+import logging
 import time
+from collections import defaultdict
 from collections.abc import Callable, Coroutine
+from threading import Lock
 from typing import Any
 
 from fastapi import Request, Response
@@ -27,13 +33,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 
 from app.core.config import settings
-from app.core.redis import get_redis
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
 
-_RL_PREFIX = "rl:"  # rl:<key> → JSON list of timestamps
+_RL_PREFIX = "rl:"  # rl:<key> → sorted-set of timestamps
 
 # Whitelisted client IPs that always bypass rate limiting.
 _WHITELISTED_IPS: frozenset[str] = frozenset({"127.0.0.1", "::1"})
@@ -51,6 +58,8 @@ _ROLE_LIMITS: dict[str, int] = {
 _ENDPOINT_LIMITS: dict[str, tuple[int, int]] = {
     "/api/v1/auth/login": (settings.RATE_LIMIT_LOGIN, 60),
     "/api/v1/auth/otp/request": (settings.RATE_LIMIT_LOGIN, 60),
+    "/api/v1/auth/register": (settings.RATE_LIMIT_AUTH, 60),
+    "/api/v1/auth/": (settings.RATE_LIMIT_AUTH, 60),
 }
 
 _DEFAULT_WINDOW = 60  # seconds
@@ -72,7 +81,44 @@ def add_endpoint_limit(path_prefix: str, max_requests: int, window: int = 60) ->
 
 
 # ---------------------------------------------------------------------------
-# Sliding-window counter (Redis list of timestamps)
+# In-memory fallback (thread-safe sliding window using sorted lists)
+# ---------------------------------------------------------------------------
+
+_mem_store: dict[str, list[float]] = defaultdict(list)
+_mem_lock = Lock()
+
+
+def _inmemory_check(key: str, max_requests: int, window: int) -> tuple[bool, int, int]:
+    """Thread-safe in-memory sliding window check."""
+    now = time.time()
+    window_start = now - window
+    full_key = f"{_RL_PREFIX}{key}"
+
+    with _mem_lock:
+        timestamps = _mem_store[full_key]
+        # Prune expired entries
+        _mem_store[full_key] = timestamps = [
+            ts for ts in timestamps if ts > window_start
+        ]
+
+        if len(timestamps) >= max_requests:
+            reset_ts = int(timestamps[0] + window) if timestamps else int(now + window)
+            return False, 0, reset_ts
+
+        timestamps.append(now)
+        remaining = max_requests - len(timestamps)
+        reset_ts = int(now + window)
+        return True, remaining, reset_ts
+
+
+def _clear_inmemory_store() -> None:
+    """Clear the in-memory store (for testing)."""
+    with _mem_lock:
+        _mem_store.clear()
+
+
+# ---------------------------------------------------------------------------
+# Sliding-window counter (Redis sorted-set of timestamps)
 # ---------------------------------------------------------------------------
 
 
@@ -81,20 +127,28 @@ async def _sliding_window_check(
     max_requests: int,
     window: int,
 ) -> tuple[bool, int, int]:
-    """Atomic sliding-window check using a Redis list.
+    """Atomic sliding-window check using a Redis sorted set.
+
+    Falls back to in-memory if Redis is unavailable.
 
     Returns ``(allowed, remaining, reset_ts)`` where:
       - ``allowed`` – True if the request should be served
       - ``remaining`` – requests left after this one
       - ``reset_ts``  – UNIX timestamp of window expiry
     """
-    redis = get_redis()
+    try:
+        from app.core.redis import get_redis
+
+        redis = get_redis()
+        # Quick connectivity check on first use is handled by eval itself.
+    except Exception:
+        logger.warning("Redis unavailable, using in-memory rate limiter")
+        return _inmemory_check(key, max_requests, window)
+
     now = time.time()
     window_start = now - window
     full_key = f"{_RL_PREFIX}{key}"
 
-    # Lua script: remove expired entries, append current ts, get count.
-    # All ops are atomic.
     lua_script = """
 local key        = KEYS[1]
 local now        = tonumber(ARGV[1])
@@ -102,14 +156,11 @@ local window_start = tonumber(ARGV[2])
 local window     = tonumber(ARGV[3])
 local max_req    = tonumber(ARGV[4])
 
--- Remove timestamps older than the window
 redis.call('ZREMRANGEBYSCORE', key, '-inf', window_start)
 
--- Count current requests in window
 local count = redis.call('ZCARD', key)
 
 if count >= max_req then
-    -- Get oldest timestamp to calculate reset time
     local oldest = redis.call('ZRANGE', key, 0, 0, 'WITHSCORES')
     local reset_ts = now + window
     if #oldest >= 2 then
@@ -118,7 +169,6 @@ if count >= max_req then
     return {0, 0, math.floor(reset_ts)}
 end
 
--- Add current request timestamp (score = ts, member = ts:random)
 redis.call('ZADD', key, now, now .. ':' .. math.random(1000000))
 redis.call('EXPIRE', key, window + 1)
 
@@ -127,19 +177,23 @@ local remaining = max_req - new_count
 local reset_ts  = math.floor(now + window)
 return {1, remaining, reset_ts}
 """
-    result = await redis.eval(
-        lua_script,
-        1,
-        full_key,
-        str(now),
-        str(window_start),
-        str(window),
-        str(max_requests),
-    )
-    allowed = bool(result[0])
-    remaining = int(result[1])
-    reset_ts = int(result[2])
-    return allowed, remaining, reset_ts
+    try:
+        result = await redis.eval(
+            lua_script,
+            1,
+            full_key,
+            str(now),
+            str(window_start),
+            str(window),
+            str(max_requests),
+        )
+        allowed = bool(result[0])
+        remaining = int(result[1])
+        reset_ts = int(result[2])
+        return allowed, remaining, reset_ts
+    except Exception:
+        logger.warning("Redis eval failed, falling back to in-memory rate limiter")
+        return _inmemory_check(key, max_requests, window)
 
 
 # ---------------------------------------------------------------------------
@@ -149,6 +203,8 @@ return {1, remaining, reset_ts}
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Sliding-window rate limiting middleware.
+
+    Disabled entirely when ``settings.RATE_LIMIT_ENABLED`` is ``False``.
 
     Mount **after** the application is created::
 
@@ -164,6 +220,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         request: Request,
         call_next: Callable[[Request], Coroutine[Any, Any, Response]],
     ) -> Response:
+        # Global kill-switch
+        if not settings.RATE_LIMIT_ENABLED:
+            return await call_next(request)
+
         client_ip = self._get_client_ip(request)
 
         # Whitelisted IPs bypass all limits.
@@ -173,7 +233,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         path = request.url.path
         max_requests, window = self._resolve_limit(path, request)
 
-        # Build a rate-limit key scoped to IP (+ path for endpoint overrides).
+        # Build a rate-limit key scoped to IP + user_id (+ path for endpoint overrides).
         rl_key = self._build_key(client_ip, path, request)
 
         allowed, remaining, reset_ts = await _sliding_window_check(
@@ -230,10 +290,21 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     @staticmethod
     def _build_key(client_ip: str, path: str, request: Request) -> str:
-        """Derive a Redis key for this (client, path) combination."""
-        # Endpoint-specific: scope to IP + path prefix.
+        """Derive a Redis key for this (client, path) combination.
+
+        Includes ``user_id`` when the request is authenticated so that
+        each user gets their own bucket rather than sharing one with
+        all users behind the same IP / NAT.
+        """
+        # Extract user_id if present (set by auth dependency).
+        user_id: str | None = getattr(request.state, "user_id", None)
+        identity = f"ip:{client_ip}"
+        if user_id:
+            identity = f"ip:{client_ip}:uid:{user_id}"
+
+        # Endpoint-specific: scope to identity + path prefix.
         for prefix in _ENDPOINT_LIMITS:
             if path.startswith(prefix):
-                return f"ip:{client_ip}:ep:{prefix}"
-        # Role-based or default: scope to IP only (global bucket per client).
-        return f"ip:{client_ip}"
+                return f"{identity}:ep:{prefix}"
+        # Role-based or default: scope to identity only (global bucket).
+        return identity
