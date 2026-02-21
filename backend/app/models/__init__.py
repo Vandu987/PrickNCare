@@ -11,6 +11,7 @@ from .orders import (
     PaymentStatus,
 )
 from .packages import OrderPackage, Package
+from .payments import DiscrepancyType, PhlebotomistCashReconciliation
 from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from .samples import SampleAccessioning, SampleIntegrity, SampleStatus
 from .users import User, UserRole
@@ -44,4 +45,6 @@ __all__ = [
     "SampleAccessioning",
     "SampleIntegrity",
     "SampleStatus",
+    "PhlebotomistCashReconciliation",
+    "DiscrepancyType",
 ]
