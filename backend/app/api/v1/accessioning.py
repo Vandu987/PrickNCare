@@ -157,6 +157,84 @@ async def list_pending_samples(
     return PendingAccessioningResponse(total=total, items=items)
 
 
+# ── Task 8.5 — Accessioning report / analytics ──────────────────────────
+
+
+@router.get("/report", response_model=AccessioningReportResponse)
+async def accessioning_report(
+    date_from: date = Query(..., description="Start date (inclusive)"),
+    date_to: date = Query(..., description="End date (inclusive)"),
+    integrity: SampleIntegrity | None = Query(None, description="Filter by integrity"),
+    status: SampleStatus | None = Query(None, description="Filter by status"),
+    user: User = Depends(_admin_only),
+    db: AsyncSession = Depends(get_db),
+) -> AccessioningReportResponse:
+    """Accessioning analytics report for a date range."""
+
+    base = select(SampleAccessioning).where(
+        func.date(SampleAccessioning.created_at) >= date_from,
+        func.date(SampleAccessioning.created_at) <= date_to,
+    )
+    if integrity is not None:
+        base = base.where(SampleAccessioning.integrity == integrity)
+    if status is not None:
+        base = base.where(SampleAccessioning.status == status)
+
+    result = await db.execute(base.options(selectinload(SampleAccessioning.order)))
+    samples = result.scalars().all()
+
+    total = len(samples)
+
+    # Breakdowns
+    integrity_counts: dict[str, int] = {}
+    status_counts: dict[str, int] = {}
+    order_ids: set[uuid.UUID] = set()
+    rejected: list[RejectedSampleDetail] = []
+
+    for s in samples:
+        i_val = s.integrity.value
+        integrity_counts[i_val] = integrity_counts.get(i_val, 0) + 1
+        s_val = s.status.value
+        status_counts[s_val] = status_counts.get(s_val, 0) + 1
+        order_ids.add(s.order_id)
+        if s.status == SampleStatus.REJECTED:
+            patient_name = s.order.patient_name if s.order else "Unknown"
+            rejected.append(
+                RejectedSampleDetail(
+                    order_id=s.order_id,
+                    patient_name=patient_name,
+                    rejection_reason=s.rejection_reason,
+                    vial_type=s.vial_type,
+                )
+            )
+
+    def _pct(count: int) -> float:
+        return round(count / total * 100, 2) if total else 0.0
+
+    breakdown_integrity = {
+        k: IntegrityBreakdownItem(count=v, percentage=_pct(v))
+        for k, v in integrity_counts.items()
+    }
+    breakdown_status = {
+        k: StatusBreakdownItem(count=v, percentage=_pct(v))
+        for k, v in status_counts.items()
+    }
+
+    rejection_count = status_counts.get(SampleStatus.REJECTED.value, 0)
+    hold_count = status_counts.get(SampleStatus.HOLD.value, 0)
+    avg_per_order = round(total / len(order_ids), 2) if order_ids else 0.0
+
+    return AccessioningReportResponse(
+        total_samples_received=total,
+        breakdown_by_integrity=breakdown_integrity,
+        breakdown_by_status=breakdown_status,
+        rejection_rate=_pct(rejection_count),
+        hold_rate=_pct(hold_count),
+        average_samples_per_order=avg_per_order,
+        rejected_samples_list=rejected,
+    )
+
+
 # ── Task 8.2 — Accessioning CRUD ────────────────────────────────────────
 
 
@@ -357,84 +435,6 @@ async def update_accessioning(
         accessioned_by=record.accessioned_by,
         created_at=record.created_at,
         updated_at=record.updated_at,
-    )
-
-
-# ── Task 8.5 — Accessioning report / analytics ──────────────────────────
-
-
-@router.get("/report", response_model=AccessioningReportResponse)
-async def accessioning_report(
-    date_from: date = Query(..., description="Start date (inclusive)"),
-    date_to: date = Query(..., description="End date (inclusive)"),
-    integrity: SampleIntegrity | None = Query(None, description="Filter by integrity"),
-    status: SampleStatus | None = Query(None, description="Filter by status"),
-    user: User = Depends(_admin_only),
-    db: AsyncSession = Depends(get_db),
-) -> AccessioningReportResponse:
-    """Accessioning analytics report for a date range."""
-
-    base = select(SampleAccessioning).where(
-        func.date(SampleAccessioning.created_at) >= date_from,
-        func.date(SampleAccessioning.created_at) <= date_to,
-    )
-    if integrity is not None:
-        base = base.where(SampleAccessioning.integrity == integrity)
-    if status is not None:
-        base = base.where(SampleAccessioning.status == status)
-
-    result = await db.execute(base.options(selectinload(SampleAccessioning.order)))
-    samples = result.scalars().all()
-
-    total = len(samples)
-
-    # Breakdowns
-    integrity_counts: dict[str, int] = {}
-    status_counts: dict[str, int] = {}
-    order_ids: set[uuid.UUID] = set()
-    rejected: list[RejectedSampleDetail] = []
-
-    for s in samples:
-        i_val = s.integrity.value
-        integrity_counts[i_val] = integrity_counts.get(i_val, 0) + 1
-        s_val = s.status.value
-        status_counts[s_val] = status_counts.get(s_val, 0) + 1
-        order_ids.add(s.order_id)
-        if s.status == SampleStatus.REJECTED:
-            patient_name = s.order.patient_name if s.order else "Unknown"
-            rejected.append(
-                RejectedSampleDetail(
-                    order_id=s.order_id,
-                    patient_name=patient_name,
-                    rejection_reason=s.rejection_reason,
-                    vial_type=s.vial_type,
-                )
-            )
-
-    def _pct(count: int) -> float:
-        return round(count / total * 100, 2) if total else 0.0
-
-    breakdown_integrity = {
-        k: IntegrityBreakdownItem(count=v, percentage=_pct(v))
-        for k, v in integrity_counts.items()
-    }
-    breakdown_status = {
-        k: StatusBreakdownItem(count=v, percentage=_pct(v))
-        for k, v in status_counts.items()
-    }
-
-    rejection_count = status_counts.get(SampleStatus.REJECTED.value, 0)
-    hold_count = status_counts.get(SampleStatus.HOLD.value, 0)
-    avg_per_order = round(total / len(order_ids), 2) if order_ids else 0.0
-
-    return AccessioningReportResponse(
-        total_samples_received=total,
-        breakdown_by_integrity=breakdown_integrity,
-        breakdown_by_status=breakdown_status,
-        rejection_rate=_pct(rejection_count),
-        hold_rate=_pct(hold_count),
-        average_samples_per_order=avg_per_order,
-        rejected_samples_list=rejected,
     )
 
 
