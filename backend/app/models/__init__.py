@@ -1,5 +1,6 @@
 from .base import Base, TimestampMixin, UUIDMixin
 from .clients import Client, ClientUser, PaymentTerms
+from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from .users import User, UserRole
 
 __all__ = [
@@ -11,4 +12,6 @@ __all__ = [
     "Client",
     "ClientUser",
     "PaymentTerms",
+    "Phlebotomist",
+    "PhlebotomistZoneAssignment",
 ]
