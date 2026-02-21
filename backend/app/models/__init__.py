@@ -2,6 +2,7 @@ from .base import Base, TimestampMixin, UUIDMixin
 from .clients import Client, ClientUser, PaymentTerms
 from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from .users import User, UserRole
+from .zones import City, Locality, Pincode, Zone
 
 __all__ = [
     "Base",
@@ -14,4 +15,8 @@ __all__ = [
     "PaymentTerms",
     "Phlebotomist",
     "PhlebotomistZoneAssignment",
+    "City",
+    "Zone",
+    "Pincode",
+    "Locality",
 ]
