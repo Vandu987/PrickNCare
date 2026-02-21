@@ -10,6 +10,7 @@ class AppConstants {
   static const String biometricRoute = '/biometric';
   static const String profileRoute = '/profile';
   static const String attendanceRoute = '/attendance';
+  static const String navigationRoute = '/navigation';
 
   // Collection Status
   static const String statusPending = 'pending';

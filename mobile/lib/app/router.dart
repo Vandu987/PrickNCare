@@ -11,6 +11,7 @@ import '../features/orders/presentation/screens/orders_screen.dart';
 import '../features/orders/presentation/screens/order_detail_screen.dart';
 import '../features/collection/presentation/screens/collection_screen.dart';
 import '../features/attendance/screens/attendance_screen.dart';
+import '../features/maps/screens/navigation_screen.dart';
 import '../features/splash/presentation/screens/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -81,6 +82,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id']!;
           return CollectionScreen(orderId: id);
+        },
+      ),
+      GoRoute(
+        path: AppConstants.navigationRoute,
+        builder: (context, state) {
+          final args = state.extra as Map<String, dynamic>;
+          return NavigationScreen(
+            patientLat: args['lat'] as double,
+            patientLng: args['lng'] as double,
+            patientName: args['name'] as String,
+            patientAddress: args['address'] as String,
+          );
         },
       ),
     ],

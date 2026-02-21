@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/loading_widget.dart';
 import '../../../../shared/widgets/error_widget.dart';
@@ -81,13 +83,36 @@ class _OrderDetailBody extends ConsumerWidget {
               Text(order.address, style: Theme.of(context).textTheme.bodyLarge),
               if (order.latitude != null && order.longitude != null) ...[
                 const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _openMap(order.latitude!, order.longitude!),
-                    icon: const Icon(Icons.map),
-                    label: const Text('Open in Maps'),
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _openMap(order.latitude!, order.longitude!),
+                        icon: const Icon(Icons.map),
+                        label: const Text('Open in Maps'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => context.push(
+                          AppConstants.navigationRoute,
+                          extra: {
+                            'lat': order.latitude!,
+                            'lng': order.longitude!,
+                            'name': order.patientName,
+                            'address': order.address,
+                          },
+                        ),
+                        icon: const Icon(Icons.navigation, size: 18),
+                        label: const Text('Navigate'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],
