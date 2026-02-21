@@ -6,6 +6,7 @@
   "exports": {
     "./tailwind": "./tailwind/index.js",
     "./eslint": "./eslint/index.js",
+    "./prettier": "./prettier/index.js",
     "./typescript": "./typescript/tsconfig.json"
   }
 }

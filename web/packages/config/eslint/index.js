@@ -2,5 +2,7 @@ module.exports = {
   extends: ["next/core-web-vitals"],
   rules: {
     "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "prefer-const": "error",
+    "no-console": ["warn", { allow: ["warn", "error"] }],
   },
 };

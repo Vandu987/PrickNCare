@@ -11,7 +11,10 @@
     "build:client": "turbo build --filter=client"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.21",
+    "prettier": "^3.4.2"
   },
   "packageManager": "pnpm@10.15.1"
 }
