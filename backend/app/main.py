@@ -8,6 +8,9 @@ from app.api.v1.router import router as v1_router
 from app.core.config import settings
 from app.core.database import close_db, init_db
 from app.core.redis import close_redis
+from app.middleware.audit import AuditMiddleware
+from app.middleware.error_handler import register_exception_handlers
+from app.middleware.logging import RequestLoggingMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 
 
@@ -28,7 +31,12 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.add_middleware(RateLimitMiddleware)
+# Exception handlers (not middleware — registered separately).
+register_exception_handlers(app)
+
+# Middleware stack — add_middleware is LIFO: last added = outermost = first executed.
+# Desired request processing order:
+#   RequestLogging → Audit → RateLimit → CORS → route handler
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,
@@ -36,5 +44,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(AuditMiddleware)
+app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(v1_router, prefix="/api/v1")
