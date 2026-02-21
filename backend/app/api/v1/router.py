@@ -10,6 +10,7 @@ from app.api.v1.packages import router as packages_router
 from app.api.v1.payments import router as payments_router
 from app.api.v1.phlebotomists import router as phlebotomists_router
 from app.api.v1.pricing import router as pricing_router
+from app.api.v1.reconciliation import router as reconciliation_router
 from app.api.v1.zones import locality_router, nsa_router, pincode_router, zone_router
 from app.api.v1.zones import router as zones_router
 
@@ -30,3 +31,4 @@ router.include_router(pricing_router)
 router.include_router(accessioning_router)
 router.include_router(invoices_router)
 router.include_router(payments_router)
+router.include_router(reconciliation_router)
