@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import date
 from decimal import Decimal
-from enum import Enum as PyEnum
+from enum import StrEnum
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
@@ -446,7 +446,7 @@ async def zone_wise_report(
 # ---------------------------------------------------------------------------
 
 
-class GroupBy(str, PyEnum):
+class GroupBy(StrEnum):
     DAY = "day"
     WEEK = "week"
     MONTH = "month"
