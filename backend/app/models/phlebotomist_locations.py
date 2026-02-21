@@ -1,7 +1,6 @@
 """Phlebotomist location tracking — task 4.6."""
 
 import uuid
-
 from datetime import datetime
 
 from sqlalchemy import DateTime, Float, ForeignKey, Index

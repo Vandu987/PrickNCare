@@ -344,7 +344,7 @@
         "dependencies": [
           "3"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -416,16 +416,16 @@
               5
             ],
             "details": "Implement `GET /phlebotomists/{id}/metrics` accepting date_from and date_to query parameters. Calculate and return: total_collections (count of orders with status COLLECTED), successful_collections, failed_collections (UNCOLLECTED status), success_rate (percentage), average_rating (from order feedback), total_ratings_count, average_tat_minutes (time from assignment to collection), orders_on_time (within SLA), on_time_percentage, total_distance_km (if location tracking enabled), earnings (sum of collection fees). Query from orders table joining with feedback and calculate aggregates. Use database-level aggregation for performance. Cache results for same date range queries (1 hour TTL). Implement `PUT /phlebotomists/{id}/location` for mobile app with lat, lng, accuracy, timestamp parameters. Store in `phlebotomist_locations` table with phlebotomist_id, lat, lng, accuracy, recorded_at. Only phlebotomist can update their own location (verify JWT user_id matches). Optionally implement `GET /phlebotomists/{id}/location/history` for date range with admin access only. Add `GET /phlebotomists/{id}/location/current` for real-time tracking.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test metrics calculation with sample order data. Verify success_rate calculation is accurate. Test date range filtering returns correct subset. Test empty date range returns zeros not errors. Verify average calculations handle null ratings. Test location update stores correctly with timestamp. Verify only authenticated phlebotomist can update their location. Test location history returns chronological data. Verify caching improves response time for repeated queries. Test metrics endpoint performance with large datasets.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:38:28.043Z"
+            "updatedAt": "2026-02-21T19:39:46.172Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 6,
         "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
-        "updatedAt": "2026-02-21T19:38:28.043Z"
+        "updatedAt": "2026-02-21T19:39:46.172Z"
       },
       {
         "id": "5",
@@ -437,7 +437,7 @@
         "dependencies": [
           "3"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -445,9 +445,10 @@
             "description": "Build complete CRUD APIs for city management including create, list with filtering, update, and serviceable status toggle functionality.",
             "dependencies": [],
             "details": "Create api/v1/zones.py with City endpoints:\n\n1. **POST /cities** - Create city with name and state fields, validate uniqueness\n2. **GET /cities** - List cities with optional is_serviceable filter parameter\n3. **PUT /cities/{city_id}** - Update city details (name, state)\n4. **PUT /cities/{city_id}/serviceable** - Toggle is_serviceable boolean flag\n\nImplement Pydantic schemas:\n- CityCreate(name: str, state: str)\n- CityUpdate(name: Optional[str], state: Optional[str])\n- CityResponse(id: UUID, name: str, state: str, is_serviceable: bool, created_at: datetime)\n\nDatabase model should include: id (UUID), name, state, is_serviceable (default True), created_at, updated_at.\n\nAdd proper RBAC - require SUPER_ADMIN or CITY_ADMIN roles for create/update operations. List endpoint should be accessible to authenticated users.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test city creation with valid data and verify response structure. Test duplicate city name validation returns 400. Test list endpoint with and without is_serviceable filter. Test serviceable toggle updates database correctly. Verify RBAC - unauthorized roles cannot create/update cities. Test update endpoint modifies only specified fields.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:40:42.353Z"
           },
           {
             "id": 2,
@@ -501,7 +502,8 @@
         ],
         "complexity": 5,
         "recommendedSubtasks": 5,
-        "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration."
+        "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
+        "updatedAt": "2026-02-21T19:40:42.353Z"
       },
       {
         "id": "6",
@@ -1683,9 +1685,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:38:28.044Z",
+      "lastModified": "2026-02-21T19:40:42.353Z",
       "taskCount": 18,
-      "completedCount": 3,
+      "completedCount": 4,
       "tags": [
         "master"
       ]
