@@ -9,6 +9,7 @@ class AppConstants {
   static const String collectionRoute = '/collection/:id';
   static const String biometricRoute = '/biometric';
   static const String profileRoute = '/profile';
+  static const String attendanceRoute = '/attendance';
 
   // Collection Status
   static const String statusPending = 'pending';

@@ -10,6 +10,7 @@ import '../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../features/orders/presentation/screens/orders_screen.dart';
 import '../features/orders/presentation/screens/order_detail_screen.dart';
 import '../features/collection/presentation/screens/collection_screen.dart';
+import '../features/attendance/screens/attendance_screen.dart';
 import '../features/splash/presentation/screens/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -70,6 +71,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['id']!;
           return OrderDetailScreen(orderId: id);
         },
+      ),
+      GoRoute(
+        path: AppConstants.attendanceRoute,
+        builder: (context, state) => const AttendanceScreen(),
       ),
       GoRoute(
         path: AppConstants.collectionRoute,
