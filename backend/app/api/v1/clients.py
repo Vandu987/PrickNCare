@@ -73,10 +73,14 @@ async def list_clients(
 
     total = (await db.execute(count_query)).scalar_one()
     items = (
-        await db.execute(
-            query.order_by(Client.created_at.desc()).offset(skip).limit(limit)
+        (
+            await db.execute(
+                query.order_by(Client.created_at.desc()).offset(skip).limit(limit)
+            )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
 
     page = (skip // limit) + 1
 

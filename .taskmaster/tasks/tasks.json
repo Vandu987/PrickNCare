@@ -352,10 +352,10 @@
             "description": "Build complete CRUD API endpoints for client management including create, read (list and detail), update, and soft-delete operations with pagination, search by name/GST, and city filtering capabilities.",
             "dependencies": [],
             "details": "Create `api/v1/clients.py` with FastAPI router. Implement `POST /clients` for client creation with validation (name, gst_number, address, city, pincode, payment_terms). Implement `GET /clients` with query parameters: skip (default 0), limit (default 20, max 100), city filter, and search (case-insensitive partial match on name and gst_number). Use SQLAlchemy's `ilike` for search and proper pagination with total count in response. Implement `GET /clients/{client_id}` returning detailed client info including associated users and rate configuration. Implement `PUT /clients/{client_id}` for updates and `DELETE /clients/{client_id}` for soft-delete (set is_active=False). Create Pydantic schemas: `ClientCreate`, `ClientUpdate`, `ClientResponse`, `ClientDetailResponse`, `ClientListResponse` (with pagination metadata). Add role-based access control requiring SUPER_ADMIN or CITY_ADMIN roles.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test create client with valid/invalid data. Verify GST number format validation. Test pagination returns correct page sizes and total counts. Test search functionality matches partial name/GST. Test city filter returns only matching clients. Test 404 for non-existent client_id. Test soft-delete marks client inactive. Verify RBAC blocks unauthorized roles.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:13:03.480Z"
+            "updatedAt": "2026-02-21T19:22:58.370Z"
           },
           {
             "id": 2,
@@ -420,7 +420,7 @@
         "complexity": 6,
         "recommendedSubtasks": 6,
         "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
-        "updatedAt": "2026-02-21T19:13:03.480Z"
+        "updatedAt": "2026-02-21T19:22:58.370Z"
       },
       {
         "id": "5",
@@ -1678,7 +1678,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:13:03.482Z",
+      "lastModified": "2026-02-21T19:22:58.370Z",
       "taskCount": 18,
       "completedCount": 3,
       "tags": [
