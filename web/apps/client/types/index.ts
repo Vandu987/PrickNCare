@@ -73,6 +73,7 @@ export interface Order {
   pincode: string;
   notes?: string;
   assigned_phlebotomist?: User;
+  priority: "normal" | "high";
   total_amount: number;
   created_at: string;
   updated_at: string;
