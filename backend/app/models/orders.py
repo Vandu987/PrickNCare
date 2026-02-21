@@ -22,7 +22,9 @@ from .base import Base, TimestampMixin, UUIDMixin
 
 if TYPE_CHECKING:
     from .clients import Client
+    from .packages import OrderPackage
     from .phlebotomists import Phlebotomist
+    from .samples import SampleAccessioning
     from .users import User
     from .zones import Locality, Pincode
 
@@ -187,7 +189,12 @@ class Order(UUIDMixin, TimestampMixin, Base):
         back_populates="order",
         cascade="all, delete-orphan",
     )
-    # packages relationship added when OrderPackage is defined (task 2.6)
+    packages: Mapped[list["OrderPackage"]] = relationship(
+        "OrderPackage", back_populates="order", cascade="all, delete-orphan"
+    )
+    samples: Mapped[list["SampleAccessioning"]] = relationship(
+        "SampleAccessioning", back_populates="order", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (Index("ix_orders_status_date", "status", "appointment_date"),)
 
