@@ -445,10 +445,10 @@
             "description": "Build complete CRUD APIs for city management including create, list with filtering, update, and serviceable status toggle functionality.",
             "dependencies": [],
             "details": "Create api/v1/zones.py with City endpoints:\n\n1. **POST /cities** - Create city with name and state fields, validate uniqueness\n2. **GET /cities** - List cities with optional is_serviceable filter parameter\n3. **PUT /cities/{city_id}** - Update city details (name, state)\n4. **PUT /cities/{city_id}/serviceable** - Toggle is_serviceable boolean flag\n\nImplement Pydantic schemas:\n- CityCreate(name: str, state: str)\n- CityUpdate(name: Optional[str], state: Optional[str])\n- CityResponse(id: UUID, name: str, state: str, is_serviceable: bool, created_at: datetime)\n\nDatabase model should include: id (UUID), name, state, is_serviceable (default True), created_at, updated_at.\n\nAdd proper RBAC - require SUPER_ADMIN or CITY_ADMIN roles for create/update operations. List endpoint should be accessible to authenticated users.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test city creation with valid data and verify response structure. Test duplicate city name validation returns 400. Test list endpoint with and without is_serviceable filter. Test serviceable toggle updates database correctly. Verify RBAC - unauthorized roles cannot create/update cities. Test update endpoint modifies only specified fields.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:40:42.353Z"
+            "updatedAt": "2026-02-21T19:46:09.211Z"
           },
           {
             "id": 2,
@@ -503,7 +503,7 @@
         "complexity": 5,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
-        "updatedAt": "2026-02-21T19:40:42.353Z"
+        "updatedAt": "2026-02-21T19:46:09.211Z"
       },
       {
         "id": "6",
@@ -1685,7 +1685,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:40:42.353Z",
+      "lastModified": "2026-02-21T19:46:09.212Z",
       "taskCount": 18,
       "completedCount": 4,
       "tags": [

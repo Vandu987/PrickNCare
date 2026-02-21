@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 from app.models.users import User, UserRole
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -107,9 +106,7 @@ class TestClientCreate:
         assert resp.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_create_client_unauthorized(
-        self, phleb_client: AsyncClient
-    ) -> None:
+    async def test_create_client_unauthorized(self, phleb_client: AsyncClient) -> None:
         resp = await phleb_client.post(
             "/api/v1/clients",
             json={"name": "Unauthorized Lab"},
@@ -185,9 +182,7 @@ class TestClientUpdate:
         assert resp.json()["name"] == "New Name"
 
     @pytest.mark.asyncio
-    async def test_update_client_unauthorized(
-        self, phleb_client: AsyncClient
-    ) -> None:
+    async def test_update_client_unauthorized(self, phleb_client: AsyncClient) -> None:
         fake_id = uuid.uuid4()
         resp = await phleb_client.put(
             f"/api/v1/clients/{fake_id}",
@@ -230,9 +225,7 @@ class TestClientDelete:
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_delete_client_unauthorized(
-        self, phleb_client: AsyncClient
-    ) -> None:
+    async def test_delete_client_unauthorized(self, phleb_client: AsyncClient) -> None:
         fake_id = uuid.uuid4()
         resp = await phleb_client.delete(f"/api/v1/clients/{fake_id}")
         assert resp.status_code == 403
@@ -282,9 +275,7 @@ class TestClientRates:
         assert resp.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_update_rates_negative_value(
-        self, admin_client: AsyncClient
-    ) -> None:
+    async def test_update_rates_negative_value(self, admin_client: AsyncClient) -> None:
         resp = await admin_client.put(
             f"/api/v1/clients/{uuid.uuid4()}/rates",
             json={"rate_first_collection": -10},
@@ -327,21 +318,15 @@ class TestClientRates:
             json={"rate_first_collection": 100},
         )
 
-        resp = await admin_client.get(
-            f"/api/v1/clients/{client_id}/rates/history"
-        )
+        resp = await admin_client.get(f"/api/v1/clients/{client_id}/rates/history")
         assert resp.status_code == 200
         data = resp.json()
         assert "items" in data
         assert "total" in data
 
     @pytest.mark.asyncio
-    async def test_get_rate_history_not_found(
-        self, admin_client: AsyncClient
-    ) -> None:
-        resp = await admin_client.get(
-            f"/api/v1/clients/{uuid.uuid4()}/rates/history"
-        )
+    async def test_get_rate_history_not_found(self, admin_client: AsyncClient) -> None:
+        resp = await admin_client.get(f"/api/v1/clients/{uuid.uuid4()}/rates/history")
         assert resp.status_code == 404
 
 
@@ -427,9 +412,7 @@ class TestClientUsers:
         assert "total" in data
 
     @pytest.mark.asyncio
-    async def test_list_client_users_not_found(
-        self, admin_client: AsyncClient
-    ) -> None:
+    async def test_list_client_users_not_found(self, admin_client: AsyncClient) -> None:
         resp = await admin_client.get(f"/api/v1/clients/{uuid.uuid4()}/users")
         assert resp.status_code == 404
 
@@ -454,9 +437,7 @@ class TestClientUsers:
             pytest.skip("Cannot create user (DB issue)")
         user_id = user_resp.json()["user_id"]
 
-        resp = await admin_client.delete(
-            f"/api/v1/clients/{client_id}/users/{user_id}"
-        )
+        resp = await admin_client.delete(f"/api/v1/clients/{client_id}/users/{user_id}")
         assert resp.status_code == 204
 
     @pytest.mark.asyncio

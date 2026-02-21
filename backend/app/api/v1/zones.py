@@ -65,7 +65,9 @@ async def get_city(
     result = await db.execute(select(City).where(City.id == city_id))
     city = result.scalar_one_or_none()
     if city is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
     return city
 
 
@@ -79,7 +81,9 @@ async def update_city(
     result = await db.execute(select(City).where(City.id == city_id))
     city = result.scalar_one_or_none()
     if city is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
 
     update_data = body.model_dump(exclude_unset=True)
     for field, value in update_data.items():
@@ -100,7 +104,9 @@ async def toggle_city_serviceable(
     result = await db.execute(select(City).where(City.id == city_id))
     city = result.scalar_one_or_none()
     if city is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
 
     city.is_serviceable = body.is_serviceable
     await db.commit()
@@ -117,7 +123,9 @@ async def delete_city(
     result = await db.execute(select(City).where(City.id == city_id))
     city = result.scalar_one_or_none()
     if city is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
 
     # Eagerly load zones to check
     from sqlalchemy.orm import selectinload

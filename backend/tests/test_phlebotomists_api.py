@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import io
 import uuid
 from datetime import date, timedelta
 from unittest.mock import MagicMock
@@ -12,7 +11,6 @@ from httpx import ASGITransport, AsyncClient
 
 from app.main import app
 from app.models.users import User, UserRole
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -276,9 +274,7 @@ class TestPhlebotomistDocuments:
         phleb = await _create_phlebotomist(admin_client)
         if not phleb:
             pytest.skip("Cannot create phlebotomist (DB not configured)")
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{phleb['id']}/documents"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{phleb['id']}/documents")
         assert resp.status_code == 200
         assert "items" in resp.json()
 
@@ -301,9 +297,7 @@ class TestPhlebotomistDocuments:
         assert resp.json()["verified"] is True
 
     @pytest.mark.asyncio
-    async def test_verify_document_not_found(
-        self, admin_client: AsyncClient
-    ) -> None:
+    async def test_verify_document_not_found(self, admin_client: AsyncClient) -> None:
         phleb = await _create_phlebotomist(admin_client)
         if not phleb:
             pytest.skip("Cannot create phlebotomist (DB not configured)")
@@ -335,16 +329,12 @@ class TestPhlebotomistZones:
         phleb = await _create_phlebotomist(admin_client)
         if not phleb:
             pytest.skip("Cannot create phlebotomist (DB not configured)")
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{phleb['id']}/zones"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{phleb['id']}/zones")
         assert resp.status_code == 200
 
     @pytest.mark.asyncio
     async def test_zones_phleb_not_found(self, admin_client: AsyncClient) -> None:
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{uuid.uuid4()}/zones"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{uuid.uuid4()}/zones")
         assert resp.status_code == 404
 
 
@@ -414,9 +404,7 @@ class TestPhlebotomistLeave:
         phleb = await _create_phlebotomist(admin_client)
         if not phleb:
             pytest.skip("Cannot create phlebotomist (DB not configured)")
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{phleb['id']}/leave"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{phleb['id']}/leave")
         assert resp.status_code == 200
         assert "items" in resp.json()
 
@@ -564,9 +552,7 @@ class TestPhlebotomistLocation:
         assert "total" in data
 
     @pytest.mark.asyncio
-    async def test_location_history_not_found(
-        self, admin_client: AsyncClient
-    ) -> None:
+    async def test_location_history_not_found(self, admin_client: AsyncClient) -> None:
         resp = await admin_client.get(
             f"/api/v1/phlebotomists/{uuid.uuid4()}/location/history"
         )
@@ -582,9 +568,7 @@ class TestPhlebotomistMetrics:
         phleb = await _create_phlebotomist(admin_client)
         if not phleb:
             pytest.skip("Cannot create phlebotomist (DB not configured)")
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{phleb['id']}/metrics"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{phleb['id']}/metrics")
         assert resp.status_code == 200
         data = resp.json()
         assert data["total_collections"] == 0
@@ -592,15 +576,11 @@ class TestPhlebotomistMetrics:
 
     @pytest.mark.asyncio
     async def test_metrics_not_found(self, admin_client: AsyncClient) -> None:
-        resp = await admin_client.get(
-            f"/api/v1/phlebotomists/{uuid.uuid4()}/metrics"
-        )
+        resp = await admin_client.get(f"/api/v1/phlebotomists/{uuid.uuid4()}/metrics")
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_metrics_unauthorized(
-        self, client_user_client: AsyncClient
-    ) -> None:
+    async def test_metrics_unauthorized(self, client_user_client: AsyncClient) -> None:
         resp = await client_user_client.get(
             f"/api/v1/phlebotomists/{uuid.uuid4()}/metrics"
         )
