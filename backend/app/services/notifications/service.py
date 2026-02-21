@@ -142,11 +142,7 @@ class NotificationService:
             status=status,
             message_content=message_content,
             error_message=error_message,
-            sent_at=(
-                datetime.now(UTC)
-                if status == NotificationStatus.SENT
-                else None
-            ),
+            sent_at=(datetime.now(UTC) if status == NotificationStatus.SENT else None),
         )
         self.db.add(log)  # type: ignore[union-attr]
         try:
