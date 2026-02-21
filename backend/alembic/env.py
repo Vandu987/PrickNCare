@@ -3,7 +3,7 @@ import os
 from logging.config import fileConfig
 
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy.ext.asyncio import create_async_engine
 
 import app.models.audit  # noqa: F401
 import app.models.clients  # noqa: F401
@@ -31,14 +31,17 @@ if not _db_url:
 
     _db_url = settings.DATABASE_URL
 
-config.set_main_option("sqlalchemy.url", _db_url)
+# NOTE: We intentionally do NOT call config.set_main_option() here because
+# configparser treats '%' as a format specifier, which breaks passwords that
+# contain URL-encoded characters (e.g. '@' → '%40').  Instead we pass _db_url
+# directly to create_async_engine() in run_async_migrations() below.
 
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
     """Run migrations without a live DB connection (SQL script output)."""
-    url = config.get_main_option("sqlalchemy.url")
+    url = _db_url
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -62,11 +65,7 @@ def do_run_migrations(connection):  # type: ignore[no-untyped-def]
 
 async def run_async_migrations() -> None:
     """Run migrations using an async engine (asyncpg)."""
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_async_engine(_db_url, poolclass=pool.NullPool)
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
     await connectable.dispose()
