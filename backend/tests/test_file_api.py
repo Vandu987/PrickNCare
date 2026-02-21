@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -40,7 +40,7 @@ def _mock_file_service(**overrides) -> FileUploadService:
     svc = MagicMock(spec=FileUploadService)
     svc.upload_file = overrides.get(
         "upload_file",
-        MagicMock(return_value="https://cdn.example.com/documents/test_abc123.pdf"),
+        AsyncMock(return_value="https://cdn.example.com/documents/test_abc123.pdf"),
     )
     svc.get_presigned_url = overrides.get(
         "get_presigned_url", MagicMock(return_value="https://s3.example.com/signed-url")
@@ -96,7 +96,7 @@ async def test_upload_no_auth(client):
 async def test_upload_validation_error(client):
     _override_auth(CLIENT_USER)
     svc = _mock_file_service()
-    svc.upload_file = MagicMock(side_effect=FileUploadError("Invalid folder"))
+    svc.upload_file = AsyncMock(side_effect=FileUploadError("Invalid folder"))
     _override_file_service(svc)
     try:
         resp = await client.post(
@@ -105,7 +105,7 @@ async def test_upload_validation_error(client):
             files={"file": ("test.pdf", b"content", "application/pdf")},
         )
         assert resp.status_code == 400
-        assert "Invalid folder" in resp.json()["detail"]
+        assert "Invalid folder" in resp.json()["error"]["message"]
     finally:
         _clear_overrides()
 
