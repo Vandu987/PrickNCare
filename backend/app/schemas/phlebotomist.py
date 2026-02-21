@@ -177,3 +177,43 @@ class BankDetailsResponse(BaseModel):
 
 class AvailabilityUpdate(BaseModel):
     is_available: bool
+
+
+# ── Location schemas — task 4.6 ──────────────────────────────────────────
+
+
+class LocationUpdate(BaseModel):
+    lat: float
+    lng: float
+    accuracy: float | None = None
+
+
+class LocationResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    lat: float
+    lng: float
+    accuracy: float | None = None
+    recorded_at: datetime
+
+
+class LocationHistoryResponse(BaseModel):
+    items: list[LocationResponse]
+    total: int
+
+
+# ── Performance metrics — task 4.6 ───────────────────────────────────────
+
+
+class PerformanceMetricsResponse(BaseModel):
+    total_collections: int = 0
+    successful_collections: int = 0
+    failed_collections: int = 0
+    success_rate: float = 0.0
+    average_rating: float | None = None
+    total_ratings_count: int = 0
+    average_tat_minutes: float | None = None
+    orders_on_time: int = 0
+    on_time_percentage: float = 0.0
+    total_distance_km: float | None = None
+    earnings: float = 0.0

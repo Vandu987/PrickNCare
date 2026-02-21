@@ -402,10 +402,10 @@
               4
             ],
             "details": "Add zone assignment endpoints: `PUT /phlebotomists/{id}/zones` accepting `ZoneAssignmentUpdate` schema with zone_ids list - this replaces all current assignments (sync operation). `GET /phlebotomists/{id}/zones` returns list of assigned zones with details. Create `phlebotomist_zones` junction table for many-to-many relationship. Implement availability management: `PUT /phlebotomists/{id}/availability` with is_available boolean - updates real-time availability status. Add leave management: `POST /phlebotomists/{id}/leave` with `LeaveRequest` schema (date, reason, leave_type: Literal['full_day', 'half_day']), `GET /phlebotomists/{id}/leave` with date range filter, `DELETE /phlebotomists/{id}/leave/{leave_id}` to cancel pending leave. Create `phlebotomist_leaves` table. Implement bank details: `PUT /phlebotomists/{id}/bank-details` with `BankDetailsUpdate` schema (account_number, ifsc, bank_name, upi_id) - encrypt sensitive data before storage. `GET /phlebotomists/{id}/bank-details` returns masked account number. Validate IFSC format. Ensure phlebotomist can only update their own availability and apply for their own leave.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test zone assignment replaces existing zones correctly. Verify phlebotomist appears in zone-filtered queries. Test availability toggle updates status. Test leave application for future dates succeeds. Verify past date leave is rejected. Test leave cancellation. Verify bank details are encrypted in database. Test IFSC format validation. Verify account number masking in response. Test phlebotomist can only modify their own records.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:35:49.422Z"
+            "updatedAt": "2026-02-21T19:37:41.437Z"
           },
           {
             "id": 6,
@@ -416,15 +416,16 @@
               5
             ],
             "details": "Implement `GET /phlebotomists/{id}/metrics` accepting date_from and date_to query parameters. Calculate and return: total_collections (count of orders with status COLLECTED), successful_collections, failed_collections (UNCOLLECTED status), success_rate (percentage), average_rating (from order feedback), total_ratings_count, average_tat_minutes (time from assignment to collection), orders_on_time (within SLA), on_time_percentage, total_distance_km (if location tracking enabled), earnings (sum of collection fees). Query from orders table joining with feedback and calculate aggregates. Use database-level aggregation for performance. Cache results for same date range queries (1 hour TTL). Implement `PUT /phlebotomists/{id}/location` for mobile app with lat, lng, accuracy, timestamp parameters. Store in `phlebotomist_locations` table with phlebotomist_id, lat, lng, accuracy, recorded_at. Only phlebotomist can update their own location (verify JWT user_id matches). Optionally implement `GET /phlebotomists/{id}/location/history` for date range with admin access only. Add `GET /phlebotomists/{id}/location/current` for real-time tracking.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test metrics calculation with sample order data. Verify success_rate calculation is accurate. Test date range filtering returns correct subset. Test empty date range returns zeros not errors. Verify average calculations handle null ratings. Test location update stores correctly with timestamp. Verify only authenticated phlebotomist can update their location. Test location history returns chronological data. Verify caching improves response time for repeated queries. Test metrics endpoint performance with large datasets.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:38:28.043Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 6,
         "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
-        "updatedAt": "2026-02-21T19:35:49.422Z"
+        "updatedAt": "2026-02-21T19:38:28.043Z"
       },
       {
         "id": "5",
@@ -1682,7 +1683,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:35:49.423Z",
+      "lastModified": "2026-02-21T19:38:28.044Z",
       "taskCount": 18,
       "completedCount": 3,
       "tags": [

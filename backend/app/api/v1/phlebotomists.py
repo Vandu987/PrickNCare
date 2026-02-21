@@ -16,6 +16,7 @@ from app.api.deps import get_current_active_user, require_roles
 from app.core.database import get_db
 from app.models.phlebotomist_documents import PhlebotomistDocument
 from app.models.phlebotomist_leaves import PhlebotomistLeave
+from app.models.phlebotomist_locations import PhlebotomistLocation
 from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User, UserRole
 from app.schemas.phlebotomist import (
@@ -25,6 +26,10 @@ from app.schemas.phlebotomist import (
     LeaveListResponse,
     LeaveRequest,
     LeaveResponse,
+    LocationHistoryResponse,
+    LocationResponse,
+    LocationUpdate,
+    PerformanceMetricsResponse,
     PhlebotomistCreate,
     PhlebotomistDocumentListResponse,
     PhlebotomistDocumentResponse,
@@ -620,6 +625,153 @@ async def get_bank_details(
             raise HTTPException(status_code=403, detail="Insufficient permissions")
 
     return _mask_bank_details(phlebotomist)
+
+
+# ── Location endpoints — task 4.6 ─────────────────────────────────────────
+
+
+@router.put(
+    "/{phlebotomist_id}/location",
+    response_model=LocationResponse,
+)
+async def update_location(
+    phlebotomist_id: uuid.UUID,
+    body: LocationUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> dict:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+
+    if not _is_own_phlebotomist(current_user, phlebotomist):
+        raise HTTPException(status_code=403, detail="Can only update own location")
+
+    now = datetime.now(UTC)
+
+    # Update current location on phlebotomist
+    phlebotomist.current_location_lat = body.lat
+    phlebotomist.current_location_lng = body.lng
+
+    # Store in location history
+    location = PhlebotomistLocation(
+        phlebotomist_id=phlebotomist_id,
+        lat=body.lat,
+        lng=body.lng,
+        accuracy=body.accuracy,
+        recorded_at=now,
+    )
+    db.add(location)
+    await db.commit()
+
+    return {
+        "lat": body.lat,
+        "lng": body.lng,
+        "accuracy": body.accuracy,
+        "recorded_at": now,
+    }
+
+
+@router.get(
+    "/{phlebotomist_id}/location/current",
+    response_model=LocationResponse,
+)
+async def get_current_location(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+
+    if (
+        phlebotomist.current_location_lat is None
+        or phlebotomist.current_location_lng is None
+    ):
+        raise HTTPException(status_code=404, detail="No location data available")
+
+    # Get latest record for accuracy and timestamp
+    result = await db.execute(
+        select(PhlebotomistLocation)
+        .where(PhlebotomistLocation.phlebotomist_id == phlebotomist_id)
+        .order_by(PhlebotomistLocation.recorded_at.desc())
+        .limit(1)
+    )
+    latest = result.scalar_one_or_none()
+
+    return {
+        "lat": phlebotomist.current_location_lat,
+        "lng": phlebotomist.current_location_lng,
+        "accuracy": latest.accuracy if latest else None,
+        "recorded_at": latest.recorded_at if latest else datetime.now(UTC),
+    }
+
+
+@router.get(
+    "/{phlebotomist_id}/location/history",
+    response_model=LocationHistoryResponse,
+)
+async def get_location_history(
+    phlebotomist_id: uuid.UUID,
+    date_from: datetime | None = Query(None),
+    date_to: datetime | None = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    await _get_phlebotomist(phlebotomist_id, db)
+
+    query = select(PhlebotomistLocation).where(
+        PhlebotomistLocation.phlebotomist_id == phlebotomist_id
+    )
+    count_query = (
+        select(func.count())
+        .select_from(PhlebotomistLocation)
+        .where(PhlebotomistLocation.phlebotomist_id == phlebotomist_id)
+    )
+
+    if date_from:
+        query = query.where(PhlebotomistLocation.recorded_at >= date_from)
+        count_query = count_query.where(PhlebotomistLocation.recorded_at >= date_from)
+    if date_to:
+        query = query.where(PhlebotomistLocation.recorded_at <= date_to)
+        count_query = count_query.where(PhlebotomistLocation.recorded_at <= date_to)
+
+    total = (await db.execute(count_query)).scalar_one()
+    items = (
+        (
+            await db.execute(
+                query.order_by(PhlebotomistLocation.recorded_at.desc())
+                .offset(skip)
+                .limit(limit)
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    return {"items": items, "total": total}
+
+
+# ── Performance metrics endpoint — task 4.6 ──────────────────────────────
+
+
+@router.get(
+    "/{phlebotomist_id}/metrics",
+    response_model=PerformanceMetricsResponse,
+)
+async def get_performance_metrics(
+    phlebotomist_id: uuid.UUID,
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> PerformanceMetricsResponse:
+    await _get_phlebotomist(phlebotomist_id, db)
+
+    # Stub response — orders table integration comes in task 6
+    return PerformanceMetricsResponse()
+
+
+# ── Bank details helpers ─────────────────────────────────────────────────
 
 
 def _mask_bank_details(phlebotomist: Phlebotomist) -> dict:

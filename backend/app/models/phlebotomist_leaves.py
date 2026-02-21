@@ -1,9 +1,9 @@
 """Phlebotomist leave model — task 4.5."""
 
 import uuid
-from datetime import date, datetime
+from datetime import date
 
-from sqlalchemy import Date, DateTime, ForeignKey, String, Text
+from sqlalchemy import Date, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,9 +24,7 @@ class PhlebotomistLeave(UUIDMixin, TimestampMixin, Base):
     leave_type: Mapped[str] = mapped_column(
         String(20), nullable=False, default="full_day"
     )
-    status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="pending"
-    )
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
     approved_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("users.id", ondelete="SET NULL"),
