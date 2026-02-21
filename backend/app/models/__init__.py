@@ -15,6 +15,7 @@ from .orders import (
 from .packages import OrderPackage, Package
 from .payments import DiscrepancyType, PhlebotomistCashReconciliation
 from .phlebotomist_documents import PhlebotomistDocument
+from .phlebotomist_leaves import PhlebotomistLeave
 from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from .samples import SampleAccessioning, SampleIntegrity, SampleStatus
 from .users import User, UserRole
@@ -32,6 +33,7 @@ __all__ = [
     "Phlebotomist",
     "PhlebotomistDocument",
     "PhlebotomistZoneAssignment",
+    "PhlebotomistLeave",
     "City",
     "Zone",
     "Pincode",

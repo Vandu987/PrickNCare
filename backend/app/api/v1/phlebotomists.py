@@ -1,4 +1,4 @@
-"""Phlebotomist CRUD endpoints — task 4.4."""
+"""Phlebotomist CRUD endpoints — tasks 4.4 & 4.5."""
 
 from __future__ import annotations
 
@@ -6,24 +6,33 @@ import logging
 import os
 import secrets
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, date, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import require_roles
+from app.api.deps import get_current_active_user, require_roles
 from app.core.database import get_db
 from app.models.phlebotomist_documents import PhlebotomistDocument
-from app.models.phlebotomists import Phlebotomist
+from app.models.phlebotomist_leaves import PhlebotomistLeave
+from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User, UserRole
 from app.schemas.phlebotomist import (
+    AvailabilityUpdate,
+    BankDetailsResponse,
+    BankDetailsUpdate,
+    LeaveListResponse,
+    LeaveRequest,
+    LeaveResponse,
     PhlebotomistCreate,
     PhlebotomistDocumentListResponse,
     PhlebotomistDocumentResponse,
     PhlebotomistListResponse,
     PhlebotomistResponse,
     PhlebotomistUpdate,
+    ZoneAssignmentResponse,
+    ZoneAssignmentUpdate,
 )
 
 logger = logging.getLogger(__name__)
@@ -55,7 +64,7 @@ async def _upload_to_s3(
             detail="File size exceeds 5MB limit",
         )
 
-    timestamp = int(datetime.now(timezone.utc).timestamp())
+    timestamp = int(datetime.now(UTC).timestamp())
     filename = f"{timestamp}_{file.filename}"
     s3_key = f"phlebotomists/{phlebotomist_id}/{doc_type}/{filename}"
 
@@ -119,7 +128,9 @@ async def create_phlebotomist(
     # Generate temp password and create user
     temp_password = secrets.token_urlsafe(12)
     email = f"phleb_{body.employee_id}@prickncare.local"
-    logger.info("Temp password for phlebotomist %s: %s", body.employee_id, temp_password)
+    logger.info(
+        "Temp password for phlebotomist %s: %s", body.employee_id, temp_password
+    )
 
     user = User(
         email=email,
@@ -240,9 +251,7 @@ async def delete_phlebotomist(
         raise HTTPException(status_code=404, detail="Phlebotomist not found")
 
     # Soft delete: deactivate user and mark unavailable
-    user_result = await db.execute(
-        select(User).where(User.id == phlebotomist.user_id)
-    )
+    user_result = await db.execute(select(User).where(User.id == phlebotomist.user_id))
     user = user_result.scalar_one_or_none()
     if user:
         user.is_active = False
@@ -287,7 +296,7 @@ async def upload_document(
         doc_type=doc_type,
         s3_url=s3_url,
         original_filename=file.filename or "unknown",
-        uploaded_at=datetime.now(timezone.utc),
+        uploaded_at=datetime.now(UTC),
     )
     db.add(doc)
     await db.commit()
@@ -348,8 +357,282 @@ async def verify_document(
 
     doc.verified = True
     doc.verified_by = current_user.id
-    doc.verified_at = datetime.now(timezone.utc)
+    doc.verified_at = datetime.now(UTC)
 
     await db.commit()
     await db.refresh(doc)
     return doc
+
+
+# ── Helper: fetch phlebotomist or 404 ───────────────────────────────────
+
+
+async def _get_phlebotomist(
+    phlebotomist_id: uuid.UUID, db: AsyncSession
+) -> Phlebotomist:
+    result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == phlebotomist_id)
+    )
+    phlebotomist = result.scalar_one_or_none()
+    if not phlebotomist:
+        raise HTTPException(status_code=404, detail="Phlebotomist not found")
+    return phlebotomist
+
+
+def _is_own_phlebotomist(user: User, phlebotomist: Phlebotomist) -> bool:
+    return user.id == phlebotomist.user_id
+
+
+def _check_own_or_admin(user: User, phlebotomist: Phlebotomist) -> None:
+    if user.role.value in ("super_admin", "city_admin"):
+        return
+    if _is_own_phlebotomist(user, phlebotomist):
+        return
+    raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+
+# ── Zone assignment endpoints — task 4.5 ─────────────────────────────────
+
+
+@router.put(
+    "/{phlebotomist_id}/zones",
+    response_model=list[ZoneAssignmentResponse],
+)
+async def sync_zone_assignments(
+    phlebotomist_id: uuid.UUID,
+    body: ZoneAssignmentUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> list[PhlebotomistZoneAssignment]:
+    await _get_phlebotomist(phlebotomist_id, db)
+
+    # Delete existing assignments
+    await db.execute(
+        delete(PhlebotomistZoneAssignment).where(
+            PhlebotomistZoneAssignment.phlebotomist_id == phlebotomist_id
+        )
+    )
+
+    # Insert new assignments
+    now = datetime.now(UTC)
+    assignments = []
+    for zone_id in body.zone_ids:
+        assignment = PhlebotomistZoneAssignment(
+            phlebotomist_id=phlebotomist_id,
+            zone_id=zone_id,
+            assigned_at=now,
+        )
+        db.add(assignment)
+        assignments.append(assignment)
+
+    await db.commit()
+    return assignments
+
+
+@router.get(
+    "/{phlebotomist_id}/zones",
+    response_model=list[ZoneAssignmentResponse],
+)
+async def list_zone_assignments(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> list[PhlebotomistZoneAssignment]:
+    await _get_phlebotomist(phlebotomist_id, db)
+
+    result = await db.execute(
+        select(PhlebotomistZoneAssignment).where(
+            PhlebotomistZoneAssignment.phlebotomist_id == phlebotomist_id
+        )
+    )
+    return list(result.scalars().all())
+
+
+# ── Availability endpoint — task 4.5 ─────────────────────────────────────
+
+
+@router.put(
+    "/{phlebotomist_id}/availability",
+    response_model=PhlebotomistResponse,
+)
+async def update_availability(
+    phlebotomist_id: uuid.UUID,
+    body: AvailabilityUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> Phlebotomist:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+    _check_own_or_admin(current_user, phlebotomist)
+
+    phlebotomist.is_available = body.is_available
+    await db.commit()
+    await db.refresh(phlebotomist)
+    return phlebotomist
+
+
+# ── Leave endpoints — task 4.5 ───────────────────────────────────────────
+
+
+@router.post(
+    "/{phlebotomist_id}/leave",
+    response_model=LeaveResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def apply_for_leave(
+    phlebotomist_id: uuid.UUID,
+    body: LeaveRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> PhlebotomistLeave:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+    _check_own_or_admin(current_user, phlebotomist)
+
+    leave = PhlebotomistLeave(
+        phlebotomist_id=phlebotomist_id,
+        date=body.date,
+        reason=body.reason,
+        leave_type=body.leave_type,
+        status="pending",
+    )
+    db.add(leave)
+    await db.commit()
+    await db.refresh(leave)
+    return leave
+
+
+@router.get(
+    "/{phlebotomist_id}/leave",
+    response_model=LeaveListResponse,
+)
+async def list_leaves(
+    phlebotomist_id: uuid.UUID,
+    date_from: date | None = Query(None),
+    date_to: date | None = Query(None),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> dict:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+    _check_own_or_admin(current_user, phlebotomist)
+
+    query = select(PhlebotomistLeave).where(
+        PhlebotomistLeave.phlebotomist_id == phlebotomist_id
+    )
+    count_query = (
+        select(func.count())
+        .select_from(PhlebotomistLeave)
+        .where(PhlebotomistLeave.phlebotomist_id == phlebotomist_id)
+    )
+
+    if date_from:
+        query = query.where(PhlebotomistLeave.date >= date_from)
+        count_query = count_query.where(PhlebotomistLeave.date >= date_from)
+    if date_to:
+        query = query.where(PhlebotomistLeave.date <= date_to)
+        count_query = count_query.where(PhlebotomistLeave.date <= date_to)
+
+    total = (await db.execute(count_query)).scalar_one()
+    items = (
+        (await db.execute(query.order_by(PhlebotomistLeave.date.desc())))
+        .scalars()
+        .all()
+    )
+
+    return {"items": items, "total": total}
+
+
+@router.delete(
+    "/{phlebotomist_id}/leave/{leave_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def cancel_leave(
+    phlebotomist_id: uuid.UUID,
+    leave_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> None:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+    _check_own_or_admin(current_user, phlebotomist)
+
+    result = await db.execute(
+        select(PhlebotomistLeave).where(
+            PhlebotomistLeave.id == leave_id,
+            PhlebotomistLeave.phlebotomist_id == phlebotomist_id,
+        )
+    )
+    leave = result.scalar_one_or_none()
+    if not leave:
+        raise HTTPException(status_code=404, detail="Leave not found")
+
+    if leave.status != "pending":
+        raise HTTPException(
+            status_code=400,
+            detail="Only pending leaves can be cancelled",
+        )
+
+    leave.status = "cancelled"
+    await db.commit()
+
+
+# ── Bank details endpoints — task 4.5 ────────────────────────────────────
+
+
+@router.put(
+    "/{phlebotomist_id}/bank-details",
+    response_model=BankDetailsResponse,
+)
+async def update_bank_details(
+    phlebotomist_id: uuid.UUID,
+    body: BankDetailsUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+
+    if body.account_number is not None:
+        phlebotomist.bank_account_number = body.account_number
+    if body.ifsc is not None:
+        phlebotomist.bank_ifsc = body.ifsc
+    if body.bank_name is not None:
+        phlebotomist.bank_name = body.bank_name
+    if body.upi_id is not None:
+        phlebotomist.upi_id = body.upi_id
+
+    await db.commit()
+    await db.refresh(phlebotomist)
+
+    return _mask_bank_details(phlebotomist)
+
+
+@router.get(
+    "/{phlebotomist_id}/bank-details",
+    response_model=BankDetailsResponse,
+)
+async def get_bank_details(
+    phlebotomist_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> dict:
+    phlebotomist = await _get_phlebotomist(phlebotomist_id, db)
+
+    # Allow admin or own phlebotomist
+    if current_user.role.value not in ("super_admin", "city_admin"):
+        if not _is_own_phlebotomist(current_user, phlebotomist):
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    return _mask_bank_details(phlebotomist)
+
+
+def _mask_bank_details(phlebotomist: Phlebotomist) -> dict:
+    account = phlebotomist.bank_account_number
+    masked = None
+    if account and len(account) >= 4:
+        masked = "XXXX" + account[-4:]
+    elif account:
+        masked = "XXXX" + account
+
+    return {
+        "account_number": masked,
+        "ifsc": phlebotomist.bank_ifsc,
+        "bank_name": phlebotomist.bank_name,
+        "upi_id": phlebotomist.upi_id,
+    }

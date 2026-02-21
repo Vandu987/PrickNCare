@@ -389,10 +389,10 @@
             "description": "Build CRUD APIs for phlebotomist management including profile management and document upload functionality for ID proof, certifications, and photos to AWS S3.",
             "dependencies": [],
             "details": "Create `api/v1/phlebotomists.py` with FastAPI router. Implement `POST /phlebotomists` with `PhlebotomistCreate` schema: name, phone (validate Indian format), employee_id (unique), working_hours_start, working_hours_end. Implement `GET /phlebotomists` with filters: zone_id, is_available, search (name/employee_id/phone), pagination. Implement `GET /phlebotomists/{id}`, `PUT /phlebotomists/{id}`, `DELETE /phlebotomists/{id}` (soft-delete). For document upload, implement `POST /phlebotomists/{id}/documents` accepting multipart file upload with doc_type parameter (Literal['id_proof', 'certification', 'photo']). Use boto3 to upload to S3 bucket with path structure: `phlebotomists/{id}/{doc_type}/{timestamp}_{filename}`. Store document metadata in `phlebotomist_documents` table: id, phlebotomist_id, doc_type, s3_url, uploaded_at, verified (boolean), verified_by, verified_at. Implement `GET /phlebotomists/{id}/documents` to list documents. Add `PUT /phlebotomists/{id}/documents/{doc_id}/verify` for admin verification. Validate file types (jpg, png, pdf) and size limits (5MB).",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test phlebotomist creation with valid/invalid phone formats. Verify employee_id uniqueness. Test search and filter combinations. Test document upload with valid file types and sizes. Verify S3 upload using moto mock. Test rejection of invalid file types and oversized files. Test document listing and verification workflow. Verify soft-delete preserves data but hides from listings.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:33:19.423Z"
+            "updatedAt": "2026-02-21T19:35:05.008Z"
           },
           {
             "id": 5,
@@ -402,9 +402,10 @@
               4
             ],
             "details": "Add zone assignment endpoints: `PUT /phlebotomists/{id}/zones` accepting `ZoneAssignmentUpdate` schema with zone_ids list - this replaces all current assignments (sync operation). `GET /phlebotomists/{id}/zones` returns list of assigned zones with details. Create `phlebotomist_zones` junction table for many-to-many relationship. Implement availability management: `PUT /phlebotomists/{id}/availability` with is_available boolean - updates real-time availability status. Add leave management: `POST /phlebotomists/{id}/leave` with `LeaveRequest` schema (date, reason, leave_type: Literal['full_day', 'half_day']), `GET /phlebotomists/{id}/leave` with date range filter, `DELETE /phlebotomists/{id}/leave/{leave_id}` to cancel pending leave. Create `phlebotomist_leaves` table. Implement bank details: `PUT /phlebotomists/{id}/bank-details` with `BankDetailsUpdate` schema (account_number, ifsc, bank_name, upi_id) - encrypt sensitive data before storage. `GET /phlebotomists/{id}/bank-details` returns masked account number. Validate IFSC format. Ensure phlebotomist can only update their own availability and apply for their own leave.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test zone assignment replaces existing zones correctly. Verify phlebotomist appears in zone-filtered queries. Test availability toggle updates status. Test leave application for future dates succeeds. Verify past date leave is rejected. Test leave cancellation. Verify bank details are encrypted in database. Test IFSC format validation. Verify account number masking in response. Test phlebotomist can only modify their own records.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:35:49.422Z"
           },
           {
             "id": 6,
@@ -423,7 +424,7 @@
         "complexity": 6,
         "recommendedSubtasks": 6,
         "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
-        "updatedAt": "2026-02-21T19:33:19.423Z"
+        "updatedAt": "2026-02-21T19:35:49.422Z"
       },
       {
         "id": "5",
@@ -1681,7 +1682,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:33:19.424Z",
+      "lastModified": "2026-02-21T19:35:49.423Z",
       "taskCount": 18,
       "completedCount": 3,
       "tags": [

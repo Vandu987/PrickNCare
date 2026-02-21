@@ -46,6 +46,7 @@ class Phlebotomist(UUIDMixin, TimestampMixin, Base):
     # Bank details
     bank_account_number: Mapped[str | None] = mapped_column(String(30), nullable=True)
     bank_ifsc: Mapped[str | None] = mapped_column(String(11), nullable=True)
+    bank_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
     upi_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     # Working schedule
