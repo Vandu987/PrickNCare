@@ -1,19 +1,25 @@
 class AppConstants {
-  // API
-  static const String baseUrl = 'http://localhost:8000/api/v1';
-  static const int connectTimeout = 30000;
-  static const int receiveTimeout = 30000;
+  // Routes
+  static const String splashRoute = '/';
+  static const String loginRoute = '/login';
+  static const String otpRoute = '/otp';
+  static const String dashboardRoute = '/dashboard';
+  static const String ordersRoute = '/orders';
+  static const String orderDetailRoute = '/orders/:id';
+  static const String collectionRoute = '/collection/:id';
+  static const String profileRoute = '/profile';
 
-  // Storage keys
-  static const String accessTokenKey = 'access_token';
-  static const String refreshTokenKey = 'refresh_token';
-  static const String userDataKey = 'user_data';
-
-  // Order statuses
+  // Collection Status
   static const String statusPending = 'pending';
-  static const String statusAssigned = 'assigned';
+  static const String statusAccepted = 'accepted';
   static const String statusInTransit = 'in_transit';
-  static const String statusCollected = 'collected';
-  static const String statusDelivered = 'delivered';
+  static const String statusArrived = 'arrived';
+  static const String statusCollecting = 'collecting';
+  static const String statusCompleted = 'completed';
   static const String statusCancelled = 'cancelled';
+
+  // Hive Boxes
+  static const String userBox = 'user_box';
+  static const String settingsBox = 'settings_box';
+  static const String cacheBox = 'cache_box';
 }
