@@ -33,4 +33,6 @@ class NSARecord(UUIDMixin, Base):
         super().__init__(**kwargs)
 
     def __repr__(self) -> str:
-        return f"<NSARecord id={self.id} pincode={self.pincode} active={self.is_active}>"
+        return (
+            f"<NSARecord id={self.id} pincode={self.pincode} active={self.is_active}>"
+        )

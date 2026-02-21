@@ -437,7 +437,7 @@
         "dependencies": [
           "3"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -498,16 +498,16 @@
               4
             ],
             "details": "Add NSA endpoints to api/v1/zones.py:\n\n1. **GET /nsa/check** - Check service availability for pincode\n   - Returns: is_serviceable, zone info, available_phlebotomists count\n   - Use Redis cache with 5-minute TTL for frequently checked pincodes\n   - Query phlebotomist availability from their zone assignments\n\n2. **POST /nsa/mark** - Mark pincode as NSA (No Service Area)\n   - Parameters: pincode, reason (optional)\n   - Create/update NSA record with timestamp and marked_by user\n   - Invalidate related caches\n\n3. **DELETE /nsa/unmark** - Remove NSA marking from pincode\n   - Restore pincode to serviceable status\n   - Invalidate caches\n\n4. **GET /nsa/list** - List all NSA areas with optional city_id filter\n   - Include reason, marked_at, marked_by information\n   - Pagination support\n\nPydantic schemas:\n- ServiceAvailability(is_serviceable: bool, zone: Optional[ZoneInfo], available_phlebotomists: int, nsa_reason: Optional[str])\n- NSARecord(pincode: str, reason: Optional[str], marked_at: datetime, marked_by: str)\n\nRedis caching strategy:\n- Cache key pattern: `service_check:{pincode}`\n- TTL: 300 seconds (5 minutes)\n- Invalidate on: NSA mark/unmark, zone deactivation, city serviceable toggle\n\nCreate NSA database table: pincode (unique), reason, marked_by (FK to users), marked_at, is_active.\n\nIntegrate with order creation - orders for NSA pincodes should be flagged or rejected based on business rules.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test /nsa/check returns correct status for serviceable pincode with zone info. Test /nsa/check returns is_serviceable=false for NSA-marked pincode. Test mark endpoint creates NSA record with reason and user info. Test unmark removes NSA status. Test list endpoint with and without city filter. Test Redis caching - verify cache hit on repeated calls. Test cache invalidation on mark/unmark operations. Test available_phlebotomists count reflects actual availability. Test order integration - verify NSA pincode handling in order creation flow.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T20:00:48.528Z"
+            "updatedAt": "2026-02-21T20:03:48.174Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
-        "updatedAt": "2026-02-21T20:00:48.528Z"
+        "updatedAt": "2026-02-21T20:03:48.174Z"
       },
       {
         "id": "6",
@@ -520,7 +520,7 @@
           "4",
           "5"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -528,9 +528,10 @@
             "description": "Build the POST /orders endpoint that handles order creation with pincode validation, amount calculation based on packages and priority, unique booking_id generation, and initial status logging.",
             "dependencies": [],
             "details": "Create OrderCreate schema with patient_details, address, appointment_datetime, package_ids, priority, special_instructions, and payment_mode. Implement pincode serviceability check by querying zone/pincode tables from Task 5. Calculate total amount by summing package prices and applying priority multipliers. Generate unique booking_id using format like 'PNC-{YYYYMMDD}-{sequential_number}'. Create order with PENDING status. Insert initial entry into OrderStatusHistory table with timestamp, status, and actor_id. Implement optional auto-assignment trigger flag. Use transactions to ensure atomicity of order creation and history logging.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test order creation with valid data returns 201 with booking_id. Test invalid pincode returns 400 with NSA error. Test amount calculation with multiple packages and priority levels. Verify booking_id uniqueness under concurrent creation. Test OrderStatusHistory entry is created. Test validation errors for missing required fields.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T20:05:43.514Z"
           },
           {
             "id": 2,
@@ -633,7 +634,8 @@
         ],
         "complexity": 8,
         "recommendedSubtasks": 9,
-        "expansionPrompt": "Break down the order management into: 1) Order creation with pincode validation, amount calculation, and unique booking_id generation, 2) Order listing with comprehensive filters (status, date range, client, phlebotomist, priority, search), 3) Order status management with valid transition enforcement and history logging, 4) Manual assignment API with phlebotomist validation (zone coverage, availability), 5) Auto-assignment algorithm based on zone matching and workload balancing, 6) Re-routing and bulk assignment APIs, 7) Phlebotomist order actions (accept, reject, start-transit, collect with proof), 8) Order cancellation and rescheduling with history tracking, 9) Bulk order upload from Excel with validation and error reporting. This is the core workflow of the platform."
+        "expansionPrompt": "Break down the order management into: 1) Order creation with pincode validation, amount calculation, and unique booking_id generation, 2) Order listing with comprehensive filters (status, date range, client, phlebotomist, priority, search), 3) Order status management with valid transition enforcement and history logging, 4) Manual assignment API with phlebotomist validation (zone coverage, availability), 5) Auto-assignment algorithm based on zone matching and workload balancing, 6) Re-routing and bulk assignment APIs, 7) Phlebotomist order actions (accept, reject, start-transit, collect with proof), 8) Order cancellation and rescheduling with history tracking, 9) Bulk order upload from Excel with validation and error reporting. This is the core workflow of the platform.",
+        "updatedAt": "2026-02-21T20:05:43.514Z"
       },
       {
         "id": "7",
@@ -1689,9 +1691,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T20:00:48.528Z",
+      "lastModified": "2026-02-21T20:05:43.514Z",
       "taskCount": 18,
-      "completedCount": 4,
+      "completedCount": 5,
       "tags": [
         "master"
       ]

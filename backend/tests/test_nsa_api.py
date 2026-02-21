@@ -13,7 +13,6 @@ from app.api.deps import get_current_active_user, get_current_user
 from app.core.database import get_db
 from app.main import app
 from app.models.nsa import NSARecord
-from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User, UserRole
 from app.models.zones import City, Pincode, Zone
 
@@ -92,7 +91,7 @@ class MockResult:
     def scalar_one(self) -> object:
         return self._value if self._value is not None else 0
 
-    def scalars(self) -> "MockResult":
+    def scalars(self) -> MockResult:
         return self
 
     def all(self) -> list:
@@ -158,7 +157,9 @@ def noauth_client(mock_db: MockDB):
 # Disable Redis for all tests
 @pytest.fixture(autouse=True)
 def _no_redis():
-    with patch("app.api.v1.zones._get_redis", new_callable=AsyncMock, return_value=None):
+    with patch(
+        "app.api.v1.zones._get_redis", new_callable=AsyncMock, return_value=None
+    ):
         yield
 
 
@@ -172,9 +173,9 @@ async def test_check_serviceable_pincode(noauth_client: MockDB) -> None:
 
     # 1st call: NSA check → None, 2nd: pincode lookup → found, 3rd: phleb count → 3
     db.set_sequence(
-        MockResult(None),   # NSA check
-        MockResult(pc),     # pincode lookup
-        MockResult(3),      # phleb count
+        MockResult(None),  # NSA check
+        MockResult(pc),  # pincode lookup
+        MockResult(3),  # phleb count
     )
 
     transport = ASGITransport(app=app)
@@ -328,8 +329,8 @@ async def test_list_nsa_as_admin(admin_client: MockDB) -> None:
     nsa2 = _make_nsa(pincode="400002")
 
     db.set_sequence(
-        MockResult(2),              # count
-        MockResult([nsa1, nsa2]),   # items
+        MockResult(2),  # count
+        MockResult([nsa1, nsa2]),  # items
     )
 
     transport = ASGITransport(app=app)
