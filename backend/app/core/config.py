@@ -45,6 +45,16 @@ class Settings(BaseSettings):
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_FROM_NUMBER: str = ""
 
+    # Email
+    EMAIL_PROVIDER: str = "sendgrid"  # sendgrid | ses
+    SENDGRID_API_KEY: str = ""
+    AWS_SES_REGION: str = "ap-south-1"
+    EMAIL_FROM: str = ""
+
+    # Firebase Cloud Messaging (Push)
+    FCM_PROJECT_ID: str = ""
+    FCM_CREDENTIALS_PATH: str = ""
+
     # Rate Limiting (requests per minute)
     RATE_LIMIT_DEFAULT: int = 100
     RATE_LIMIT_ADMIN: int = 500
