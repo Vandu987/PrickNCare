@@ -12,7 +12,7 @@ from sqlalchemy.orm import selectinload
 
 from app.api.deps import RoleChecker, require_roles
 from app.core.database import get_db
-from app.models.orders import Order, OrderStatus
+from app.models.orders import Order, OrderStatus, OrderStatusHistory
 from app.models.packages import OrderPackage
 from app.models.samples import SampleAccessioning, SampleIntegrity, SampleStatus
 from app.models.users import User
@@ -20,19 +20,63 @@ from app.schemas.accessioning import (
     AccessioningCreate,
     AccessioningDetailItem,
     AccessioningDetailResponse,
+    AccessioningReportResponse,
     ClientInfo,
+    IntegrityBreakdownItem,
     OrderSummaryResponse,
     OrderTestSummary,
     PendingAccessioningResponse,
     PendingSampleItem,
     PhlebotomistInfo,
+    RejectedSampleDetail,
     SampleAccessioningSummary,
     SampleItemUpdate,
+    StatusBreakdownItem,
 )
+from app.services.notifications import notify_sample_hold, notify_sample_rejection
 
 router = APIRouter(prefix="/accessioning", tags=["accessioning"])
 
 _admin_only = RoleChecker("super_admin", "city_admin")
+
+
+async def _determine_and_update_order_status(
+    order: Order,
+    samples: list[SampleAccessioning],
+    user: User,
+    db: AsyncSession,
+) -> None:
+    """Determine order status from accessioning results and update if changed."""
+    statuses = {s.status for s in samples}
+
+    if SampleStatus.REJECTED in statuses:
+        new_status = OrderStatus.SAMPLE_REJECTED
+    elif SampleStatus.HOLD in statuses:
+        new_status = OrderStatus.SAMPLE_HOLD
+    else:
+        new_status = OrderStatus.COMPLETED
+
+    old_status = order.status
+    if new_status == old_status:
+        return
+
+    order.status = new_status
+    db.add(
+        OrderStatusHistory(
+            order_id=order.id,
+            changed_by=user.id,
+            status=new_status,
+            notes=f"Auto-set by accessioning: {old_status.value} → {new_status.value}",
+        )
+    )
+
+    # Notifications
+    rejected = [s for s in samples if s.status == SampleStatus.REJECTED]
+    held = [s for s in samples if s.status == SampleStatus.HOLD]
+    if rejected:
+        await notify_sample_rejection(order, rejected)
+    if held and new_status == OrderStatus.SAMPLE_HOLD:
+        await notify_sample_hold(order, held)
 
 
 # ── Task 8.1 — Pending samples listing ──────────────────────────────────
@@ -174,6 +218,9 @@ async def create_accessioning(
         db.add(record)
         created.append(record)
 
+    # Determine and update order status based on accessioning results
+    await _determine_and_update_order_status(order, created, user, db)
+
     await db.commit()
     for r in created:
         await db.refresh(r)
@@ -286,6 +333,15 @@ async def update_accessioning(
     if payload.notes is not None:
         record.notes = payload.notes
 
+    # Recalculate order status from all samples for this order
+    all_samples_q = await db.execute(
+        select(SampleAccessioning).where(SampleAccessioning.order_id == record.order_id)
+    )
+    all_samples = list(all_samples_q.scalars().all())
+    order = await db.get(Order, record.order_id)
+    if order:
+        await _determine_and_update_order_status(order, all_samples, user, db)
+
     await db.commit()
     await db.refresh(record)
 
@@ -301,6 +357,84 @@ async def update_accessioning(
         accessioned_by=record.accessioned_by,
         created_at=record.created_at,
         updated_at=record.updated_at,
+    )
+
+
+# ── Task 8.5 — Accessioning report / analytics ──────────────────────────
+
+
+@router.get("/report", response_model=AccessioningReportResponse)
+async def accessioning_report(
+    date_from: date = Query(..., description="Start date (inclusive)"),
+    date_to: date = Query(..., description="End date (inclusive)"),
+    integrity: SampleIntegrity | None = Query(None, description="Filter by integrity"),
+    status: SampleStatus | None = Query(None, description="Filter by status"),
+    user: User = Depends(_admin_only),
+    db: AsyncSession = Depends(get_db),
+) -> AccessioningReportResponse:
+    """Accessioning analytics report for a date range."""
+
+    base = select(SampleAccessioning).where(
+        func.date(SampleAccessioning.created_at) >= date_from,
+        func.date(SampleAccessioning.created_at) <= date_to,
+    )
+    if integrity is not None:
+        base = base.where(SampleAccessioning.integrity == integrity)
+    if status is not None:
+        base = base.where(SampleAccessioning.status == status)
+
+    result = await db.execute(base.options(selectinload(SampleAccessioning.order)))
+    samples = result.scalars().all()
+
+    total = len(samples)
+
+    # Breakdowns
+    integrity_counts: dict[str, int] = {}
+    status_counts: dict[str, int] = {}
+    order_ids: set[uuid.UUID] = set()
+    rejected: list[RejectedSampleDetail] = []
+
+    for s in samples:
+        i_val = s.integrity.value
+        integrity_counts[i_val] = integrity_counts.get(i_val, 0) + 1
+        s_val = s.status.value
+        status_counts[s_val] = status_counts.get(s_val, 0) + 1
+        order_ids.add(s.order_id)
+        if s.status == SampleStatus.REJECTED:
+            patient_name = s.order.patient_name if s.order else "Unknown"
+            rejected.append(
+                RejectedSampleDetail(
+                    order_id=s.order_id,
+                    patient_name=patient_name,
+                    rejection_reason=s.rejection_reason,
+                    vial_type=s.vial_type,
+                )
+            )
+
+    def _pct(count: int) -> float:
+        return round(count / total * 100, 2) if total else 0.0
+
+    breakdown_integrity = {
+        k: IntegrityBreakdownItem(count=v, percentage=_pct(v))
+        for k, v in integrity_counts.items()
+    }
+    breakdown_status = {
+        k: StatusBreakdownItem(count=v, percentage=_pct(v))
+        for k, v in status_counts.items()
+    }
+
+    rejection_count = status_counts.get(SampleStatus.REJECTED.value, 0)
+    hold_count = status_counts.get(SampleStatus.HOLD.value, 0)
+    avg_per_order = round(total / len(order_ids), 2) if order_ids else 0.0
+
+    return AccessioningReportResponse(
+        total_samples_received=total,
+        breakdown_by_integrity=breakdown_integrity,
+        breakdown_by_status=breakdown_status,
+        rejection_rate=_pct(rejection_count),
+        hold_rate=_pct(hold_count),
+        average_samples_per_order=avg_per_order,
+        rejected_samples_list=rejected,
     )
 
 

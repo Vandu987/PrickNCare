@@ -113,6 +113,38 @@ class AccessioningDetailResponse(BaseModel):
     items: list[AccessioningDetailItem]
 
 
+# ── Task 8.5 — Accessioning report / analytics ──────────────────────────
+
+
+class IntegrityBreakdownItem(BaseModel):
+    count: int
+    percentage: float
+
+
+class StatusBreakdownItem(BaseModel):
+    count: int
+    percentage: float
+
+
+class RejectedSampleDetail(BaseModel):
+    order_id: uuid.UUID
+    patient_name: str
+    rejection_reason: str | None
+    vial_type: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AccessioningReportResponse(BaseModel):
+    total_samples_received: int
+    breakdown_by_integrity: dict[str, IntegrityBreakdownItem]
+    breakdown_by_status: dict[str, StatusBreakdownItem]
+    rejection_rate: float
+    hold_rate: float
+    average_samples_per_order: float
+    rejected_samples_list: list[RejectedSampleDetail]
+
+
 class OrderSummaryResponse(BaseModel):
     order_id: uuid.UUID
     booking_id: str

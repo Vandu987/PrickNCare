@@ -52,6 +52,9 @@ class OrderStatus(str, enum.Enum):
     UNCOLLECTED = "uncollected"
     CANCELLED = "cancelled"
     NSA = "nsa"  # Not Serviceable Area
+    COMPLETED = "completed"
+    SAMPLE_REJECTED = "sample_rejected"
+    SAMPLE_HOLD = "sample_hold"
 
 
 class OrderPriority(str, enum.Enum):

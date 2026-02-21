@@ -51,7 +51,17 @@ _VALID_TRANSITIONS: dict[OrderStatus, list[OrderStatus]] = {
         OrderStatus.UNCOLLECTED,
         OrderStatus.NSA,
     ],
-    OrderStatus.COLLECTED: [],
+    OrderStatus.COLLECTED: [
+        OrderStatus.COMPLETED,
+        OrderStatus.SAMPLE_REJECTED,
+        OrderStatus.SAMPLE_HOLD,
+    ],
+    OrderStatus.SAMPLE_HOLD: [
+        OrderStatus.COMPLETED,
+        OrderStatus.SAMPLE_REJECTED,
+    ],
+    OrderStatus.SAMPLE_REJECTED: [],
+    OrderStatus.COMPLETED: [],
     OrderStatus.UNCOLLECTED: [OrderStatus.PENDING],
     OrderStatus.CANCELLED: [],
     OrderStatus.NSA: [OrderStatus.PENDING],

@@ -554,10 +554,10 @@
               1
             ],
             "details": "Define valid status transitions as state machine: PENDING→[ASSIGNED,CANCELLED], ASSIGNED→[ACCEPTED,PENDING,CANCELLED], ACCEPTED→[IN_TRANSIT,PENDING], IN_TRANSIT→[COLLECTED,UNCOLLECTED,NSA], COLLECTED→[], UNCOLLECTED→[PENDING], CANCELLED→[], NSA→[PENDING]. Create validate_transition(current, target) function that raises 400 if invalid. Create OrderStatusHistory model with order_id, previous_status, new_status, changed_by, changed_at, reason fields. Implement history logging on every status change. Build GET /orders/{order_id}/history endpoint returning chronological list of status changes with actor details.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test each valid transition succeeds and logs history. Test invalid transitions (e.g., PENDING→COLLECTED) return 400. Test history endpoint returns all changes in order. Verify changed_by captures correct user. Test concurrent status updates handle race conditions correctly.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T20:12:39.786Z"
+            "updatedAt": "2026-02-21T20:16:00.199Z"
           },
           {
             "id": 4,
@@ -637,7 +637,7 @@
         "complexity": 8,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the order management into: 1) Order creation with pincode validation, amount calculation, and unique booking_id generation, 2) Order listing with comprehensive filters (status, date range, client, phlebotomist, priority, search), 3) Order status management with valid transition enforcement and history logging, 4) Manual assignment API with phlebotomist validation (zone coverage, availability), 5) Auto-assignment algorithm based on zone matching and workload balancing, 6) Re-routing and bulk assignment APIs, 7) Phlebotomist order actions (accept, reject, start-transit, collect with proof), 8) Order cancellation and rescheduling with history tracking, 9) Bulk order upload from Excel with validation and error reporting. This is the core workflow of the platform.",
-        "updatedAt": "2026-02-21T20:12:39.786Z"
+        "updatedAt": "2026-02-21T20:16:00.199Z"
       },
       {
         "id": "7",
@@ -1693,7 +1693,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T20:12:39.787Z",
+      "lastModified": "2026-02-21T20:16:00.199Z",
       "taskCount": 18,
       "completedCount": 5,
       "tags": [

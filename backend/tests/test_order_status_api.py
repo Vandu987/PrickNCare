@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -162,7 +162,7 @@ class TestUpdateOrderStatus:
         from datetime import UTC, datetime
 
         async def fake_refresh(obj):
-            if not hasattr(obj, 'created_at') or obj.created_at is None:
+            if not hasattr(obj, "created_at") or obj.created_at is None:
                 obj.created_at = datetime.now(UTC)
 
         mock_db.refresh = fake_refresh
