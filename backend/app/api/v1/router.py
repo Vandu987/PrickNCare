@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.accessioning import router as accessioning_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.clients import router as clients_router
 from app.api.v1.health import router as health_router
@@ -24,3 +25,4 @@ router.include_router(nsa_router)
 router.include_router(orders_router)
 router.include_router(packages_router)
 router.include_router(pricing_router)
+router.include_router(accessioning_router)

@@ -1,0 +1,83 @@
+"""Accessioning schemas — tasks 8.1 & 8.4."""
+
+from __future__ import annotations
+
+import uuid
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict
+
+# ── Task 8.1 — Pending samples listing ───────────────────────────────────
+
+
+class PhlebotomistInfo(BaseModel):
+    id: uuid.UUID
+    name: str
+    phone: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ClientInfo(BaseModel):
+    id: uuid.UUID
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PendingSampleItem(BaseModel):
+    order_id: uuid.UUID
+    booking_id: str
+    patient_name: str
+    patient_age: int
+    patient_gender: str
+    patient_phone: str
+    client: ClientInfo
+    expected_sample_types: list[str]
+    collection_timestamp: datetime | None
+    phlebotomist: PhlebotomistInfo | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PendingAccessioningResponse(BaseModel):
+    total: int
+    items: list[PendingSampleItem]
+
+
+# ── Task 8.4 — Barcode scan / order summary ─────────────────────────────
+
+
+class OrderTestSummary(BaseModel):
+    package_name: str
+    package_code: str
+    sample_types: list[str]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class SampleAccessioningSummary(BaseModel):
+    id: uuid.UUID
+    vial_type: str
+    quantity: int
+    integrity: str
+    status: str
+    received_at: datetime | None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class OrderSummaryResponse(BaseModel):
+    order_id: uuid.UUID
+    booking_id: str
+    patient_name: str
+    patient_age: int
+    patient_gender: str
+    client_name: str
+    collected_at: datetime | None
+    phlebotomist_name: str | None
+    ordered_tests: list[OrderTestSummary]
+    status: str
+    accessioning: list[SampleAccessioningSummary]
+
+    model_config = ConfigDict(from_attributes=True)
