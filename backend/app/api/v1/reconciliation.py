@@ -23,11 +23,14 @@ from app.models.reconciliation import (
 )
 from app.models.users import User
 from app.schemas.reconciliation import (
+    CashSubmissionCreate,
+    CashSubmissionResponse,
     PendingReconciliationResponse,
     PhlebotomistSummary,
     ReconciliationCreate,
     ReconciliationResponse,
     ReconciliationUpdate,
+    ReconciliationVerifyResponse,
 )
 
 router = APIRouter(tags=["reconciliation"])
@@ -331,3 +334,122 @@ async def update_reconciliation(
     await db.refresh(rec, attribute_names=["discrepancies"])
 
     return ReconciliationResponse.model_validate(rec)
+
+
+# ── POST /reconciliation/submit (task 9.4) ───────────────────────────
+
+
+@router.post(
+    "/reconciliation/submit",
+    response_model=CashSubmissionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def submit_daily_cash(
+    body: CashSubmissionCreate,
+    user: User = Depends(require_roles("phlebotomist")),
+    db: AsyncSession = Depends(get_db),
+) -> CashSubmissionResponse:
+    """Phlebotomist submits daily cash total for reconciliation review."""
+
+    today = datetime.now(UTC).date()
+
+    # Find phlebotomist record for this user
+    phleb_stmt = select(Phlebotomist).where(Phlebotomist.user_id == user.id)
+    phleb = (await db.execute(phleb_stmt)).scalar_one_or_none()
+    if not phleb:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Phlebotomist profile not found",
+        )
+
+    # Check if reconciliation already exists for today
+    rec_stmt = select(Reconciliation).where(
+        Reconciliation.phlebotomist_id == phleb.id,
+        Reconciliation.date == today,
+    )
+    rec = (await db.execute(rec_stmt)).scalar_one_or_none()
+
+    if rec:
+        # Update existing reconciliation with submission
+        if rec.submitted_cash is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Cash already submitted for today",
+            )
+        rec.submitted_cash = body.total_cash
+        rec.submitted_notes = body.notes
+        rec.submitted_by = user.id
+        rec.submitted_at = datetime.now(UTC)
+        if rec.status == ReconciliationStatus.DRAFT:
+            rec.status = ReconciliationStatus.PENDING_REVIEW
+    else:
+        # Calculate expected cash
+        cash_stmt = select(func.coalesce(func.sum(Payment.amount), 0)).where(
+            Payment.collected_by == user.id,
+            Payment.mode == OrderPaymentMode.CASH,
+            Payment.status != OrderPaymentStatus.RECONCILED,
+            cast(Payment.collected_at, Date) == today,
+        )
+        expected_cash = float((await db.execute(cash_stmt)).scalar_one())
+
+        rec = Reconciliation(
+            phlebotomist_id=phleb.id,
+            date=today,
+            expected_cash=expected_cash,
+            cash_handed_over=0,
+            net_discrepancy=expected_cash,
+            status=ReconciliationStatus.PENDING_REVIEW,
+            created_by=user.id,
+            submitted_cash=body.total_cash,
+            submitted_notes=body.notes,
+            submitted_by=user.id,
+            submitted_at=datetime.now(UTC),
+        )
+        db.add(rec)
+
+    await db.commit()
+    await db.refresh(rec)
+
+    return CashSubmissionResponse.model_validate(rec)
+
+
+# ── POST /reconciliation/{id}/verify (task 9.4) ─────────────────────
+
+
+@router.post(
+    "/reconciliation/{reconciliation_id}/verify",
+    response_model=ReconciliationVerifyResponse,
+)
+async def verify_reconciliation(
+    reconciliation_id: uuid.UUID,
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> ReconciliationVerifyResponse:
+    """Admin verifies/approves a reconciliation. Payments stay RECONCILED."""
+
+    stmt = (
+        select(Reconciliation)
+        .options(selectinload(Reconciliation.discrepancies))
+        .where(Reconciliation.id == reconciliation_id)
+    )
+    rec = (await db.execute(stmt)).scalar_one_or_none()
+    if not rec:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Reconciliation not found",
+        )
+
+    if rec.verified_at is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Reconciliation already verified",
+        )
+
+    rec.status = ReconciliationStatus.CONFIRMED
+    rec.verified_by = user.id
+    rec.verified_at = datetime.now(UTC)
+
+    await db.commit()
+    await db.refresh(rec, attribute_names=["discrepancies"])
+
+    return ReconciliationVerifyResponse.model_validate(rec)

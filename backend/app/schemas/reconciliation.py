@@ -61,9 +61,13 @@ class ReconciliationResponse(BaseModel):
     date: date
     expected_cash: float
     cash_handed_over: float
+    submitted_cash: float | None = None
+    submitted_notes: str | None = None
     net_discrepancy: float
     status: str
     created_by: uuid.UUID
+    verified_by: uuid.UUID | None = None
+    verified_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
     discrepancies: list[DiscrepancyResponse] = []
@@ -73,3 +77,44 @@ class ReconciliationUpdate(BaseModel):
     cash_handed_over: float | None = None
     status: str | None = None
     discrepancies: list[DiscrepancyItem] | None = None
+
+
+# ── Task 9.4 schemas ──────────────────────────────────────────────────
+
+
+class CashSubmissionCreate(BaseModel):
+    total_cash: float
+    notes: str | None = None
+
+
+class CashSubmissionResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    phlebotomist_id: uuid.UUID
+    date: date
+    expected_cash: float
+    submitted_cash: float | None = None
+    submitted_notes: str | None = None
+    submitted_at: datetime | None = None
+    status: str
+
+
+class ReconciliationVerifyResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    phlebotomist_id: uuid.UUID
+    date: date
+    expected_cash: float
+    cash_handed_over: float
+    submitted_cash: float | None = None
+    submitted_notes: str | None = None
+    net_discrepancy: float
+    status: str
+    created_by: uuid.UUID
+    verified_by: uuid.UUID | None = None
+    verified_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+    discrepancies: list[DiscrepancyResponse] = []

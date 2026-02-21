@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import enum
 import uuid
-from datetime import date
+from datetime import date, datetime
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import (
     Date,
+    DateTime,
     Enum,
     ForeignKey,
     Index,
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
 
 class ReconciliationStatus(enum.StrEnum):
     DRAFT = "draft"
+    PENDING_REVIEW = "pending_review"
     CONFIRMED = "confirmed"
     DISPUTED = "disputed"
 
@@ -64,11 +66,35 @@ class Reconciliation(UUIDMixin, TimestampMixin, Base):
         nullable=False,
     )
 
+    # Phlebotomist cash submission fields (task 9.4)
+    submitted_cash: Mapped[float | None] = mapped_column(Numeric(10, 2), nullable=True)
+    submitted_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    submitted_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    submitted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    # Verification fields (task 9.4)
+    verified_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     # Relationships
     phlebotomist: Mapped[Phlebotomist] = relationship(
         "Phlebotomist", foreign_keys=[phlebotomist_id]
     )
     creator: Mapped[User] = relationship("User", foreign_keys=[created_by])
+    submitter: Mapped[User | None] = relationship("User", foreign_keys=[submitted_by])
+    verifier: Mapped[User | None] = relationship("User", foreign_keys=[verified_by])
     discrepancies: Mapped[list[ReconciliationDiscrepancy]] = relationship(
         "ReconciliationDiscrepancy",
         back_populates="reconciliation",
