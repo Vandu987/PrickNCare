@@ -26,6 +26,12 @@ from .phlebotomist_documents import PhlebotomistDocument
 from .phlebotomist_leaves import PhlebotomistLeave
 from .phlebotomist_locations import PhlebotomistLocation
 from .phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
+from .reconciliation import (
+    DiscrepancyCategory,
+    Reconciliation,
+    ReconciliationDiscrepancy,
+    ReconciliationStatus,
+)
 from .samples import SampleAccessioning, SampleIntegrity, SampleStatus, VialType
 from .users import User, UserRole
 from .zones import City, Locality, Pincode, Zone
@@ -73,4 +79,8 @@ __all__ = [
     "InvoiceLineItem",
     "InvoiceStatus",
     "NSARecord",
+    "Reconciliation",
+    "ReconciliationDiscrepancy",
+    "ReconciliationStatus",
+    "DiscrepancyCategory",
 ]
