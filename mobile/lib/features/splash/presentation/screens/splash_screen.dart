@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/config/app_config.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/providers/auth_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -23,11 +23,21 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString(AppConfig.accessTokenKey);
+    final notifier = ref.read(authProvider.notifier);
+    await notifier.checkAuthStatus();
 
-    if (token != null) {
-      context.go(AppConstants.dashboardRoute);
+    if (!mounted) return;
+
+    final state = ref.read(authProvider);
+
+    if (state.status == AuthStatus.authenticated) {
+      // Check if biometric should be shown
+      final showBiometric = await notifier.shouldShowBiometric();
+      if (showBiometric && mounted) {
+        context.go(AppConstants.biometricRoute);
+      } else if (mounted) {
+        context.go(AppConstants.dashboardRoute);
+      }
     } else {
       context.go(AppConstants.loginRoute);
     }

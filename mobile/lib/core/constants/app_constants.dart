@@ -7,6 +7,7 @@ class AppConstants {
   static const String ordersRoute = '/orders';
   static const String orderDetailRoute = '/orders/:id';
   static const String collectionRoute = '/collection/:id';
+  static const String biometricRoute = '/biometric';
   static const String profileRoute = '/profile';
 
   // Collection Status

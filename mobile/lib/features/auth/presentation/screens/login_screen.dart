@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -21,14 +22,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _requestOtp() {
-    if (_formKey.currentState?.validate() ?? false) {
-      context.push(AppConstants.otpRoute, extra: _phoneController.text);
-    }
+  Future<void> _requestOtp() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    await ref.read(authProvider.notifier).requestOtp(_phoneController.text);
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
+    ref.listen<AuthState>(authProvider, (prev, next) {
+      if (next.status == AuthStatus.otpSent) {
+        context.push(AppConstants.otpRoute, extra: _phoneController.text);
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.errorMessage!), backgroundColor: Colors.red),
+        );
+      }
+    });
+
+    final isLoading = authState.status == AuthStatus.loading;
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -56,6 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
+                  enabled: !isLoading,
                   decoration: const InputDecoration(
                     labelText: 'Phone Number',
                     prefixText: '+91 ',
@@ -64,13 +80,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   validator: (value) {
                     if (value == null || value.isEmpty) return 'Enter phone number';
                     if (value.length != 10) return 'Enter valid 10-digit number';
+                    if (!RegExp(r'^\d{10}$').hasMatch(value)) return 'Only digits allowed';
                     return null;
                   },
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: _requestOtp,
-                  child: const Text('Request OTP'),
+                  onPressed: isLoading ? null : _requestOtp,
+                  child: isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Request OTP'),
                 ),
               ],
             ),

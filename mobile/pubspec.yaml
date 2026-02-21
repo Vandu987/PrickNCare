@@ -31,6 +31,9 @@ dependencies:
   geolocator: ^13.0.2
   geocoding: ^3.0.0
 
+  # Biometric Authentication
+  local_auth: ^2.3.0
+
   # Camera & Media
   image_picker: ^1.1.2
 
