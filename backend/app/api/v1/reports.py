@@ -1,10 +1,11 @@
-"""Report endpoints — tasks 14.1, 14.2 & 14.3."""
+"""Report endpoints — tasks 14.1, 14.2, 14.3 & 14.4."""
 
 from __future__ import annotations
 
 import uuid
 from datetime import date
 from decimal import Decimal
+from enum import Enum as PyEnum
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
@@ -17,6 +18,7 @@ from app.models.clients import Client, PaymentTerms
 from app.models.orders import Order, OrderStatus
 from app.models.payments import Payment
 from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
+from app.models.samples import SampleAccessioning
 from app.models.users import User
 from app.models.zones import Pincode, Zone
 from app.schemas.report import (
@@ -26,6 +28,10 @@ from app.schemas.report import (
     DailyCollectionReport,
     PhlebotomistPerformanceItem,
     PhlebotomistPerformanceReport,
+    RevenueDataPoint,
+    RevenueReport,
+    TATAnalysisReport,
+    TATByPriority,
     ZoneWiseReport,
     ZoneWiseReportItem,
 )
@@ -433,3 +439,193 @@ async def zone_wise_report(
         )
 
     return ZoneWiseReport(date_from=date_from, date_to=date_to, items=items)
+
+
+# ---------------------------------------------------------------------------
+# Task 14.4 — Revenue report & TAT analysis
+# ---------------------------------------------------------------------------
+
+
+class GroupBy(str, PyEnum):
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+
+
+@router.get("/revenue", response_model=RevenueReport)
+async def revenue_report(
+    date_from: date = Query(..., description="Start date (inclusive)"),
+    date_to: date = Query(..., description="End date (inclusive)"),
+    group_by: GroupBy = Query(GroupBy.DAY, description="Group by day/week/month"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> RevenueReport:
+    """Time-series revenue report grouped by day, week, or month."""
+
+    # Build the truncation expression based on group_by
+    if group_by == GroupBy.DAY:
+        trunc_expr = func.date_trunc("day", Order.appointment_date)
+    elif group_by == GroupBy.WEEK:
+        trunc_expr = func.date_trunc("week", Order.appointment_date)
+    else:
+        trunc_expr = func.date_trunc("month", Order.appointment_date)
+
+    stmt = (
+        select(
+            trunc_expr.label("period"),
+            func.sum(Order.amount).label("total_revenue"),
+            func.count(Order.id).label("order_count"),
+        )
+        .where(
+            Order.appointment_date >= date_from,
+            Order.appointment_date <= date_to,
+            Order.status == OrderStatus.COMPLETED,
+        )
+        .group_by(trunc_expr)
+        .order_by(trunc_expr)
+    )
+
+    result = await db.execute(stmt)
+    rows = result.all()
+
+    data = []
+    for row in rows:
+        period_val = row[0]
+        total_rev = float(row[1] or 0)
+        count = int(row[2] or 0)
+        avg_val = round(total_rev / count, 2) if count > 0 else 0.0
+        # Format period label
+        if hasattr(period_val, "strftime"):
+            period_label = period_val.strftime("%Y-%m-%d")
+        else:
+            period_label = str(period_val)
+        data.append(
+            RevenueDataPoint(
+                period=period_label,
+                total_revenue=round(total_rev, 2),
+                order_count=count,
+                avg_order_value=avg_val,
+            )
+        )
+
+    return RevenueReport(
+        date_from=date_from,
+        date_to=date_to,
+        group_by=group_by.value,
+        data=data,
+    )
+
+
+@router.get("/tat-analysis", response_model=TATAnalysisReport)
+async def tat_analysis_report(
+    date_from: date = Query(..., description="Start date (inclusive)"),
+    date_to: date = Query(..., description="End date (inclusive)"),
+    city_id: uuid.UUID | None = Query(None, description="Filter by city"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> TATAnalysisReport:
+    """TAT (turnaround time) analysis report with priority breakdown."""
+
+    # Base order filter
+    order_filters = [
+        Order.appointment_date >= date_from,
+        Order.appointment_date <= date_to,
+        Order.assigned_at.isnot(None),
+        Order.collected_at.isnot(None),
+    ]
+
+    if city_id is not None:
+        zone_ids = select(Zone.id).where(Zone.city_id == city_id)
+        pincode_ids = select(Pincode.id).where(Pincode.zone_id.in_(zone_ids))
+        order_filters.append(Order.pincode_id.in_(pincode_ids))
+
+    # Fetch relevant orders with their samples for collection→accessioning TAT
+    order_stmt = select(Order).where(*order_filters)
+    result = await db.execute(order_stmt)
+    orders: list[Order] = list(result.scalars().all())
+
+    if not orders:
+        return TATAnalysisReport(date_from=date_from, date_to=date_to, by_priority=[])
+
+    # Get accessioning timestamps for these orders
+    order_ids = [o.id for o in orders]
+    acc_stmt = (
+        select(
+            SampleAccessioning.order_id,
+            func.min(SampleAccessioning.created_at).label("first_accessioned_at"),
+        )
+        .where(SampleAccessioning.order_id.in_(order_ids))
+        .group_by(SampleAccessioning.order_id)
+    )
+    acc_result = await db.execute(acc_stmt)
+    acc_map: dict[uuid.UUID, object] = {r[0]: r[1] for r in acc_result.all()}
+
+    # Compute TAT values
+    assign_to_collect: list[float] = []
+    collect_to_accession: list[float] = []
+    by_priority_data: dict[str, dict] = {}
+
+    for o in orders:
+        a2c = (o.collected_at - o.assigned_at).total_seconds() / 60.0
+        assign_to_collect.append(a2c)
+
+        c2a = None
+        acc_time = acc_map.get(o.id)
+        if acc_time is not None and o.collected_at is not None:
+            c2a = (acc_time - o.collected_at).total_seconds() / 60.0
+            collect_to_accession.append(c2a)
+
+        priority_key = o.priority.value if o.priority else "normal"
+        bucket = by_priority_data.setdefault(
+            priority_key, {"a2c": [], "c2a": [], "count": 0}
+        )
+        bucket["a2c"].append(a2c)
+        if c2a is not None:
+            bucket["c2a"].append(c2a)
+        bucket["count"] += 1
+
+    # Overall averages
+    avg_a2c = (
+        round(sum(assign_to_collect) / len(assign_to_collect), 2)
+        if assign_to_collect
+        else None
+    )
+    avg_c2a = (
+        round(sum(collect_to_accession) / len(collect_to_accession), 2)
+        if collect_to_accession
+        else None
+    )
+
+    # P95 for assignment→collection
+    p95 = None
+    if assign_to_collect:
+        sorted_vals = sorted(assign_to_collect)
+        idx = int(len(sorted_vals) * 0.95)
+        idx = min(idx, len(sorted_vals) - 1)
+        p95 = round(sorted_vals[idx], 2)
+
+    # By priority breakdown
+    by_priority = []
+    for pkey in sorted(by_priority_data.keys()):
+        b = by_priority_data[pkey]
+        by_priority.append(
+            TATByPriority(
+                priority=pkey,
+                avg_assignment_to_collection_minutes=(
+                    round(sum(b["a2c"]) / len(b["a2c"]), 2) if b["a2c"] else None
+                ),
+                avg_collection_to_accessioning_minutes=(
+                    round(sum(b["c2a"]) / len(b["c2a"]), 2) if b["c2a"] else None
+                ),
+                order_count=b["count"],
+            )
+        )
+
+    return TATAnalysisReport(
+        date_from=date_from,
+        date_to=date_to,
+        avg_assignment_to_collection_minutes=avg_a2c,
+        avg_collection_to_accessioning_minutes=avg_c2a,
+        percentile_95_assignment_to_collection_minutes=p95,
+        by_priority=by_priority,
+    )

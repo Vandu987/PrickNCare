@@ -87,6 +87,47 @@ class ZoneWiseReport(BaseModel):
 # ── Task 14.2: Phlebotomist Performance Report ──────────────────────────
 
 
+# ── Task 14.4: Revenue & TAT Analysis report schemas ────────────────────
+
+
+class RevenueDataPoint(BaseModel):
+    """Single time-series data point for revenue report."""
+
+    period: str = Field(..., description="Period label (date or week/month range)")
+    total_revenue: float = 0.0
+    order_count: int = 0
+    avg_order_value: float = 0.0
+
+
+class RevenueReport(BaseModel):
+    """Time-series revenue report."""
+
+    date_from: date
+    date_to: date
+    group_by: str
+    data: list[RevenueDataPoint] = Field(default_factory=list)
+
+
+class TATByPriority(BaseModel):
+    """TAT breakdown for a single priority level."""
+
+    priority: str
+    avg_assignment_to_collection_minutes: float | None = None
+    avg_collection_to_accessioning_minutes: float | None = None
+    order_count: int = 0
+
+
+class TATAnalysisReport(BaseModel):
+    """TAT analysis report."""
+
+    date_from: date
+    date_to: date
+    avg_assignment_to_collection_minutes: float | None = None
+    avg_collection_to_accessioning_minutes: float | None = None
+    percentile_95_assignment_to_collection_minutes: float | None = None
+    by_priority: list[TATByPriority] = Field(default_factory=list)
+
+
 class PhlebotomistPerformanceItem(BaseModel):
     """Performance metrics for a single phlebotomist."""
 

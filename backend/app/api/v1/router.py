@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.v1.accessioning import router as accessioning_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.clients import router as clients_router
+from app.api.v1.files import router as files_router
 from app.api.v1.health import router as health_router
 from app.api.v1.invoices import router as invoices_router
 from app.api.v1.notifications import router as notifications_router
@@ -36,3 +37,4 @@ router.include_router(payments_router)
 router.include_router(notifications_router)
 router.include_router(reconciliation_router)
 router.include_router(reports_router)
+router.include_router(files_router)

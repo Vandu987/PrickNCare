@@ -36,14 +36,24 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refresh_token");
-        if (refreshToken) {
-          const { data } = await axios.post(
-            `${api.defaults.baseURL}/auth/token/refresh/`,
-            { refresh: refreshToken }
+        const accessToken = localStorage.getItem("access_token");
+        if (refreshToken && accessToken) {
+          // Decode current access token to get user_id and jti
+          const payload = JSON.parse(
+            atob(accessToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
           );
-          localStorage.setItem("access_token", data.access);
+          const { data } = await axios.post(
+            `${api.defaults.baseURL}/auth/refresh`,
+            {
+              user_id: payload.sub,
+              jti: payload.jti,
+              refresh_token: refreshToken,
+            }
+          );
+          localStorage.setItem("access_token", data.access_token);
+          localStorage.setItem("refresh_token", data.refresh_token);
           if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${data.access}`;
+            originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
           }
           return api(originalRequest);
         }
@@ -51,6 +61,7 @@ api.interceptors.response.use(
         // Refresh failed - clear tokens and redirect to login
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
+        document.cookie = "logged_in=; path=/; max-age=0";
         if (typeof window !== "undefined") {
           window.location.href = "/login";
         }
