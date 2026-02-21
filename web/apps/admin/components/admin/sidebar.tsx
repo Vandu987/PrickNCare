@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Droplets,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
@@ -29,6 +30,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/", icon: LayoutDashboard },
   { title: "Bookings", href: "/bookings", icon: CalendarDays },
+  { title: "Clients", href: "/clients", icon: Building2 },
   { title: "Patients", href: "/patients", icon: Users },
   { title: "Phlebotomists", href: "/phlebotomists", icon: TestTube },
   { title: "Service Areas", href: "/service-areas", icon: MapPin },
