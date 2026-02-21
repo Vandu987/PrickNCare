@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 import app.models.audit  # noqa: F401
 import app.models.clients  # noqa: F401
+import app.models.invoices  # noqa: F401
 import app.models.orders  # noqa: F401
 import app.models.packages  # noqa: F401
 import app.models.payments  # noqa: F401
