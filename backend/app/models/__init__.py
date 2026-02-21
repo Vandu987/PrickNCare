@@ -2,6 +2,7 @@ from .audit import AuditLog
 from .base import Base, TimestampMixin, UUIDMixin
 from .client_rate_history import ClientRateHistory
 from .clients import Client, ClientUser, PaymentTerms
+from .nsa import NSARecord
 from .orders import (
     Order,
     OrderPriority,
@@ -57,4 +58,5 @@ __all__ = [
     "DiscrepancyType",
     "AuditLog",
     "ClientRateHistory",
+    "NSARecord",
 ]

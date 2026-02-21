@@ -1,9 +1,12 @@
-"""City, Zone, Pincode & Locality CRUD endpoints — tasks 5.1–5.4."""
+"""City, Zone, Pincode & Locality CRUD endpoints — tasks 5.1–5.5."""
 
 from __future__ import annotations
 
 import csv
 import io
+import json
+import logging
+import os
 import uuid
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -13,6 +16,8 @@ from sqlalchemy.orm import selectinload
 
 from app.api.deps import require_roles
 from app.core.database import get_db
+from app.models.nsa import NSARecord
+from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User
 from app.models.zones import City, Locality, Pincode, Zone
 from app.schemas.zone import (
@@ -27,17 +32,79 @@ from app.schemas.zone import (
     LocalityCreate,
     LocalityListResponse,
     LocalityResponse,
+    NSAListResponse,
+    NSAMarkRequest,
+    NSARecordResponse,
     PincodeCreate,
     PincodeListResponse,
     PincodeResponse,
     PincodeSuggestion,
     PincodeZoneUpdate,
+    ServiceAvailability,
     ZoneActiveUpdate,
     ZoneCreate,
     ZoneListResponse,
     ZoneResponse,
     ZoneUpdate,
 )
+
+logger = logging.getLogger(__name__)
+
+# ── Redis cache helper — task 5.5 ───────────────────────────────────────
+
+_redis_client: object | None = None
+_redis_init_done = False
+
+
+async def _get_redis():  # noqa: ANN202
+    """Return an async Redis client, or None if unavailable."""
+    global _redis_client, _redis_init_done  # noqa: PLW0603
+    if _redis_init_done:
+        return _redis_client
+    _redis_init_done = True
+    redis_url = os.environ.get("REDIS_URL")
+    if not redis_url:
+        return None
+    try:
+        from redis.asyncio import from_url
+
+        _redis_client = await from_url(redis_url, decode_responses=True)  # type: ignore[assignment]
+        return _redis_client
+    except Exception:
+        logger.warning("Redis unavailable, caching disabled")
+        return None
+
+
+async def _cache_get(key: str) -> dict | None:
+    r = await _get_redis()
+    if r is None:
+        return None
+    try:
+        val = await r.get(key)  # type: ignore[union-attr]
+        return json.loads(val) if val else None
+    except Exception:
+        return None
+
+
+async def _cache_set(key: str, value: dict, ttl: int = 300) -> None:
+    r = await _get_redis()
+    if r is None:
+        return
+    try:
+        await r.set(key, json.dumps(value, default=str), ex=ttl)  # type: ignore[union-attr]
+    except Exception:
+        pass
+
+
+async def _cache_delete(key: str) -> None:
+    r = await _get_redis()
+    if r is None:
+        return
+    try:
+        await r.delete(key)  # type: ignore[union-attr]
+    except Exception:
+        pass
+
 
 router = APIRouter(prefix="/cities", tags=["cities"])
 
@@ -873,3 +940,174 @@ async def get_localities_by_pincode(
     localities = list(result.scalars().all())
 
     return [_locality_to_response(loc) for loc in localities]
+
+
+# ── NSA (Non-Serviceable Area) endpoints — task 5.5 ─────────────────────
+
+nsa_router = APIRouter(prefix="/nsa", tags=["nsa"])
+
+
+@nsa_router.get("/check", response_model=ServiceAvailability)
+async def check_service_availability(
+    pincode: str = Query(..., min_length=6, max_length=6),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Check if a pincode is serviceable. No auth required (for order forms)."""
+    cache_key = f"service_check:{pincode}"
+    cached = await _cache_get(cache_key)
+    if cached is not None:
+        return cached
+
+    # Check NSA first
+    nsa_result = await db.execute(
+        select(NSARecord).where(
+            NSARecord.pincode == pincode, NSARecord.is_active.is_(True)
+        )
+    )
+    nsa = nsa_result.scalar_one_or_none()
+    if nsa is not None:
+        result = {
+            "is_serviceable": False,
+            "zone_name": None,
+            "city_name": None,
+            "available_phlebotomists": 0,
+            "nsa_reason": nsa.reason,
+        }
+        await _cache_set(cache_key, result)
+        return result
+
+    # Look up pincode → zone → city
+    pc_result = await db.execute(
+        select(Pincode)
+        .where(Pincode.pincode == pincode)
+        .options(selectinload(Pincode.zone).selectinload(Zone.city))
+    )
+    pc = pc_result.scalar_one_or_none()
+
+    if pc is None or not pc.zone.is_active or not pc.zone.city.is_serviceable:
+        result = {
+            "is_serviceable": False,
+            "zone_name": pc.zone.name if pc else None,
+            "city_name": pc.zone.city.name if pc else None,
+            "available_phlebotomists": 0,
+            "nsa_reason": None,
+        }
+        await _cache_set(cache_key, result)
+        return result
+
+    # Count available phlebotomists in that zone
+    phleb_count_result = await db.execute(
+        select(func.count())
+        .select_from(PhlebotomistZoneAssignment)
+        .join(
+            Phlebotomist, PhlebotomistZoneAssignment.phlebotomist_id == Phlebotomist.id
+        )
+        .where(
+            PhlebotomistZoneAssignment.zone_id == pc.zone_id,
+            Phlebotomist.is_available.is_(True),
+        )
+    )
+    phleb_count = phleb_count_result.scalar_one()
+
+    result = {
+        "is_serviceable": True,
+        "zone_name": pc.zone.name,
+        "city_name": pc.zone.city.name,
+        "available_phlebotomists": phleb_count,
+        "nsa_reason": None,
+    }
+    await _cache_set(cache_key, result)
+    return result
+
+
+@nsa_router.post(
+    "/mark", response_model=NSARecordResponse, status_code=status.HTTP_201_CREATED
+)
+async def mark_nsa(
+    body: NSAMarkRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(require_roles("super_admin")),
+) -> NSARecord:
+    """Mark a pincode as non-serviceable."""
+    # Check if already marked
+    existing = await db.execute(
+        select(NSARecord).where(
+            NSARecord.pincode == body.pincode, NSARecord.is_active.is_(True)
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Pincode {body.pincode} is already marked as NSA",
+        )
+
+    record = NSARecord(
+        pincode=body.pincode,
+        reason=body.reason,
+        marked_by=user.id,
+    )
+    db.add(record)
+    await db.commit()
+    await db.refresh(record)
+
+    await _cache_delete(f"service_check:{body.pincode}")
+    return record
+
+
+@nsa_router.delete("/unmark", status_code=status.HTTP_200_OK)
+async def unmark_nsa(
+    pincode: str = Query(..., min_length=6, max_length=6),
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(require_roles("super_admin")),
+) -> dict:
+    """Remove NSA marking from a pincode."""
+    result = await db.execute(
+        select(NSARecord).where(
+            NSARecord.pincode == pincode, NSARecord.is_active.is_(True)
+        )
+    )
+    record = result.scalar_one_or_none()
+    if record is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No active NSA record for pincode {pincode}",
+        )
+
+    record.is_active = False
+    await db.commit()
+
+    await _cache_delete(f"service_check:{pincode}")
+    return {"detail": f"NSA marking removed for pincode {pincode}"}
+
+
+@nsa_router.get("/list", response_model=NSAListResponse)
+async def list_nsa(
+    city_id: uuid.UUID | None = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> dict:
+    """List NSA areas with optional city filter."""
+    query = select(NSARecord).where(NSARecord.is_active.is_(True))
+    count_query = (
+        select(func.count()).select_from(NSARecord).where(NSARecord.is_active.is_(True))
+    )
+
+    if city_id is not None:
+        # Filter by pincodes belonging to zones in the given city
+        pincode_sub = (
+            select(Pincode.pincode)
+            .join(Zone, Pincode.zone_id == Zone.id)
+            .where(Zone.city_id == city_id)
+        )
+        query = query.where(NSARecord.pincode.in_(pincode_sub))
+        count_query = count_query.where(NSARecord.pincode.in_(pincode_sub))
+
+    total = (await db.execute(count_query)).scalar_one()
+    result = await db.execute(
+        query.offset(skip).limit(limit).order_by(NSARecord.marked_at.desc())
+    )
+    items = list(result.scalars().all())
+
+    return {"items": items, "total": total}

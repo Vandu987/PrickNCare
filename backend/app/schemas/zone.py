@@ -154,3 +154,44 @@ class LocalityResponse(BaseModel):
 class LocalityListResponse(BaseModel):
     items: list[LocalityResponse]
     total: int
+
+
+# ── NSA / Service Availability schemas — task 5.5 ───────────────────────
+
+
+class ServiceAvailability(BaseModel):
+    is_serviceable: bool
+    zone_name: str | None = None
+    city_name: str | None = None
+    available_phlebotomists: int = 0
+    nsa_reason: str | None = None
+
+
+class NSAMarkRequest(BaseModel):
+    pincode: str
+    reason: str | None = None
+
+    @field_validator("pincode")
+    @classmethod
+    def validate_pincode_format(cls, v: str) -> str:
+        import re
+
+        if not re.fullmatch(r"\d{6}", v):
+            raise ValueError("Pincode must be exactly 6 digits")
+        return v
+
+
+class NSARecordResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    pincode: str
+    reason: str | None
+    marked_at: datetime
+    marked_by: uuid.UUID | None
+    is_active: bool
+
+
+class NSAListResponse(BaseModel):
+    items: list[NSARecordResponse]
+    total: int

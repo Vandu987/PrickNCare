@@ -484,10 +484,10 @@
               3
             ],
             "details": "Add Locality endpoints to api/v1/zones.py:\n\n1. **POST /localities** - Create locality with name and pincode_id\n2. **POST /localities/bulk** - Bulk create localities from list of {name, pincode_id}\n3. **GET /localities** - List with filters: pincode_id, pincode (string match), search (name contains)\n4. **GET /localities/by-pincode/{pincode}** - Get all localities for a pincode string (for order form dropdown)\n\nPydantic schemas:\n- LocalityCreate(name: str, pincode_id: UUID)\n- BulkLocalityCreate(localities: List[LocalityCreate])\n- LocalityResponse(id: UUID, name: str, pincode: str, pincode_id: UUID, zone_name: str)\n\nExtend import endpoint to handle locality column:\n- During CSV/Excel import, create localities after pincodes\n- Handle duplicates gracefully (skip or update)\n\nAdd full-text search index on locality name for efficient search. Include pagination for list endpoints (skip, limit with sensible defaults).\n\nImplement Redis caching for get_localities_by_pincode:\n```python\nasync def get_cached_pincode_localities(pincode: str):\n    cache_key = f\"localities:{pincode}\"\n    cached = await redis.get(cache_key)\n    if cached:\n        return json.loads(cached)\n    localities = await fetch_from_db(pincode)\n    await redis.setex(cache_key, 3600, json.dumps(localities))\n    return localities\n```\n\nInvalidate cache on locality create/update/delete for affected pincode.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test locality creation with valid pincode_id. Test bulk creation handles duplicates appropriately. Test search endpoint with partial name match. Test by-pincode endpoint returns all localities for given pincode. Test Redis caching - second call should hit cache (verify with mock). Test cache invalidation on locality modification. Test pagination parameters work correctly. Test import creates localities linked to correct pincodes.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:56:55.708Z"
+            "updatedAt": "2026-02-21T19:59:58.493Z"
           },
           {
             "id": 5,
@@ -498,15 +498,16 @@
               4
             ],
             "details": "Add NSA endpoints to api/v1/zones.py:\n\n1. **GET /nsa/check** - Check service availability for pincode\n   - Returns: is_serviceable, zone info, available_phlebotomists count\n   - Use Redis cache with 5-minute TTL for frequently checked pincodes\n   - Query phlebotomist availability from their zone assignments\n\n2. **POST /nsa/mark** - Mark pincode as NSA (No Service Area)\n   - Parameters: pincode, reason (optional)\n   - Create/update NSA record with timestamp and marked_by user\n   - Invalidate related caches\n\n3. **DELETE /nsa/unmark** - Remove NSA marking from pincode\n   - Restore pincode to serviceable status\n   - Invalidate caches\n\n4. **GET /nsa/list** - List all NSA areas with optional city_id filter\n   - Include reason, marked_at, marked_by information\n   - Pagination support\n\nPydantic schemas:\n- ServiceAvailability(is_serviceable: bool, zone: Optional[ZoneInfo], available_phlebotomists: int, nsa_reason: Optional[str])\n- NSARecord(pincode: str, reason: Optional[str], marked_at: datetime, marked_by: str)\n\nRedis caching strategy:\n- Cache key pattern: `service_check:{pincode}`\n- TTL: 300 seconds (5 minutes)\n- Invalidate on: NSA mark/unmark, zone deactivation, city serviceable toggle\n\nCreate NSA database table: pincode (unique), reason, marked_by (FK to users), marked_at, is_active.\n\nIntegrate with order creation - orders for NSA pincodes should be flagged or rejected based on business rules.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test /nsa/check returns correct status for serviceable pincode with zone info. Test /nsa/check returns is_serviceable=false for NSA-marked pincode. Test mark endpoint creates NSA record with reason and user info. Test unmark removes NSA status. Test list endpoint with and without city filter. Test Redis caching - verify cache hit on repeated calls. Test cache invalidation on mark/unmark operations. Test available_phlebotomists count reflects actual availability. Test order integration - verify NSA pincode handling in order creation flow.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T20:00:48.528Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
-        "updatedAt": "2026-02-21T19:56:55.708Z"
+        "updatedAt": "2026-02-21T20:00:48.528Z"
       },
       {
         "id": "6",
@@ -1688,7 +1689,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:56:55.708Z",
+      "lastModified": "2026-02-21T20:00:48.528Z",
       "taskCount": 18,
       "completedCount": 4,
       "tags": [
