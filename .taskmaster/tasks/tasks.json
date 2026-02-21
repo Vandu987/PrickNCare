@@ -458,10 +458,10 @@
               1
             ],
             "details": "Add Zone endpoints to api/v1/zones.py:\n\n1. **POST /zones** - Create zone with name and city_id (validate city exists and is serviceable)\n2. **GET /zones** - List zones with optional filters: city_id, is_active\n3. **PUT /zones/{zone_id}** - Update zone details (name, city_id reassignment)\n4. **PUT /zones/{zone_id}/active** - Toggle zone is_active status\n5. **DELETE /zones/{zone_id}** - Soft delete zone (check no active pincodes assigned)\n\nPydantic schemas:\n- ZoneCreate(name: str, city_id: UUID)\n- ZoneUpdate(name: Optional[str], city_id: Optional[UUID])\n- ZoneResponse(id: UUID, name: str, city_id: UUID, city_name: str, is_active: bool, pincode_count: int)\n\nDatabase model: id, name, city_id (FK), is_active (default True), created_at, updated_at.\n\nInclude eager loading of city data for response. Add cascade considerations - deactivating zone should flag associated pincodes.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test zone creation with valid city_id succeeds. Test zone creation with non-existent city_id returns 404. Test zone creation with non-serviceable city returns 400. Test list endpoint filters by city_id and is_active correctly. Test active toggle updates zone and related pincodes appropriately. Test delete with associated pincodes returns appropriate error.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T19:46:54.940Z"
+            "updatedAt": "2026-02-21T19:50:29.712Z"
           },
           {
             "id": 3,
@@ -471,9 +471,10 @@
               2
             ],
             "details": "Add Pincode endpoints to api/v1/zones.py:\n\n1. **POST /pincodes** - Create single pincode with zone_id assignment\n2. **POST /pincodes/bulk** - Bulk create pincodes from list of {pincode, zone_id}\n3. **GET /pincodes** - List with filters: zone_id, search (prefix match)\n4. **GET /pincodes/suggest** - Auto-suggest endpoint for order form, returns top 10 matches with zone info\n5. **PUT /pincodes/{pincode_id}/zone** - Reassign pincode to different zone\n6. **POST /zones/import** - Import from Excel/CSV with columns: city, zone, pincode, locality\n\nPydantic schemas:\n- PincodeCreate(pincode: str, zone_id: UUID)\n- BulkPincodeCreate(pincodes: List[PincodeCreate])\n- PincodeSuggestion(id: UUID, pincode: str, zone_name: str, city_name: str)\n\nFor import endpoint:\n- Accept multipart/form-data with file upload\n- Parse using pandas (Excel) or csv module\n- Validate all data before insert (check cities/zones exist or create)\n- Return import summary with success/error counts\n\nAdd index on pincode column for fast prefix search. Validate pincode format (6 digits for India).",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test pincode creation with valid zone_id. Test bulk creation with mixed valid/invalid data returns partial success. Test suggest endpoint returns max 10 results sorted by pincode. Test import with valid CSV/Excel file creates all records. Test import with missing columns returns validation error. Test import with non-existent zone auto-creates or returns error based on config. Test pincode format validation rejects invalid formats.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:51:14.292Z"
           },
           {
             "id": 4,
@@ -504,7 +505,7 @@
         "complexity": 5,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
-        "updatedAt": "2026-02-21T19:46:54.940Z"
+        "updatedAt": "2026-02-21T19:51:14.292Z"
       },
       {
         "id": "6",
@@ -1686,7 +1687,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T19:46:54.941Z",
+      "lastModified": "2026-02-21T19:51:14.293Z",
       "taskCount": 18,
       "completedCount": 4,
       "tags": [

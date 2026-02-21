@@ -224,9 +224,7 @@ class TestListZones:
         # Pincode count query
         pc_result = MagicMock()
         pc_result.__iter__ = MagicMock(return_value=iter([]))
-        mock_db.execute = AsyncMock(
-            side_effect=[count_result, data_result, pc_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[count_result, data_result, pc_result])
 
         _setup_overrides(ADMIN_USER, mock_db)
 
@@ -270,9 +268,7 @@ class TestListZones:
         data_result.scalars.return_value = scalars_mock
         pc_result = MagicMock()
         pc_result.__iter__ = MagicMock(return_value=iter([]))
-        mock_db.execute = AsyncMock(
-            side_effect=[count_result, data_result, pc_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[count_result, data_result, pc_result])
 
         _setup_overrides(ADMIN_USER, mock_db)
 
@@ -295,9 +291,7 @@ class TestListZones:
         data_result.scalars.return_value = scalars_mock
         pc_result = MagicMock()
         pc_result.__iter__ = MagicMock(return_value=iter([]))
-        mock_db.execute = AsyncMock(
-            side_effect=[count_result, data_result, pc_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[count_result, data_result, pc_result])
 
         _setup_overrides(ADMIN_USER, mock_db)
 
@@ -391,9 +385,7 @@ class TestUpdateZone:
         pc_result = MagicMock()
         pc_result.scalar_one.return_value = 0
 
-        mock_db.execute = AsyncMock(
-            side_effect=[find_result, reload_result, pc_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[find_result, reload_result, pc_result])
 
         _setup_overrides(ADMIN_USER, mock_db)
 
@@ -449,9 +441,7 @@ class TestToggleZoneActive:
         pc_result = MagicMock()
         pc_result.scalar_one.return_value = 0
 
-        mock_db.execute = AsyncMock(
-            side_effect=[find_result, reload_result, pc_result]
-        )
+        mock_db.execute = AsyncMock(side_effect=[find_result, reload_result, pc_result])
 
         _setup_overrides(ADMIN_USER, mock_db)
 
