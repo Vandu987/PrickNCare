@@ -56,11 +56,21 @@ class Settings(BaseSettings):
     FCM_CREDENTIALS_PATH: str = ""
 
     # Rate Limiting (requests per minute)
+    RATE_LIMIT_ENABLED: bool = True
     RATE_LIMIT_DEFAULT: int = 100
     RATE_LIMIT_ADMIN: int = 500
     RATE_LIMIT_CLIENT: int = 200
     RATE_LIMIT_PHLEBOTOMIST: int = 100
+    RATE_LIMIT_AUTH: int = 10  # auth endpoints (login, OTP, register)
     RATE_LIMIT_LOGIN: int = 5  # brute-force protection
+
+    # AWS / S3
+    AWS_ACCESS_KEY_ID: str = ""
+    AWS_SECRET_ACCESS_KEY: str = ""
+    AWS_REGION: str = "ap-south-1"
+    S3_BUCKET_NAME: str = ""
+    CLOUDFRONT_DOMAIN: str = ""
+    LOCAL_STORAGE_DIR: str = "uploads"
 
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
