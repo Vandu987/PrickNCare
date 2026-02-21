@@ -1,3 +1,4 @@
+from .audit import AuditLog
 from .base import Base, TimestampMixin, UUIDMixin
 from .clients import Client, ClientUser, PaymentTerms
 from .orders import (
@@ -47,4 +48,5 @@ __all__ = [
     "SampleStatus",
     "PhlebotomistCashReconciliation",
     "DiscrepancyType",
+    "AuditLog",
 ]
