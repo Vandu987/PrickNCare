@@ -31,9 +31,36 @@ from app.schemas.order import (
     OrderDetailResponse,
     OrderListResponse,
     OrderResponse,
+    OrderStatusUpdate,
+    StatusHistoryResponse,
 )
 
 router = APIRouter(prefix="/orders", tags=["orders"])
+
+# State machine: valid status transitions
+_VALID_TRANSITIONS: dict[OrderStatus, list[OrderStatus]] = {
+    OrderStatus.PENDING: [OrderStatus.ASSIGNED, OrderStatus.CANCELLED],
+    OrderStatus.ASSIGNED: [
+        OrderStatus.ACCEPTED,
+        OrderStatus.PENDING,
+        OrderStatus.CANCELLED,
+    ],
+    OrderStatus.ACCEPTED: [OrderStatus.IN_TRANSIT, OrderStatus.PENDING],
+    OrderStatus.IN_TRANSIT: [
+        OrderStatus.COLLECTED,
+        OrderStatus.UNCOLLECTED,
+        OrderStatus.NSA,
+    ],
+    OrderStatus.COLLECTED: [],
+    OrderStatus.UNCOLLECTED: [OrderStatus.PENDING],
+    OrderStatus.CANCELLED: [],
+    OrderStatus.NSA: [OrderStatus.PENDING],
+}
+
+
+def validate_transition(current: OrderStatus, target: OrderStatus) -> bool:
+    """Check whether a status transition is allowed."""
+    return target in _VALID_TRANSITIONS.get(current, [])
 
 
 async def _generate_booking_id(db: AsyncSession, appt_date: date) -> str:
@@ -250,3 +277,83 @@ async def get_order(
             detail="Order not found",
         )
     return order
+
+
+@router.put(
+    "/{order_id}/status",
+    response_model=StatusHistoryResponse,
+)
+async def update_order_status(
+    order_id: uuid.UUID,
+    payload: OrderStatusUpdate,
+    user: User = Depends(
+        require_roles("super_admin", "city_admin", "client_user", "phlebotomist")
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> OrderStatusHistory:
+    """Update order status with state machine validation."""
+    result = await db.execute(select(Order).where(Order.id == order_id))
+    order = result.scalar_one_or_none()
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+
+    try:
+        target_status = OrderStatus(payload.status)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid status: {payload.status}",
+        ) from None
+
+    if not validate_transition(order.status, target_status):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                f"Cannot transition from {order.status.value}"
+                f" to {target_status.value}"
+            ),
+        )
+
+    order.status = target_status
+
+    history = OrderStatusHistory(
+        order_id=order.id,
+        status=target_status,
+        changed_by=user.id,
+        notes=payload.reason,
+    )
+    db.add(history)
+
+    await db.commit()
+    await db.refresh(history)
+    return history
+
+
+@router.get(
+    "/{order_id}/history",
+    response_model=list[StatusHistoryResponse],
+)
+async def get_order_history(
+    order_id: uuid.UUID,
+    user: User = Depends(
+        require_roles("super_admin", "city_admin", "client_user", "phlebotomist")
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> list[OrderStatusHistory]:
+    """Return chronological list of status changes for an order."""
+    order_result = await db.execute(select(Order.id).where(Order.id == order_id))
+    if order_result.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+
+    result = await db.execute(
+        select(OrderStatusHistory)
+        .where(OrderStatusHistory.order_id == order_id)
+        .order_by(OrderStatusHistory.created_at.asc())
+    )
+    return list(result.scalars().all())

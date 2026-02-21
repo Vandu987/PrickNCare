@@ -3,18 +3,15 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, date, datetime
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 
 from app.main import app
-from app.models.clients import ClientUser
-from app.models.orders import Order, OrderPriority, OrderStatus
-from app.models.phlebotomists import Phlebotomist
+from app.models.orders import Order
 from app.models.users import User, UserRole
-
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -86,7 +83,7 @@ def _mock_order(
     order.payment_mode = "cash"
     order.payment_status = "pending"
     order.assigned_phlebotomist_id = phleb_id
-    order.created_at = datetime.now(timezone.utc)
+    order.created_at = datetime.now(UTC)
     order.status_history = []
     return order
 
@@ -243,9 +240,7 @@ async def test_filter_by_date_from():
     _setup_db_for_list([_mock_order()], total=1)
 
     async with _make_client(ADMIN_USER) as ac:
-        resp = await ac.get(
-            f"/api/v1/orders?date_from={date.today().isoformat()}"
-        )
+        resp = await ac.get(f"/api/v1/orders?date_from={date.today().isoformat()}")
 
     assert resp.status_code == 200
 
@@ -257,9 +252,7 @@ async def test_filter_by_date_to():
     _setup_db_for_list([_mock_order()], total=1)
 
     async with _make_client(ADMIN_USER) as ac:
-        resp = await ac.get(
-            f"/api/v1/orders?date_to={date.today().isoformat()}"
-        )
+        resp = await ac.get(f"/api/v1/orders?date_to={date.today().isoformat()}")
 
     assert resp.status_code == 200
 
@@ -333,9 +326,7 @@ async def test_search_by_booking_id():
 async def test_search_by_patient_name():
     """Search matches patient_name."""
     _override_auth(ADMIN_USER)
-    _setup_db_for_list(
-        [_mock_order(patient_name="John Doe")], total=1
-    )
+    _setup_db_for_list([_mock_order(patient_name="John Doe")], total=1)
 
     async with _make_client(ADMIN_USER) as ac:
         resp = await ac.get("/api/v1/orders?search=John")
@@ -348,9 +339,7 @@ async def test_search_by_patient_name():
 async def test_search_by_patient_phone():
     """Search matches patient_phone."""
     _override_auth(ADMIN_USER)
-    _setup_db_for_list(
-        [_mock_order(patient_phone="+919876543210")], total=1
-    )
+    _setup_db_for_list([_mock_order(patient_phone="+919876543210")], total=1)
 
     async with _make_client(ADMIN_USER) as ac:
         resp = await ac.get("/api/v1/orders?search=9876543210")
@@ -434,9 +423,7 @@ async def test_phlebotomist_sees_assigned_only():
     assigned_orders = [_mock_order(phleb_id=FAKE_PHLEB_ID)]
     _override_auth(PHLEB_USER)
     # RBAC lookup returns phlebotomist id
-    _setup_db_for_list(
-        assigned_orders, total=1, rbac_lookups=[FAKE_PHLEB_ID]
-    )
+    _setup_db_for_list(assigned_orders, total=1, rbac_lookups=[FAKE_PHLEB_ID])
 
     async with _make_client(PHLEB_USER) as ac:
         resp = await ac.get("/api/v1/orders")

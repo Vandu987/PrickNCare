@@ -70,6 +70,11 @@ class OrderCreate(BaseModel):
         return v
 
 
+class OrderStatusUpdate(BaseModel):
+    status: str
+    reason: str | None = None
+
+
 class StatusHistoryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
