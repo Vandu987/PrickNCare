@@ -91,9 +91,43 @@ class FileUploadService:
         """Return the public URL for an existing key (CloudFront when available)."""
         return self._storage._public_url(key)
 
-    def get_presigned_url(self, key: str, expires_in: int = 3600) -> str:
-        """Return a pre-signed URL for private access."""
-        return self._storage.generate_presigned_url(key, expires_in)
+    def get_presigned_url(
+        self,
+        key: str,
+        expires_in: int = 3600,
+        content_disposition: str | None = None,
+        validate_exists: bool = True,
+    ) -> str:
+        """Return a pre-signed URL for private access.
+
+        Args:
+            key: S3 object key.
+            expires_in: Expiration in seconds (default 3600 = 1 hour).
+            content_disposition: ``"inline"``, ``"attachment"``, or a full
+                header value like ``"attachment; filename=report.pdf"``.
+                Shorthand values ``"inline"`` and ``"attachment"`` are
+                expanded automatically.
+            validate_exists: When *True* (default), verify the object exists
+                before generating a URL.
+
+        Raises:
+            FileUploadError: If *validate_exists* is True and the key is missing.
+        """
+        if validate_exists and not self._storage.object_exists(key):
+            raise FileUploadError(f"Object not found: {key}")
+
+        # Expand shorthand disposition values
+        disposition = content_disposition
+        if disposition in ("inline", "attachment"):
+            # Extract filename from key for attachment header
+            filename = PurePosixPath(key).name
+            if disposition == "attachment":
+                disposition = f'attachment; filename="{filename}"'
+            # "inline" stays as-is (browsers handle it)
+
+        return self._storage.generate_presigned_url(
+            key, expires_in=expires_in, content_disposition=disposition
+        )
 
     def delete_file(self, key: str) -> None:
         """Delete a file by its storage key."""

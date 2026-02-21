@@ -100,14 +100,42 @@ class S3Storage:
         )
         return self._public_url(key)
 
-    def generate_presigned_url(self, key: str, expires_in: int = 3600) -> str:
-        """Generate a pre-signed GET URL (S3) or local path."""
+    def object_exists(self, key: str) -> bool:
+        """Check whether an object exists in the bucket (or locally)."""
+        if self._use_local:
+            return (Path(self._settings.LOCAL_STORAGE_DIR) / key).is_file()
+        try:
+            self._client.head_object(  # type: ignore[union-attr]
+                Bucket=self._settings.S3_BUCKET_NAME, Key=key
+            )
+            return True
+        except (BotoCoreError, ClientError):
+            return False
+
+    def generate_presigned_url(
+        self,
+        key: str,
+        expires_in: int = 3600,
+        content_disposition: str | None = None,
+    ) -> str:
+        """Generate a pre-signed GET URL (S3) or local path.
+
+        Args:
+            key: S3 object key.
+            expires_in: URL expiration in seconds (default 3600 = 1 hour).
+            content_disposition: Optional disposition header, e.g.
+                ``"inline"`` or ``"attachment; filename=report.pdf"``.
+        """
         if self._use_local:
             return str(Path(self._settings.LOCAL_STORAGE_DIR) / key)
 
+        params: dict = {"Bucket": self._settings.S3_BUCKET_NAME, "Key": key}
+        if content_disposition:
+            params["ResponseContentDisposition"] = content_disposition
+
         return self._client.generate_presigned_url(  # type: ignore[union-attr]
             "get_object",
-            Params={"Bucket": self._settings.S3_BUCKET_NAME, "Key": key},
+            Params=params,
             ExpiresIn=expires_in,
         )
 
