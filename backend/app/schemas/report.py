@@ -150,3 +150,31 @@ class PhlebotomistPerformanceReport(BaseModel):
     date_from: date
     date_to: date
     phlebotomists: list[PhlebotomistPerformanceItem] = Field(default_factory=list)
+
+
+# ── Task 14.5: Dashboard Analytics & Export schemas ─────────────────────
+
+
+class DashboardRecentOrder(BaseModel):
+    """Recent order summary for the dashboard."""
+
+    order_id: uuid.UUID
+    booking_id: str
+    patient_name: str
+    status: str
+    appointment_date: date
+    amount: float = 0.0
+
+    model_config = {"from_attributes": True}
+
+
+class DashboardAnalytics(BaseModel):
+    """Aggregated dashboard analytics response."""
+
+    today_total_orders: int = 0
+    today_completed_orders: int = 0
+    today_pending_orders: int = 0
+    this_week_revenue: float = 0.0
+    active_phlebotomists: int = 0
+    pending_reconciliations: int = 0
+    recent_orders: list[DashboardRecentOrder] = Field(default_factory=list)

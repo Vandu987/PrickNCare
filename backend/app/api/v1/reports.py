@@ -1,13 +1,17 @@
-"""Report endpoints — tasks 14.1, 14.2, 14.3 & 14.4."""
+"""Report endpoints — tasks 14.1, 14.2, 14.3, 14.4 & 14.5."""
 
 from __future__ import annotations
 
+import asyncio
+import csv
+import io
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from decimal import Decimal
 from enum import StrEnum
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -18,6 +22,7 @@ from app.models.clients import Client, PaymentTerms
 from app.models.orders import Order, OrderStatus
 from app.models.payments import Payment
 from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
+from app.models.reconciliation import Reconciliation, ReconciliationStatus
 from app.models.samples import SampleAccessioning
 from app.models.users import User
 from app.models.zones import Pincode, Zone
@@ -26,6 +31,8 @@ from app.schemas.report import (
     ClientWiseReportItem,
     DailyCollectionOrderItem,
     DailyCollectionReport,
+    DashboardAnalytics,
+    DashboardRecentOrder,
     PhlebotomistPerformanceItem,
     PhlebotomistPerformanceReport,
     RevenueDataPoint,
@@ -629,3 +636,416 @@ async def tat_analysis_report(
         percentile_95_assignment_to_collection_minutes=p95,
         by_priority=by_priority,
     )
+
+
+# ---------------------------------------------------------------------------
+# Task 14.5 — Report export & Dashboard analytics
+# ---------------------------------------------------------------------------
+
+
+class ExportReportType(StrEnum):
+    DAILY_COLLECTION = "daily-collection"
+    PHLEBOTOMIST_PERFORMANCE = "phlebotomist-performance"
+    CLIENT_WISE = "client-wise"
+    ZONE_WISE = "zone-wise"
+    REVENUE = "revenue"
+
+
+class ExportFormat(StrEnum):
+    CSV = "csv"
+    EXCEL = "excel"
+
+
+# Column definitions for each report type
+_EXPORT_COLUMNS: dict[ExportReportType, list[str]] = {
+    ExportReportType.DAILY_COLLECTION: [
+        "booking_id",
+        "patient_name",
+        "status",
+        "appointment_date",
+        "amount",
+    ],
+    ExportReportType.PHLEBOTOMIST_PERFORMANCE: [
+        "phlebotomist_name",
+        "total_orders",
+        "completed",
+        "success_rate_%",
+        "avg_tat_minutes",
+    ],
+    ExportReportType.CLIENT_WISE: [
+        "client_name",
+        "payment_terms",
+        "total_orders",
+        "completed",
+        "cancelled",
+        "total_revenue",
+        "outstanding",
+    ],
+    ExportReportType.ZONE_WISE: [
+        "zone_name",
+        "total_orders",
+        "completed",
+        "cancelled",
+        "active_phlebotomists",
+        "avg_tat_minutes",
+    ],
+    ExportReportType.REVENUE: [
+        "date",
+        "total_revenue",
+        "order_count",
+        "avg_order_value",
+    ],
+}
+
+
+async def _fetch_export_rows(
+    report_type: ExportReportType,
+    date_from: date,
+    date_to: date,
+    db: AsyncSession,
+) -> list[list[str]]:
+    """Return a list of string rows for the given report type."""
+
+    rows: list[list[str]] = []
+
+    if report_type == ExportReportType.DAILY_COLLECTION:
+        stmt = (
+            select(Order)
+            .where(
+                Order.appointment_date >= date_from,
+                Order.appointment_date <= date_to,
+            )
+            .order_by(Order.appointment_date)
+        )
+        result = await db.execute(stmt)
+        for o in result.scalars().all():
+            rows.append(
+                [
+                    o.booking_id,
+                    o.patient_name,
+                    o.status.value,
+                    str(o.appointment_date),
+                    str(float(o.amount)),
+                ]
+            )
+
+    elif report_type == ExportReportType.PHLEBOTOMIST_PERFORMANCE:
+        # Aggregate per phlebotomist
+        stmt = (
+            select(
+                Phlebotomist.name,
+                func.count(Order.id).label("total"),
+                func.count(Order.id)
+                .filter(
+                    Order.status.in_([OrderStatus.COMPLETED, OrderStatus.COLLECTED])
+                )
+                .label("completed"),
+                func.avg(
+                    func.extract("epoch", Order.collected_at)
+                    - func.extract("epoch", Order.assigned_at)
+                ).label("avg_tat"),
+            )
+            .join(Order, Order.assigned_phlebotomist_id == Phlebotomist.id)
+            .where(
+                Order.appointment_date >= date_from,
+                Order.appointment_date <= date_to,
+            )
+            .group_by(Phlebotomist.id, Phlebotomist.name)
+        )
+        result = await db.execute(stmt)
+        for r in result.all():
+            total = r[1]
+            completed = r[2]
+            rate = round((completed / total) * 100, 2) if total > 0 else 0.0
+            avg_tat = round(r[3] / 60, 2) if r[3] is not None else ""
+            rows.append([r[0], str(total), str(completed), str(rate), str(avg_tat)])
+
+    elif report_type == ExportReportType.CLIENT_WISE:
+        stmt = (
+            select(Order)
+            .options(selectinload(Order.client))
+            .where(
+                Order.appointment_date >= date_from,
+                Order.appointment_date <= date_to,
+            )
+        )
+        result = await db.execute(stmt)
+        orders = list(result.scalars().all())
+        agg: dict[uuid.UUID, dict] = {}
+        for o in orders:
+            b = agg.setdefault(
+                o.client_id,
+                {
+                    "name": o.client.name if o.client else "Unknown",
+                    "terms": (o.client.payment_terms.value if o.client else "unknown"),
+                    "total": 0,
+                    "completed": 0,
+                    "cancelled": 0,
+                    "revenue": 0.0,
+                    "outstanding": 0.0,
+                },
+            )
+            b["total"] += 1
+            if o.status == OrderStatus.COMPLETED:
+                b["completed"] += 1
+                b["revenue"] += float(o.amount)
+            elif o.status == OrderStatus.CANCELLED:
+                b["cancelled"] += 1
+            if (
+                o.client
+                and o.client.payment_terms == PaymentTerms.POSTPAID
+                and o.payment_status.value != "paid"
+            ):
+                b["outstanding"] += float(o.amount)
+        for b in agg.values():
+            rows.append(
+                [
+                    b["name"],
+                    b["terms"],
+                    str(b["total"]),
+                    str(b["completed"]),
+                    str(b["cancelled"]),
+                    str(b["revenue"]),
+                    str(b["outstanding"]),
+                ]
+            )
+
+    elif report_type == ExportReportType.ZONE_WISE:
+        # Load zones with order counts
+        zone_res = await db.execute(select(Zone))
+        zones = {z.id: z for z in zone_res.scalars().all()}
+        pin_res = await db.execute(
+            select(Pincode).where(Pincode.zone_id.in_(zones.keys()))
+        )
+        pin_to_zone = {p.id: p.zone_id for p in pin_res.scalars().all()}
+
+        order_res = await db.execute(
+            select(Order).where(
+                Order.appointment_date >= date_from,
+                Order.appointment_date <= date_to,
+                Order.pincode_id.in_(pin_to_zone.keys()),
+            )
+        )
+        zagg: dict[uuid.UUID, dict] = {
+            zid: {"total": 0, "completed": 0, "cancelled": 0, "tat_s": 0, "tat_n": 0}
+            for zid in zones
+        }
+        for o in order_res.scalars().all():
+            zid = pin_to_zone.get(o.pincode_id)
+            if zid is None or zid not in zagg:
+                continue
+            zagg[zid]["total"] += 1
+            if o.status == OrderStatus.COMPLETED:
+                zagg[zid]["completed"] += 1
+                if o.assigned_at and o.collected_at:
+                    zagg[zid]["tat_s"] += (
+                        o.collected_at - o.assigned_at
+                    ).total_seconds()
+                    zagg[zid]["tat_n"] += 1
+            elif o.status == OrderStatus.CANCELLED:
+                zagg[zid]["cancelled"] += 1
+
+        phleb_res = await db.execute(
+            select(
+                PhlebotomistZoneAssignment.zone_id,
+                func.count(PhlebotomistZoneAssignment.phlebotomist_id.distinct()),
+            )
+            .where(PhlebotomistZoneAssignment.zone_id.in_(zones.keys()))
+            .group_by(PhlebotomistZoneAssignment.zone_id)
+        )
+        phleb_counts = dict(phleb_res.all())
+
+        for zid, z in sorted(zones.items(), key=lambda x: x[1].name):
+            b = zagg[zid]
+            avg_tat = str(round(b["tat_s"] / b["tat_n"] / 60, 2)) if b["tat_n"] else ""
+            rows.append(
+                [
+                    z.name,
+                    str(b["total"]),
+                    str(b["completed"]),
+                    str(b["cancelled"]),
+                    str(phleb_counts.get(zid, 0)),
+                    avg_tat,
+                ]
+            )
+
+    elif report_type == ExportReportType.REVENUE:
+        stmt = (
+            select(
+                func.date_trunc("day", Order.appointment_date).label("period"),
+                func.sum(Order.amount).label("rev"),
+                func.count(Order.id).label("cnt"),
+            )
+            .where(
+                Order.appointment_date >= date_from,
+                Order.appointment_date <= date_to,
+                Order.status == OrderStatus.COMPLETED,
+            )
+            .group_by(func.date_trunc("day", Order.appointment_date))
+            .order_by(func.date_trunc("day", Order.appointment_date))
+        )
+        result = await db.execute(stmt)
+        for r in result.all():
+            rev = float(r[1] or 0)
+            cnt = int(r[2] or 0)
+            avg_v = round(rev / cnt, 2) if cnt > 0 else 0.0
+            period_label = (
+                r[0].strftime("%Y-%m-%d") if hasattr(r[0], "strftime") else str(r[0])
+            )
+            rows.append([period_label, str(rev), str(cnt), str(avg_v)])
+
+    return rows
+
+
+@router.get("/export")
+async def export_report(
+    report_type: ExportReportType = Query(..., description="Report type to export"),
+    date_from: date = Query(..., description="Start date (inclusive)"),
+    date_to: date = Query(..., description="End date (inclusive)"),
+    format: ExportFormat = Query(  # noqa: A002
+        ExportFormat.CSV, description="Export format"
+    ),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> StreamingResponse:
+    """Export a report as a downloadable CSV or Excel file."""
+
+    columns = _EXPORT_COLUMNS[report_type]
+    rows = await _fetch_export_rows(report_type, date_from, date_to, db)
+    filename = f"{report_type.value}_{date_from}_{date_to}"
+
+    if format == ExportFormat.CSV:
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(columns)
+        writer.writerows(rows)
+        buf.seek(0)
+        return StreamingResponse(
+            iter([buf.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{filename}.csv"'},
+        )
+    else:
+        # Excel via openpyxl
+        try:
+            from openpyxl import Workbook
+        except ImportError:  # pragma: no cover
+            # Fallback to CSV if openpyxl not installed
+            buf = io.StringIO()
+            writer = csv.writer(buf)
+            writer.writerow(columns)
+            writer.writerows(rows)
+            buf.seek(0)
+            return StreamingResponse(
+                iter([buf.getvalue()]),
+                media_type="text/csv",
+                headers={
+                    "Content-Disposition": f'attachment; filename="{filename}.csv"'
+                },
+            )
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = report_type.value  # type: ignore[union-attr]
+        ws.append(columns)  # type: ignore[union-attr]
+        for row in rows:
+            ws.append(row)  # type: ignore[union-attr]
+
+        excel_buf = io.BytesIO()
+        wb.save(excel_buf)
+        excel_buf.seek(0)
+        return StreamingResponse(
+            iter([excel_buf.getvalue()]),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f'attachment; filename="{filename}.xlsx"'},
+        )
+
+
+@router.get("/dashboard", response_model=DashboardAnalytics)
+async def dashboard_analytics(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> DashboardAnalytics:
+    """Return aggregated dashboard analytics."""
+
+    today = date.today()
+    # Week start = Monday
+    week_start = today - timedelta(days=today.weekday())
+
+    # Today's order counts
+    today_total_stmt = select(func.count(Order.id)).where(
+        Order.appointment_date == today
+    )
+    today_completed_stmt = select(func.count(Order.id)).where(
+        Order.appointment_date == today,
+        Order.status == OrderStatus.COMPLETED,
+    )
+    today_pending_stmt = select(func.count(Order.id)).where(
+        Order.appointment_date == today,
+        Order.status == OrderStatus.PENDING,
+    )
+
+    # This week revenue
+    week_revenue_stmt = select(func.coalesce(func.sum(Order.amount), 0)).where(
+        Order.appointment_date >= week_start,
+        Order.appointment_date <= today,
+        Order.status == OrderStatus.COMPLETED,
+    )
+
+    # Active phlebotomists
+    active_phleb_stmt = select(func.count(Phlebotomist.id)).where(
+        Phlebotomist.is_available.is_(True)
+    )
+
+    # Pending reconciliations
+    pending_recon_stmt = select(func.count(Reconciliation.id)).where(
+        Reconciliation.status == ReconciliationStatus.PENDING_REVIEW
+    )
+
+    # Execute all in parallel-ish
+    (
+        total_res,
+        completed_res,
+        pending_res,
+        revenue_res,
+        phleb_res,
+        recon_res,
+    ) = await asyncio.gather(  # noqa: F821 — imported below
+        _scalar(db, today_total_stmt),
+        _scalar(db, today_completed_stmt),
+        _scalar(db, today_pending_stmt),
+        _scalar(db, week_revenue_stmt),
+        _scalar(db, active_phleb_stmt),
+        _scalar(db, pending_recon_stmt),
+    )
+
+    # Recent orders (last 10)
+    recent_stmt = select(Order).order_by(Order.created_at.desc()).limit(10)
+    recent_res = await db.execute(recent_stmt)
+    recent_orders = [
+        DashboardRecentOrder(
+            order_id=o.id,
+            booking_id=o.booking_id,
+            patient_name=o.patient_name,
+            status=o.status.value,
+            appointment_date=o.appointment_date,
+            amount=float(o.amount),
+        )
+        for o in recent_res.scalars().all()
+    ]
+
+    return DashboardAnalytics(
+        today_total_orders=int(total_res or 0),
+        today_completed_orders=int(completed_res or 0),
+        today_pending_orders=int(pending_res or 0),
+        this_week_revenue=float(revenue_res or 0),
+        active_phlebotomists=int(phleb_res or 0),
+        pending_reconciliations=int(recon_res or 0),
+        recent_orders=recent_orders,
+    )
+
+
+async def _scalar(db: AsyncSession, stmt: object) -> object:
+    """Execute a statement and return the scalar result."""
+    result = await db.execute(stmt)  # type: ignore[arg-type]
+    return result.scalar()
