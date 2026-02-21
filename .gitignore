@@ -55,6 +55,7 @@ ios/Flutter/Generated.xcconfig
 .env
 .env.local
 .env.*.local
+!.env.example
 
 # ========================
 # IDE / Editor
