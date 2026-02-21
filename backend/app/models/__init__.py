@@ -3,6 +3,7 @@ from .base import Base, TimestampMixin, UUIDMixin
 from .client_rate_history import ClientRateHistory
 from .clients import Client, ClientUser, PaymentTerms
 from .invoices import Invoice, InvoiceLineItem, InvoiceStatus
+from .notifications import NotificationLog
 from .nsa import NSARecord
 from .orders import (
     Order,
@@ -83,4 +84,5 @@ __all__ = [
     "ReconciliationDiscrepancy",
     "ReconciliationStatus",
     "DiscrepancyCategory",
+    "NotificationLog",
 ]
