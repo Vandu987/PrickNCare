@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard Overview - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "navy-sidebar": "#0f172a",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<!-- Mobile Wrapper -->
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Header -->
+<header class="sticky top-0 z-30 flex items-center justify-between bg-white/80 dark:bg-background-dark/80 px-4 py-3 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div>
+<nav class="flex items-center gap-1 text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+<span>Home</span>
+<span class="material-symbols-outlined text-[12px]">chevron_right</span>
+<span class="text-primary">Dashboard</span>
+</nav>
+<h1 class="text-lg font-bold leading-tight">Admin Overview</h1>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="relative flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">notifications</span>
+<span class="absolute right-2.5 top-2.5 flex h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+</button>
+<div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20">
+<img alt="Admin Profile" class="h-full w-full object-cover" data-alt="User profile photo for admin dashboard" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwqxUmlXrVYu2OwVcCmgHI-NOW_im2aMx7R6a-ecr5HdrOaSXFNyMtR7pAS8BHTUXBSh6diN-IoCwzrVbhIiktKGWSjJkC-8DEz-IJJqCIYjlXZnTw7vqS9kk_oIZ-XrTUhVF-78Nk7s0n4fqo4ChuTdaecx2h3u45ljvH-IiUDEu1BbzOuObV5k3sMjdrC3XqkPG9906CBuA3dXKxjzEOVril6OGkjsjbrj-1dAbMuvO2DytzHJO4ddblWRBpsd52XJE11JAhGWU"/>
+</div>
+</div>
+</header>
+<!-- Main Content Scroll Area -->
+<main class="flex-1 space-y-6 pb-24 pt-4">
+<!-- Horizontal Stats Scroller -->
+<section class="px-4">
+<h2 class="mb-3 text-sm font-semibold text-slate-500 uppercase tracking-wider">Order Metrics</h2>
+<div class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
+<!-- Total Orders -->
+<div class="flex min-w-[140px] flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined text-sm">list_alt</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Total Orders</p>
+<p class="text-2xl font-bold">156</p>
+</div>
+<!-- Completed -->
+<div class="flex min-w-[140px] flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Completed</p>
+<p class="text-2xl font-bold">89</p>
+</div>
+<!-- Pending -->
+<div class="flex min-w-[140px] flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+<span class="material-symbols-outlined text-sm">pending_actions</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Pending</p>
+<p class="text-2xl font-bold">42</p>
+</div>
+<!-- In Transit -->
+<div class="flex min-w-[140px] flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+</div>
+<p class="text-xs font-medium text-slate-500">In Transit</p>
+<p class="text-2xl font-bold">18</p>
+</div>
+<!-- Cancelled -->
+<div class="flex min-w-[140px] flex-col gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-100 text-rose-600">
+<span class="material-symbols-outlined text-sm">cancel</span>
+</div>
+<p class="text-xs font-medium text-slate-500">Cancelled</p>
+<p class="text-2xl font-bold">7</p>
+</div>
+</div>
+</section>
+<!-- Charts Section -->
+<section class="px-4 space-y-4">
+<!-- Line Chart: Orders Trend -->
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="mb-4 flex items-center justify-between">
+<h3 class="font-bold">Orders Trend</h3>
+<span class="text-[10px] font-bold text-slate-400">LAST 7 DAYS</span>
+</div>
+<div class="relative h-32 w-full flex items-end gap-2">
+<!-- Simplified representation of a chart using bars for CSS simplicity on mobile -->
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[40%]"></div>
+<div class="flex-1 bg-primary/20 rounded-t-sm h-[60%]"></div>
+<div class="flex-1 bg-primary/40 rounded-t-sm h-[35%]"></div>
+<div class="flex-1 bg-primary/60 rounded-t-sm h-[80%]"></div>
+<div class="flex-1 bg-primary/30 rounded-t-sm h-[50%]"></div>
+<div class="flex-1 bg-primary rounded-t-sm h-[95%]"></div>
+<div class="flex-1 bg-primary/70 rounded-t-sm h-[75%]"></div>
+</div>
+<div class="mt-2 flex justify-between text-[10px] font-medium text-slate-400">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Donut Chart: Distribution -->
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<h3 class="mb-4 font-bold">Order Distribution</h3>
+<div class="flex items-center gap-6">
+<div class="relative flex h-24 w-24 items-center justify-center rounded-full border-[12px] border-slate-100 dark:border-slate-800">
+<!-- CSS-only simple conic gradient circle represent donut -->
+<div class="absolute inset-0 rounded-full border-[12px] border-primary border-t-transparent border-r-transparent transform -rotate-45"></div>
+<span class="text-xs font-bold">156 Total</span>
+</div>
+<ul class="flex-1 space-y-1.5">
+<li class="flex items-center gap-2 text-xs">
+<span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+<span class="text-slate-600 dark:text-slate-400">Completed (57%)</span>
+</li>
+<li class="flex items-center gap-2 text-xs">
+<span class="h-2 w-2 rounded-full bg-amber-500"></span>
+<span class="text-slate-600 dark:text-slate-400">Pending (27%)</span>
+</li>
+<li class="flex items-center gap-2 text-xs">
+<span class="h-2 w-2 rounded-full bg-primary"></span>
+<span class="text-slate-600 dark:text-slate-400">Transit (12%)</span>
+</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Revenue & Phlebotomists -->
+<section class="grid grid-cols-1 gap-4 px-4">
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex items-start justify-between">
+<div>
+<p class="text-xs font-medium text-slate-500">Monthly Revenue</p>
+<h3 class="mt-1 text-2xl font-bold text-slate-900 dark:text-white">₹4,85,000</h3>
+</div>
+<div class="flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+<span class="material-symbols-outlined text-[12px]">trending_up</span>
+                            +12%
+                        </div>
+</div>
+</div>
+<div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="flex items-center justify-between mb-2">
+<p class="text-xs font-medium text-slate-500">Active Phlebotomists</p>
+<span class="text-xs font-bold text-primary">34/40</span>
+</div>
+<div class="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+<div class="h-full w-[85%] rounded-full bg-primary"></div>
+</div>
+<p class="mt-2 text-[10px] text-slate-400">85% of staff currently on-field</p>
+</div>
+</section>
+<!-- Recent Orders Table -->
+<section class="px-4">
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Recent Orders</h2>
+<a class="text-xs font-bold text-primary" href="#">View All</a>
+</div>
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+<div class="space-y-0 divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Order Row 1 -->
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400">#ORD-9021</span>
+<span class="text-sm font-semibold">Amit Sharma</span>
+<span class="text-[10px] text-slate-500">Indiranagar • 10:30 AM</span>
+</div>
+<span class="rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-700">COMPLETED</span>
+</div>
+<!-- Order Row 2 -->
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400">#ORD-9022</span>
+<span class="text-sm font-semibold">Priya Varma</span>
+<span class="text-[10px] text-slate-500">Koramangala • 11:15 AM</span>
+</div>
+<span class="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">IN TRANSIT</span>
+</div>
+<!-- Order Row 3 -->
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400">#ORD-9023</span>
+<span class="text-sm font-semibold">Rajesh Koothra</span>
+<span class="text-[10px] text-slate-500">Whitefield • 12:00 PM</span>
+</div>
+<span class="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-700">PENDING</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Sidebar / Drawer Overlay (Visual Mockup for Active State) -->
+<div class="fixed inset-y-0 left-0 z-50 w-64 -translate-x-full bg-navy-sidebar text-white shadow-2xl transition-transform lg:translate-x-0 hidden">
+<!-- Hidden by default on phone as per usual UI patterns, but indicated in prompt as active sidebar -->
+</div>
+<!-- Bottom NavBar (iOS Style) -->
+<nav class="fixed bottom-0 z-40 w-full border-t border-slate-200 bg-white/90 px-4 pb-6 pt-2 backdrop-blur-lg dark:border-slate-800 dark:bg-background-dark/90">
+<div class="flex items-center justify-around">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+<span class="text-[10px] font-medium">Staff</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">Patients</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+</div>
+</body></html>

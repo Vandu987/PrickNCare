@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Zone &amp; Coverage Management - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(19, 236, 200, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-4 pt-4 pb-2 bg-background-light dark:bg-background-dark border-b border-primary/10">
+<div class="flex items-center gap-3">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<div>
+<h1 class="text-lg font-bold leading-tight tracking-tight">Zone &amp; Coverage</h1>
+<div class="flex items-center gap-1 text-xs text-slate-500 dark:text-primary/70">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+<span>Delhi NCR</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area (Scrollable) -->
+<main class="flex-1 overflow-y-auto custom-scrollbar pb-24">
+<!-- Zone Selector Chips -->
+<div class="flex gap-3 overflow-x-auto px-4 py-4 no-scrollbar">
+<div class="flex shrink-0 items-center gap-2 rounded-xl bg-primary px-4 py-2 text-background-dark font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[18px] fill-1">check_circle</span>
+<span class="text-sm">South (24)</span>
+</div>
+<div class="flex shrink-0 items-center gap-2 rounded-xl bg-slate-100 dark:bg-primary/10 border border-primary/20 px-4 py-2 text-slate-700 dark:text-slate-200 font-medium">
+<span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+<span class="text-sm">Central (18)</span>
+</div>
+<div class="flex shrink-0 items-center gap-2 rounded-xl bg-slate-100 dark:bg-amber-500/10 border border-amber-500/30 px-4 py-2 text-amber-600 dark:text-amber-400 font-medium">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+<span class="text-sm">North (12)</span>
+</div>
+<div class="flex shrink-0 items-center gap-2 rounded-xl bg-slate-100 dark:bg-red-500/10 border border-red-500/30 px-4 py-2 text-red-600 dark:text-red-400 font-medium">
+<span class="material-symbols-outlined text-[18px]">error</span>
+<span class="text-sm">East (8)</span>
+</div>
+</div>
+<!-- South Delhi Overview Section -->
+<section class="px-4 py-2">
+<div class="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-white dark:bg-primary/5 p-4 shadow-sm">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-xl font-bold">South Delhi Zone</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Status: Operational</p>
+</div>
+<label class="relative flex h-8 w-14 cursor-pointer items-center rounded-full bg-slate-200 dark:bg-primary/20 p-1 transition-colors has-[:checked]:bg-primary">
+<input checked="" class="peer sr-only" type="checkbox"/>
+<div class="h-6 w-6 rounded-full bg-white shadow-md transition-all peer-checked:translate-x-6"></div>
+</label>
+</div>
+<!-- Map Component -->
+<div class="relative h-48 w-full overflow-hidden rounded-xl bg-slate-200 dark:bg-slate-800 border border-primary/5">
+<img alt="Map of South Delhi area" class="h-full w-full object-cover opacity-60 dark:opacity-40 grayscale" data-alt="Detailed map showing South Delhi geographical boundaries" data-location="South Delhi, India" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ5AX6I3RIfBQ5P8-bCtWKcNhyjWpNsclr3IWAhMUrXVI2CfxC-_4FM3RIS4E294IoEngJ3lbDFaMK9ce_rdcvs80Rcln_KVKYNCazG2jc5dq52pspVKutf_DEPKXdA7_Z7Mb2FYqi51GwmGCtA26uTyjyvKeyH9-Zavlj8WcmI9Xg37Dw1MW4eoE-_fm0W-WveuDBu7gXdQpA38n4T_5KPWsb0lqJ2H9TZWdmrNcJN3YWSvAfigsaVTTjpHJn9CDdFM0U5o2qQRQ"/>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative h-32 w-32 border-2 border-primary bg-primary/10 rounded-full flex items-center justify-center backdrop-blur-[2px]">
+<div class="h-4 w-4 bg-primary rounded-full animate-pulse"></div>
+</div>
+</div>
+<button class="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-lg bg-background-dark/80 text-white backdrop-blur-sm">
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+</button>
+</div>
+<!-- Metrics -->
+<div class="grid grid-cols-2 gap-3">
+<div class="rounded-xl bg-slate-50 dark:bg-white/5 p-3 border border-primary/5">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Total Pincodes</p>
+<p class="text-lg font-bold">24 Active</p>
+</div>
+<div class="rounded-xl bg-slate-50 dark:bg-white/5 p-3 border border-primary/5">
+<p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Staffing</p>
+<div class="flex items-center gap-1">
+<p class="text-lg font-bold">142</p>
+<span class="text-[10px] font-bold text-primary bg-primary/10 px-1 rounded">+3 New</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pincode Table Section -->
+<section class="mt-4 px-4">
+<div class="flex items-center justify-between mb-3">
+<h3 class="font-bold">Locality Coverage</h3>
+<button class="text-xs font-bold text-primary flex items-center gap-1">
+                        View All <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-3">
+<!-- Table Row 1 -->
+<div class="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="font-bold text-sm">117</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">110017</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Malviya Nagar</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">12 Phlebos</p>
+<span class="inline-block px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary uppercase">Full Service</span>
+</div>
+</div>
+<!-- Table Row 2 -->
+<div class="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="font-bold text-sm">116</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">110016</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Hauz Khas</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">8 Phlebos</p>
+<span class="inline-block px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary uppercase">Full Service</span>
+</div>
+</div>
+<!-- Table Row 3 (Low Staffing) -->
+<div class="flex items-center justify-between p-4 rounded-xl border border-amber-500/20 bg-white dark:bg-amber-500/5">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+<span class="font-bold text-sm">148</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">110048</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Greater Kailash</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm text-amber-500">2 Phlebos</p>
+<span class="inline-block px-2 py-0.5 rounded-full bg-amber-500/20 text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase">Limited</span>
+</div>
+</div>
+<!-- Table Row 4 -->
+<div class="flex items-center justify-between p-4 rounded-xl border border-primary/10 bg-white dark:bg-primary/5">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+<span class="font-bold text-sm">062</span>
+</div>
+<div>
+<p class="font-bold text-sm leading-tight">110062</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Khanpur</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-bold text-sm">15 Phlebos</p>
+<span class="inline-block px-2 py-0.5 rounded-full bg-primary/20 text-[10px] font-bold text-primary uppercase">Full Service</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button -->
+<button class="absolute bottom-24 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-background-dark shadow-xl shadow-primary/30 active:scale-95 transition-transform z-10">
+<span class="material-symbols-outlined text-[32px]">add_location_alt</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full border-t border-primary/10 bg-white dark:bg-background-dark px-4 pb-6 pt-2 z-20">
+<div class="flex items-center justify-between">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">map</span>
+<span class="text-[10px] font-bold tracking-wider uppercase">Zones</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium tracking-wider uppercase">Staff</span>
+</a>
+<div class="relative -top-2 px-6">
+<div class="h-1 w-8 rounded-full bg-primary/30 mx-auto"></div>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-medium tracking-wider uppercase">Bookings</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium tracking-wider uppercase">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Drawer Overlay (Hidden by Default) -->
+<div class="absolute inset-0 z-50 bg-background-dark/60 backdrop-blur-sm transition-opacity opacity-0 pointer-events-none">
+<div class="absolute left-0 top-0 h-full w-4/5 max-w-xs transform bg-background-dark p-6 transition-transform -translate-x-full border-r border-primary/20">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-xl font-bold text-primary">Prick &amp; Care</h2>
+<span class="material-symbols-outlined cursor-pointer">close</span>
+</div>
+<ul class="space-y-4">
+<li class="flex items-center gap-4 text-primary font-bold bg-primary/10 p-3 rounded-xl">
+<span class="material-symbols-outlined">location_city</span>
+<span>City Selector</span>
+</li>
+<li class="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-slate-400">analytics</span>
+<span>Coverage Reports</span>
+</li>
+<li class="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-slate-400">hub</span>
+<span>Hub Management</span>
+</li>
+<li class="flex items-center gap-4 p-3 rounded-xl hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-slate-400">settings</span>
+<span>Threshold Settings</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body></html>

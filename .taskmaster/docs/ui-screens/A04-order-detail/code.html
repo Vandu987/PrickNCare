@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Detailed View Admin - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-active { color: #13ecc8; }
+        .step-line-active { background-color: #13ecc8; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen pb-24">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">arrow_back_ios_new</span>
+</button>
+<div>
+<h1 class="text-lg font-bold tracking-tight">#PNC-210226-0042</h1>
+<nav class="flex text-[10px] uppercase tracking-wider font-semibold text-slate-400 dark:text-slate-500">
+<span class="hover:text-primary cursor-pointer">Orders</span>
+<span class="mx-1">/</span>
+<span class="text-slate-600 dark:text-slate-300">Detailed View</span>
+</nav>
+</div>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<main class="p-4 space-y-4 max-w-md mx-auto">
+<!-- Status Stepper Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between relative">
+<!-- Progress Line Background -->
+<div class="absolute top-4 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800 -z-0"></div>
+<!-- Active Progress Line -->
+<div class="absolute top-4 left-0 w-2/3 h-1 bg-primary -z-0"></div>
+<div class="flex flex-col items-center gap-2 z-10">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500">Scheduled</span>
+</div>
+<div class="flex flex-col items-center gap-2 z-10">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500">Confirmed</span>
+</div>
+<div class="flex flex-col items-center gap-2 z-10">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center text-white ring-4 ring-primary/20">
+<span class="material-symbols-outlined text-sm">local_shipping</span>
+</div>
+<span class="text-[10px] font-bold text-primary">In Transit</span>
+</div>
+<div class="flex flex-col items-center gap-2 z-10">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-sm">biotech</span>
+</div>
+<span class="text-[10px] font-bold text-slate-400">Completed</span>
+</div>
+</div>
+</section>
+<!-- Patient Info Card with Special Instructions -->
+<section class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-100 dark:border-yellow-900/30 p-3 flex items-start gap-3">
+<span class="material-symbols-outlined text-yellow-600 dark:text-yellow-500">warning</span>
+<p class="text-xs font-semibold text-yellow-800 dark:text-yellow-200">SPECIAL INSTRUCTIONS: Patient has a severe needle phobia. Use pediatric needles if possible.</p>
+</div>
+<div class="p-4 flex items-center gap-4">
+<div class="size-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
+<img alt="" class="w-full h-full object-cover" data-alt="Portrait of a male patient" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7qnG0ekTua3x84QohN6Es5o4dXpzVhfcJqRLeYb3HE1wwFxHr5S9mDBvV3syP0h0QDNiXZWl-TKLxNd3xKU69WsSyULiZFsFOF6izklmPxKnaBAjOZGha9kN-zeXCNI1VmAtLz44ORLXznte0Kmi50-eieBgtD97XnwyiC5xqNPt3bigkj1jSuszu9fft-PoN7ybRUwRKZvWZdJL_1srk8UFKk7SXz3dpaO4czP0QcnzBK8KFKdrowyCjzhGQYW-x8rFp9gVRDEE"/>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-lg">John Doe</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">32 years • Male • O+ Blood Type</p>
+</div>
+<button class="bg-primary/10 text-primary p-2 rounded-lg">
+<span class="material-symbols-outlined">contact_page</span>
+</button>
+</div>
+<div class="px-4 pb-4 grid grid-cols-2 gap-4 border-t border-slate-50 dark:border-slate-800 pt-4">
+<div>
+<p class="text-[10px] uppercase font-bold text-slate-400">Contact</p>
+<p class="text-sm font-medium">+1 (555) 000-1234</p>
+</div>
+<div>
+<p class="text-[10px] uppercase font-bold text-slate-400">Location</p>
+<p class="text-sm font-medium">Brooklyn, NY</p>
+</div>
+</div>
+</section>
+<!-- Logistics Section: Phlebotomist & Client -->
+<div class="grid grid-cols-1 gap-4">
+<!-- Phlebotomist Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-bold text-slate-400 text-xs uppercase">Phlebotomist Info</h3>
+<span class="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-[10px] font-bold rounded-full uppercase">On Duty</span>
+</div>
+<div class="flex items-center gap-3">
+<img alt="" class="size-12 rounded-lg object-cover" data-alt="Medical professional avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgZ8ixGehpMwpfWA26wjm0ES0PTbD_b5DPtOCKwpInN5QlWSjUN1EA2_HPc5ZwNAjihkHpsXBWKNJMpRSJ410Jx5wIzj10JUxL3gHXeoqkx-Iefl1k3ksdRTSpkD46MUy4k_32MaFokx8OsuWF7Q2yr2j6lhuVa1FwEwRbthQMjcgavlOK5O5j0FL3t1VQYUDmTdJDzcfUGb1OU0M9LJveAQqSfsDSdfE8feF2lBgnaxKn_n34ELKPHgLKL2bqBCjCUjbw6dnZHjg"/>
+<div class="flex-1">
+<p class="font-bold">Sarah Jenkins</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-yellow-400 text-xs fill-1">star</span>
+<span class="text-xs font-semibold text-slate-600 dark:text-slate-400">4.9 (124 reviews)</span>
+</div>
+</div>
+<button class="flex items-center gap-1 text-primary text-xs font-bold border border-primary/20 rounded-lg px-2 py-1.5">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                        Track
+                    </button>
+</div>
+</section>
+<!-- Client Info Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<h3 class="font-bold text-slate-400 text-xs uppercase mb-3">Client Information</h3>
+<div class="flex items-center gap-3">
+<div class="size-10 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400">apartment</span>
+</div>
+<div>
+<p class="font-bold text-sm">City Diagnostics Center</p>
+<p class="text-xs text-slate-500">Corporate Partner • Tier 1</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Tests & Packages Table -->
+<section class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-50 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-slate-400 text-xs uppercase">Tests &amp; Packages</h3>
+<span class="text-xs font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">3 Items</span>
+</div>
+<div class="divide-y divide-slate-50 dark:divide-slate-800">
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold">Complete Blood Count (CBC)</p>
+<p class="text-[10px] text-slate-500">Routine Screening</p>
+</div>
+<p class="text-sm font-bold">$45.00</p>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold">Lipid Profile</p>
+<p class="text-[10px] text-slate-500">Fasting required</p>
+</div>
+<p class="text-sm font-bold">$60.00</p>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold">Home Collection Fee</p>
+<p class="text-[10px] text-slate-500">Standard Service</p>
+</div>
+<p class="text-sm font-bold">$25.00</p>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 flex justify-between items-center">
+<span class="font-bold text-slate-600 dark:text-slate-400">Total Amount</span>
+<span class="font-bold text-lg text-primary">$130.00</span>
+</div>
+</section>
+<!-- Payment Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-400 uppercase">Payment Status</p>
+<p class="text-sm font-bold text-green-600">Paid via Visa **** 4242</p>
+</div>
+</div>
+<button class="text-slate-400">
+<span class="material-symbols-outlined">receipt_long</span>
+</button>
+</section>
+<!-- Assignment History -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<h3 class="font-bold text-slate-400 text-xs uppercase mb-4">Assignment History</h3>
+<div class="space-y-6 relative before:content-[''] before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+<div class="relative pl-8">
+<div class="absolute left-1.5 top-1.5 size-3 rounded-full bg-primary ring-4 ring-white dark:ring-slate-900"></div>
+<p class="text-xs font-bold">Status changed to 'In Transit'</p>
+<p class="text-[10px] text-slate-500">Feb 26, 2024 • 10:30 AM • Sarah Jenkins</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-1.5 top-1.5 size-3 rounded-full bg-slate-300 dark:bg-slate-600 ring-4 ring-white dark:ring-slate-900"></div>
+<p class="text-xs font-bold">Phlebotomist Assigned</p>
+<p class="text-[10px] text-slate-500">Feb 26, 2024 • 09:15 AM • System Auto-Assign</p>
+</div>
+<div class="relative pl-8">
+<div class="absolute left-1.5 top-1.5 size-3 rounded-full bg-slate-300 dark:bg-slate-600 ring-4 ring-white dark:ring-slate-900"></div>
+<p class="text-xs font-bold">Order Created</p>
+<p class="text-[10px] text-slate-500">Feb 25, 2024 • 04:45 PM • City Diagnostics</p>
+</div>
+</div>
+</section>
+<!-- Actions Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 space-y-3">
+<h3 class="font-bold text-slate-400 text-xs uppercase mb-2">Order Management</h3>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 py-3 rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined text-sm">person_search</span>
+                    Reassign
+                </button>
+<button class="flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 py-3 rounded-lg font-bold text-sm hover:bg-slate-200 transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+                    Edit Order
+                </button>
+</div>
+<button class="w-full flex items-center justify-center gap-2 border-2 border-red-100 dark:border-red-900/30 text-red-500 py-3 rounded-lg font-bold text-sm hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">
+<span class="material-symbols-outlined text-sm">cancel</span>
+                Cancel Order
+            </button>
+</section>
+<!-- Accessioning Card -->
+<section class="bg-primary/5 dark:bg-primary/10 border-2 border-dashed border-primary/30 rounded-xl p-6 flex flex-col items-center text-center space-y-3">
+<div class="size-12 bg-primary/20 text-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined size-6">barcode_scanner</span>
+</div>
+<div>
+<h3 class="font-bold">Sample Accessioning</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400 max-w-[200px] mx-auto">Scan sample bar codes to initiate laboratory intake process.</p>
+</div>
+<button class="bg-primary text-slate-900 px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-primary/20">
+                Start Accessioning
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 py-3 pb-8 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-variation-settings-fill-1">dashboard</span>
+<span class="text-[10px] font-bold">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-bold">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold">Staff</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+</body></html>

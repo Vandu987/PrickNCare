@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Phlebotomist Personnel Management - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .sticky-column { position: sticky; left: 0; z-index: 10; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- Main Container (iOS Mobile View) -->
+<div class="relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto bg-white dark:bg-slate-900 shadow-2xl">
+<!-- Header Section -->
+<header class="bg-white dark:bg-slate-900 px-4 pt-6 pb-2 border-b border-slate-100 dark:border-slate-800 shrink-0">
+<div class="flex items-center justify-between mb-4">
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Phlebotomist Management</h1>
+<button class="bg-primary hover:bg-primary/90 text-background-dark h-10 w-10 rounded-full flex items-center justify-center transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined font-bold">add</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="relative mb-4">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 placeholder:text-slate-400" placeholder="Search by name, ID or city..." type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+<button class="shrink-0 px-4 py-1.5 rounded-full bg-primary text-background-dark text-xs font-semibold shadow-sm">All</button>
+<button class="shrink-0 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-medium hover:bg-slate-200">Active</button>
+<button class="shrink-0 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-medium hover:bg-slate-200">Inactive</button>
+<button class="shrink-0 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-medium hover:bg-slate-200 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                    Online Now
+                </button>
+</div>
+</header>
+<!-- Main Content Area: Data Table with Horizontal Scroll -->
+<main class="flex-1 overflow-auto bg-slate-50/50 dark:bg-slate-950/50">
+<div class="min-w-[800px]"> <!-- Force horizontal scroll for detailed table columns -->
+<table class="w-full border-collapse">
+<thead>
+<tr class="text-left text-[10px] uppercase tracking-wider text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
+<th class="sticky-column bg-white dark:bg-slate-900 px-4 py-3 z-20">Name &amp; Status</th>
+<th class="px-3 py-3">Phone / ID</th>
+<th class="px-3 py-3">City / Zones</th>
+<th class="px-3 py-3 text-center">Orders (Today)</th>
+<th class="px-3 py-3 text-center">Completed</th>
+<th class="px-3 py-3">Rating</th>
+<th class="px-4 py-3 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1: Rajesh Kumar -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="sticky-column bg-white dark:bg-slate-900 px-4 py-4 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="relative shrink-0">
+<img alt="Profile photo of Rajesh Kumar" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" data-alt="Portrait of a smiling Indian male health professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMKFCvJXptERG8YfmypnVY14I-OlLeJBMx2jJ9BpZOsAWIe1OwG0TvidZV25sc8PYtCIAYJTw55BzZRu4LwiIqHmto--H1B-z4K_783nFM5hBFUiBaUYsagUg9gE_uuQkuHy54iHMmr1mPdLzTkkI2VzyC68U59xdzCvNN-tX6GZC6nqw4tSpXdEeAvg-66yOG20e_36YAUeN4kx6UIf7fg5ZFPaFX787MlxafQlIqlPTbvOaCsNhwWM2CWqOB1FCzHHEWN4Di6IM"/>
+<span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-primary border-2 border-white dark:border-slate-900 shadow-sm animate-pulse"></span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Rajesh Kumar</p>
+<p class="text-[10px] text-primary font-medium flex items-center gap-1">
+                                            ONLINE
+                                        </p>
+</div>
+</div>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400 font-medium">+91 98765 43210</p>
+<p class="text-[10px] text-slate-400">ID: PC-2024-882</p>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400">New Delhi</p>
+<span class="inline-block px-2 py-0.5 mt-1 bg-primary/10 text-primary rounded-full text-[9px] font-bold">SOUTH DELHI</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">08</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">1,420</span>
+</td>
+<td class="px-3 py-4">
+<div class="flex items-center gap-0.5 text-amber-400">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-300">4.9</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Anita Sharma -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="sticky-column bg-white dark:bg-slate-900 px-4 py-4 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="relative shrink-0">
+<img alt="Profile photo of Anita Sharma" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" data-alt="Portrait of a female Indian healthcare worker" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSeB6_dhK_mZNpDahnoRfKOz486wn2HX69ha1LqmwwA7Nht1Pl5eQ8vK7AvecJGgrvp6TdQ5-6bXePQMU8fCeP7RbYO82kiFJ1oFcfGEmdgNcYtWA9fW7M3gtiZpGoLf1Zs2RDxk7bhlrzHNksZeO5tEtho_cZHAq4UqounLC4_PJGrYcYtIJU-n4XJrtNk1QVgHDPxobUIXdc4daUzRCTZ9keYlE1DA79Uhy72HnR4_kxJvCOl5Zi7GNQLU34Y7CxtYwz_i5fzHc"/>
+<span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-slate-300 border-2 border-white dark:border-slate-900 shadow-sm"></span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Anita Sharma</p>
+<p class="text-[10px] text-slate-400 font-medium">OFFLINE</p>
+</div>
+</div>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400 font-medium">+91 91234 56789</p>
+<p class="text-[10px] text-slate-400">ID: PC-2024-714</p>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400">New Delhi</p>
+<span class="inline-block px-2 py-0.5 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full text-[9px] font-bold uppercase tracking-tight">Dwarka</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-sm font-bold text-slate-400">00</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">856</span>
+</td>
+<td class="px-3 py-4">
+<div class="flex items-center gap-0.5 text-amber-400">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-300">4.7</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Vikram Singh -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="sticky-column bg-white dark:bg-slate-900 px-4 py-4 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="relative shrink-0">
+<img alt="Profile photo of Vikram Singh" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" data-alt="Portrait of a young Indian male phlebotomist" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvAFWFmXtaNKTGhBtB_pAqLZM0dUJR-2WqgQIxD-sawGyN4XfvFC6FEXHB-Kj0MOnJOf83ZMSmL_uklN3f1M5fypPkQbOO5otTlLz9aN_cA2KFCSxdV6jPmn2j_u6sxpX9Haf6AdY82JmbEzswAorWceF_6_6V3zIQtrQr38Gcks4JJdnBtPYyy_iXUFv-NsavVnrF7N802jOagfhCZW0c_c55mhHSL8l8Y9lN8FN0y8X-h0AGipoR_2yHehY8EdmfCr6dmqfxZeI"/>
+<span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-primary border-2 border-white dark:border-slate-900 shadow-sm animate-pulse"></span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Vikram Singh</p>
+<p class="text-[10px] text-primary font-medium">ONLINE</p>
+</div>
+</div>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400 font-medium">+91 99988 77766</p>
+<p class="text-[10px] text-slate-400">ID: PC-2024-905</p>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400">New Delhi</p>
+<span class="inline-block px-2 py-0.5 mt-1 bg-primary/10 text-primary rounded-full text-[9px] font-bold">ROHINI</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-sm font-bold text-slate-800 dark:text-slate-200">05</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">512</span>
+</td>
+<td class="px-3 py-4">
+<div class="flex items-center gap-0.5 text-amber-400">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-300">4.5</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Sunita Gupta -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="sticky-column bg-white dark:bg-slate-900 px-4 py-4 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/50">
+<div class="flex items-center gap-3">
+<div class="relative shrink-0">
+<img alt="Profile photo of Sunita Gupta" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" data-alt="Portrait of an Indian woman health professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGv9uNveYZaUWEDpMTma0jUuBSTmShKGd550pnDAvOy47-G7Eb5zfMI81EVtXyVplF4mipD-cM36aO7PT6sFqZpObyeXHdHCBkFdcXdAwSGD3KOAPMo4jTmVo3miLreNne-ROrk-_1Cys_a0IqrgcMOU3Gcn9wsuAOBYHVoLTSJu0cFwl24Pb3O4E9SzTPhwcWkDNWMy47WQyOV8XyGhc2KN8cDLXuSinhAOq_OGr-CR6Vwe48E9S3lMJZ2rm9v4xqGt5nOc4cTms"/>
+<span class="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-slate-300 border-2 border-white dark:border-slate-900 shadow-sm"></span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Sunita Gupta</p>
+<p class="text-[10px] text-slate-400 font-medium">OFFLINE</p>
+</div>
+</div>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400 font-medium">+91 88877 66655</p>
+<p class="text-[10px] text-slate-400">ID: PC-2024-441</p>
+</td>
+<td class="px-3 py-4">
+<p class="text-xs text-slate-600 dark:text-slate-400">New Delhi</p>
+<span class="inline-block px-2 py-0.5 mt-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-full text-[9px] font-bold uppercase tracking-tight">Hauz Khas</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-sm font-bold text-slate-400">00</span>
+</td>
+<td class="px-3 py-4 text-center">
+<span class="text-xs font-medium text-slate-600 dark:text-slate-400">2,104</span>
+</td>
+<td class="px-3 py-4">
+<div class="flex items-center gap-0.5 text-amber-400">
+<span class="material-symbols-outlined text-sm fill-1">star</span>
+<span class="text-xs font-bold text-slate-700 dark:text-slate-300">5.0</span>
+</div>
+</td>
+<td class="px-4 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Load More Indicator -->
+<div class="p-8 text-center">
+<p class="text-xs text-slate-400">Showing 4 of 124 Personnel</p>
+<button class="mt-4 px-6 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 transition-colors">Load More</button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 shrink-0">
+<div class="flex justify-around items-center px-2 py-2 pb-6">
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">dashboard</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<span class="material-symbols-outlined text-primary fill-1">group</span>
+<span class="text-[10px] font-bold text-primary">Phlebotomists</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">assignment</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 group" href="#">
+<span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">settings</span>
+<span class="text-[10px] font-medium text-slate-400 group-hover:text-primary">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Float Info Button -->
+<div class="absolute bottom-24 right-4">
+<button class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full shadow-xl border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</div>
+</body></html>

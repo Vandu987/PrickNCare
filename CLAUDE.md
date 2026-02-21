@@ -71,10 +71,13 @@ Reference these for architecture, patterns, and conventions BEFORE implementing 
 - Task 11-12 (Next.js) → Read `frontend-nextjs.md`
 - Task 13 (Flutter) → Read `mobile-flutter.md` + reference UI screens from `.taskmaster/docs/ui-screens/`
 
-### UI Screen References (Flutter App — Task 13):
-Before building ANY mobile screen, ALWAYS open the matching `screen.png` and `code.html` from `.taskmaster/docs/ui-screens/<folder>/`.
+### UI Screen References:
+Before building ANY UI screen, ALWAYS open the matching `screen.png` and `code.html` from `.taskmaster/docs/ui-screens/<folder>/`.
 These are the approved designs — match layout, spacing, colors, and components exactly.
-See `mobile-flutter.md` for the full screen-to-file mapping table.
+
+- **Flutter App (Task 13):** Screens `01-*` to `20-*` → See `mobile-flutter.md` for mapping
+- **Admin Panel (Task 12):** Screens `A01-*` to `A10-*` → See `frontend-nextjs.md` for mapping
+- **Client Portal (Task 11):** Screens `C01-*` to `C08-*` → See `frontend-nextjs.md` for mapping
 
 ## Project Structure
 ```

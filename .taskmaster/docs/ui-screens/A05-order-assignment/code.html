@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Assignment - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="relative flex h-screen w-full overflow-hidden">
+<!-- Sidebar (Hidden on small mobile, but implied for the 'Orders' active state) -->
+<aside class="hidden md:flex w-20 flex-col items-center py-6 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark z-20">
+<div class="mb-8 p-2 bg-primary/20 rounded-xl">
+<span class="material-symbols-outlined text-primary text-3xl">medical_services</span>
+</div>
+<nav class="flex flex-col gap-6">
+<a class="p-3 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">dashboard</span>
+</a>
+<a class="p-3 bg-primary text-white rounded-xl shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined text-2xl">format_text_clip</span>
+</a>
+<a class="p-3 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">group</span>
+</a>
+<a class="p-3 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+</a>
+<a class="p-3 text-slate-400 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-2xl">settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-w-0">
+<!-- Header Bar -->
+<header class="flex items-center justify-between px-6 py-4 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined md:hidden text-slate-600">menu</span>
+<h1 class="text-xl font-bold tracking-tight">Order Assignment</h1>
+</div>
+<button class="flex items-center gap-2 bg-primary text-slate-900 px-4 py-2 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    Auto-Assign All
+                </button>
+</header>
+<!-- Content Split View -->
+<div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+<!-- Left Panel: Unassigned Orders (40%) -->
+<section class="w-full md:w-[40%] flex flex-col border-r border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-background-dark/50">
+<div class="p-4 flex items-center justify-between">
+<h2 class="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            Unassigned Orders
+                            <span class="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-xs">12</span>
+</h2>
+<button class="text-primary text-sm font-medium">Filter</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
+<!-- Order Card 1 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-2 py-0.5 rounded">High Priority</span>
+<span class="text-xs text-slate-400 font-medium">#ORD-2841</span>
+</div>
+<h3 class="font-bold text-lg mb-1">John Doe</h3>
+<div class="space-y-1.5 mb-4">
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">science</span>
+                                    Full Blood Count
+                                </div>
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                                    Downtown, Zone A
+                                </div>
+</div>
+<button class="w-full bg-slate-100 dark:bg-slate-800 group-hover:bg-primary group-hover:text-slate-900 transition-all text-slate-600 dark:text-slate-300 py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm">
+                                Assign <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+<!-- Order Card 2 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded">Standard</span>
+<span class="text-xs text-slate-400 font-medium">#ORD-2845</span>
+</div>
+<h3 class="font-bold text-lg mb-1">Sarah Jenkins</h3>
+<div class="space-y-1.5 mb-4">
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">science</span>
+                                    Lipid Panel
+                                </div>
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                                    Westside, Zone C
+                                </div>
+</div>
+<button class="w-full bg-slate-100 dark:bg-slate-800 group-hover:bg-primary group-hover:text-slate-900 transition-all text-slate-600 dark:text-slate-300 py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm">
+                                Assign <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+<!-- Order Card 3 -->
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold uppercase tracking-wider text-rose-500 bg-rose-50 dark:bg-rose-900/20 px-2 py-0.5 rounded">High Priority</span>
+<span class="text-xs text-slate-400 font-medium">#ORD-2849</span>
+</div>
+<h3 class="font-bold text-lg mb-1">Michael Chen</h3>
+<div class="space-y-1.5 mb-4">
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">science</span>
+                                    HbA1c Glucose Test
+                                </div>
+<div class="flex items-center gap-2 text-slate-500 text-sm">
+<span class="material-symbols-outlined text-base">location_on</span>
+                                    Uptown, Zone B
+                                </div>
+</div>
+<button class="w-full bg-slate-100 dark:bg-slate-800 group-hover:bg-primary group-hover:text-slate-900 transition-all text-slate-600 dark:text-slate-300 py-2.5 rounded-lg flex items-center justify-center gap-2 font-bold text-sm">
+                                Assign <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Right Panel: Map and Table (60%) -->
+<section class="w-full md:w-[60%] flex flex-col">
+<!-- Map Component -->
+<div class="h-64 md:h-[45%] relative border-b border-slate-200 dark:border-slate-800">
+<div class="absolute inset-0 bg-slate-200 dark:bg-slate-800 overflow-hidden" data-alt="Interactive city map with phlebotomist location pins" data-location="New York" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBlA4uS3DyJSEgwd8qWU6CEyRDdRutS4_joD0SyTW7vKnqe3NRo1iLYy3vrkZ-vlUz9I48EXvxiJKh8CQ4THx83iimxkuYmMEBQ735_45StkLTk8h_Utw9vWIlTdW8Br2H3DGq-Bb4RSVTdPQAnas0Ydxhxre4XAkbPBpjvMe5JW-Of8B2orEdaV2V6VsJMuIkps9wsso5FcswQsDG5xanj8iegG7dQMa9jFJURK5Y5YVweHESPwYOAjLhZrVyXCfJAbZIe93bjTgo'); background-size: cover;">
+<!-- Custom Map Markers -->
+<div class="absolute top-[30%] left-[40%] flex flex-col items-center">
+<div class="size-10 bg-primary rounded-full border-4 border-white dark:border-slate-900 shadow-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-900 text-lg">person_pin</span>
+</div>
+<div class="mt-1 bg-white dark:bg-slate-900 px-2 py-1 rounded shadow text-[10px] font-bold">Liam W.</div>
+</div>
+<div class="absolute top-[60%] left-[65%] flex flex-col items-center opacity-60">
+<div class="size-8 bg-slate-400 rounded-full border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-base">person_off</span>
+</div>
+<div class="mt-1 bg-white dark:bg-slate-900 px-2 py-1 rounded shadow text-[10px] font-bold">Emma S.</div>
+</div>
+<div class="absolute top-[20%] left-[20%] flex flex-col items-center">
+<div class="size-10 bg-primary rounded-full border-4 border-white dark:border-slate-900 shadow-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-900 text-lg">person_pin</span>
+</div>
+<div class="mt-1 bg-white dark:bg-slate-900 px-2 py-1 rounded shadow text-[10px] font-bold">David R.</div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute right-4 bottom-4 flex flex-col gap-2">
+<button class="size-8 bg-white dark:bg-slate-900 rounded-lg shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-600">add</span>
+</button>
+<button class="size-8 bg-white dark:bg-slate-900 rounded-lg shadow-md flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-600">remove</span>
+</button>
+</div>
+</div>
+<!-- Phlebotomist Table Component -->
+<div class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-background-dark">
+<div class="px-6 py-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+<h2 class="font-bold">Active Phlebotomists</h2>
+<div class="flex gap-4 text-xs">
+<span class="flex items-center gap-1.5"><span class="size-2 rounded-full bg-primary"></span> Online</span>
+<span class="flex items-center gap-1.5 text-slate-400"><span class="size-2 rounded-full bg-slate-400"></span> Offline</span>
+</div>
+</div>
+<div class="flex-1 overflow-x-auto no-scrollbar">
+<table class="w-full text-left border-collapse min-w-[600px]">
+<thead class="bg-slate-50 dark:bg-slate-900/50 sticky top-0">
+<tr>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Name</th>
+<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Zone</th>
+<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center">Load</th>
+<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Dist.</th>
+<th class="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Rating</th>
+<th class="px-6 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 font-semibold text-sm">Liam Wilson</td>
+<td class="px-4 py-4 text-sm">Zone A</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col gap-1 items-center">
+<span class="text-xs font-bold">2/5</span>
+<div class="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[40%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-sm text-slate-500">1.2 km</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1 text-amber-500">
+<span class="material-symbols-outlined text-xs fill-current">star</span>
+<span class="text-xs font-bold">4.9</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Online</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors">
+<td class="px-6 py-4 font-semibold text-sm">David Rodriguez</td>
+<td class="px-4 py-4 text-sm">Zone B</td>
+<td class="px-4 py-4 text-center">
+<div class="flex flex-col gap-1 items-center">
+<span class="text-xs font-bold">4/5</span>
+<div class="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-rose-500 h-full w-[80%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-4 text-sm text-slate-500">2.8 km</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1 text-amber-500">
+<span class="material-symbols-outlined text-xs fill-current">star</span>
+<span class="text-xs font-bold">4.7</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Online</span>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors opacity-60">
+<td class="px-6 py-4 font-semibold text-sm">Emma Smith</td>
+<td class="px-4 py-4 text-sm">Zone C</td>
+<td class="px-4 py-4 text-center">
+<span class="text-xs font-bold">0/5</span>
+</td>
+<td class="px-4 py-4 text-sm text-slate-500">--</td>
+<td class="px-4 py-4">
+<div class="flex items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-xs fill-current">star</span>
+<span class="text-xs font-bold">4.8</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-slate-200 dark:bg-slate-800 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Offline</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom NavBar (Mobile) -->
+<nav class="flex md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-4 pb-6 pt-2 items-end justify-around">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">format_text_clip</span>
+<span class="text-[10px] font-bold">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Map</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+</main>
+</div>
+</body></html>

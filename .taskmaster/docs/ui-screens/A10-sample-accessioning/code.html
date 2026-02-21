@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sample Accessioning - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl">biotech</span>
+<h1 class="text-xl font-bold tracking-tight">Sample Accessioning</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">calendar_today</span>
+</button>
+</div>
+<!-- Search Bar -->
+<div class="px-4 pb-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 py-3 text-sm focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Search Order ID or Patient" type="text"/>
+</div>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto">
+<!-- Summary Stats -->
+<div class="flex gap-3 px-4 py-4 overflow-x-auto no-scrollbar">
+<div class="flex-1 min-w-[120px] bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Received</p>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold">89</span>
+<span class="text-[10px] text-green-500 font-bold">+5%</span>
+</div>
+</div>
+<div class="flex-1 min-w-[120px] bg-primary/10 dark:bg-primary/5 p-4 rounded-xl border border-primary/20 shadow-sm">
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Pending</p>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold text-slate-900 dark:text-slate-100">12</span>
+</div>
+</div>
+<div class="flex-1 min-w-[120px] bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Rejected</p>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="text-2xl font-bold">3</span>
+<span class="text-[10px] text-red-500 font-bold">+1</span>
+</div>
+</div>
+</div>
+<!-- Pending Section Header -->
+<div class="px-4 py-2">
+<h2 class="text-sm font-semibold text-slate-500 uppercase tracking-widest">Pending Accessioning (12)</h2>
+</div>
+<!-- Order List -->
+<div class="space-y-3 px-4 pb-24">
+<!-- Order Card (Expanded State) -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border-l-4 border-l-primary shadow-sm overflow-hidden">
+<div class="p-4">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="text-xs font-bold text-primary">#ORD-99283</p>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Eleanor Shellstrop</h3>
+</div>
+<div class="bg-primary/20 text-slate-900 dark:text-slate-100 text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">check_circle</span>
+                            OK STATUS
+                        </div>
+</div>
+<div class="grid grid-cols-2 gap-y-2 mt-3 text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">person</span>
+<span>Phleb: Mark Greene</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span>Collected: 08:30 AM</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+<span>Tubes: 3 Expected / 3 Recv</span>
+</div>
+</div>
+<!-- Individual Tubes - Expanded View Detail -->
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-3">
+<p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Individual Sample Check</p>
+<!-- Tube 1 -->
+<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="w-3 h-8 rounded-full bg-purple-500"></div>
+<div>
+<p class="text-xs font-bold">Lavender Top (EDTA)</p>
+<p class="text-[10px] text-slate-400 font-mono">BC-0012993</p>
+</div>
+</div>
+<select class="text-[10px] bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg py-1 pr-8">
+<option>Status: OK</option>
+<option>Lipemic</option>
+<option>Hemolyzed</option>
+<option>Clotted</option>
+</select>
+</div>
+<!-- Tube 2 -->
+<div class="flex items-center justify-between bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-3">
+<div class="w-3 h-8 rounded-full bg-red-500"></div>
+<div>
+<p class="text-xs font-bold">Serum Separator (SST)</p>
+<p class="text-[10px] text-slate-400 font-mono">BC-0012994</p>
+</div>
+</div>
+<select class="text-[10px] bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg py-1 pr-8">
+<option>Status: OK</option>
+<option>Lipemic</option>
+<option>Hemolyzed</option>
+<option>Clotted</option>
+</select>
+</div>
+</div>
+<button class="w-full mt-4 bg-primary text-slate-900 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">how_to_reg</span>
+                        Mark Received
+                    </button>
+</div>
+</div>
+<!-- Order Card (Collapsed State) -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+<div class="p-4 flex items-center justify-between">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<p class="text-xs font-bold text-slate-400">#ORD-99284</p>
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+</div>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Tahani Al-Jamil</h3>
+<p class="text-[10px] text-slate-500 mt-1">Collected by John Watson • 09:15 AM</p>
+</div>
+<div class="text-right">
+<div class="text-xs font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg mb-2">2 / 2 Tubes</div>
+<span class="material-symbols-outlined text-slate-300">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Order Card (Collapsed State) -->
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm opacity-80">
+<div class="p-4 flex items-center justify-between">
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<p class="text-xs font-bold text-slate-400">#ORD-99285</p>
+<span class="bg-red-500/10 text-red-500 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Hemolyzed</span>
+</div>
+<h3 class="text-base font-bold text-slate-900 dark:text-slate-100">Chidi Anagonye</h3>
+<p class="text-[10px] text-slate-500 mt-1">Collected by Nurse Ratched • 09:45 AM</p>
+</div>
+<div class="text-right">
+<div class="text-xs font-bold bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg mb-2 text-red-500">1 / 2 Tubes</div>
+<span class="material-symbols-outlined text-slate-300">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Scanner FAB -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-slate-900 dark:bg-primary text-white dark:text-slate-900 rounded-full shadow-xl flex items-center justify-center z-40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl">barcode_scanner</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-2 pb-6 pt-2 z-50">
+<div class="flex justify-around items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-[1]">biotech</span>
+<span class="text-[10px] font-bold">Lab</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">bloodtype</span>
+<span class="text-[10px] font-medium">Samples</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Bottom Notch indicator for iOS style -->
+<div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-300 dark:bg-slate-700 rounded-full mb-2 pointer-events-none"></div>
+</body></html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Client Performance Reports - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen pb-24">
+<!-- iOS Status Bar Spacer -->
+<div class="h-12 w-full bg-background-light dark:bg-background-dark sticky top-0 z-50">
+<div class="flex justify-between items-center px-6 pt-4 bg-background-light dark:bg-background-dark">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-sm">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-sm">wifi</span>
+<span class="material-symbols-outlined text-sm">battery_full</span>
+</div>
+</div>
+</div>
+<!-- Header -->
+<header class="px-4 py-4 sticky top-12 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-40">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary">bar_chart_4_bars</span>
+</div>
+<h1 class="text-2xl font-bold tracking-tight">Reports</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<!-- Filters Scrollable -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+<button class="flex shrink-0 items-center gap-2 bg-primary text-slate-900 px-4 py-2 rounded-full text-sm font-semibold shadow-sm">
+<span class="material-symbols-outlined text-lg">calendar_today</span>
+                Last 30 Days
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex shrink-0 items-center gap-2 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-full text-sm font-medium">
+<span class="material-symbols-outlined text-lg">filter_list</span>
+                All Reports
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<button class="flex shrink-0 items-center gap-2 bg-slate-200 dark:bg-slate-800 px-4 py-2 rounded-full text-sm font-medium">
+                Diagnostics
+            </button>
+</div>
+</header>
+<main class="px-4 space-y-6">
+<!-- Monthly Summary KPI Section -->
+<section>
+<div class="flex items-center justify-between mb-3">
+<h2 class="text-lg font-bold">Monthly Summary</h2>
+<span class="text-xs text-slate-500 font-medium">Updated 5m ago</span>
+</div>
+<div class="grid grid-cols-1 gap-4">
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-4">
+<div>
+<p class="text-slate-500 text-sm font-medium">Orders Placed</p>
+<p class="text-3xl font-bold mt-1">1,240</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2 py-1 rounded-full">+12%</span>
+<span class="text-[10px] text-slate-400 mt-1">vs last month</span>
+</div>
+</div>
+<div class="flex items-center justify-between border-b border-slate-50 dark:border-slate-800 pb-4">
+<div>
+<p class="text-slate-500 text-sm font-medium">Average TAT</p>
+<p class="text-3xl font-bold mt-1">14.5<span class="text-lg font-medium text-slate-400 ml-1">hrs</span></p>
+</div>
+<div class="flex flex-col items-end">
+<span class="bg-primary/20 text-primary-dark text-xs font-bold px-2 py-1 rounded-full">-2.1 hrs</span>
+<span class="text-[10px] text-slate-400 mt-1">Improvement</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="text-slate-500 text-sm font-medium">Revenue</p>
+<p class="text-3xl font-bold mt-1">$12,480</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2 py-1 rounded-full">+8%</span>
+<span class="text-[10px] text-slate-400 mt-1">vs last month</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Charts Section -->
+<section class="space-y-6">
+<!-- Weekly Orders Bar Chart -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="font-bold">Orders per Week</h3>
+<p class="text-xs text-slate-500">September 2023</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</div>
+<div class="flex items-end justify-between h-40 gap-3 px-2">
+<div class="flex flex-col items-center gap-2 flex-1 group">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex items-end overflow-hidden" style="height: 60%">
+<div class="w-full bg-primary h-[85%] rounded-t-lg"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">W1</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex items-end overflow-hidden" style="height: 40%">
+<div class="w-full bg-primary h-[70%] rounded-t-lg"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">W2</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex items-end overflow-hidden" style="height: 80%">
+<div class="w-full bg-primary h-[90%] rounded-t-lg shadow-[0_-4px_10px_rgba(19,236,200,0.3)]"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-900 dark:text-white uppercase tracking-tighter">W3</span>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<div class="w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg relative flex items-end overflow-hidden" style="height: 55%">
+<div class="w-full bg-primary h-[65%] rounded-t-lg"></div>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">W4</span>
+</div>
+</div>
+</div>
+<!-- Status Distribution Pie Chart -->
+<div class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-bold">Status Distribution</h3>
+<div class="flex items-center gap-1 text-primary text-xs font-bold">
+                        Efficiency 94%
+                    </div>
+</div>
+<div class="flex items-center gap-8">
+<!-- Fake CSS Pie Chart -->
+<div class="relative size-32 shrink-0 rounded-full flex items-center justify-center border-[12px] border-slate-100 dark:border-slate-800 shadow-inner" style="background: conic-gradient(#13ecc8 0% 75%, #ffcc00 75% 90%, #ff4d4d 90% 100%);">
+<div class="size-20 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-md">
+<span class="text-lg font-bold">1,240</span>
+<span class="text-[8px] text-slate-400 uppercase">Total</span>
+</div>
+</div>
+<div class="flex flex-col gap-3 w-full">
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-primary"></div>
+<span class="text-slate-600 dark:text-slate-400 font-medium">Completed</span>
+</div>
+<span class="font-bold">75%</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-yellow-400"></div>
+<span class="text-slate-600 dark:text-slate-400 font-medium">Pending</span>
+</div>
+<span class="font-bold">15%</span>
+</div>
+<div class="flex items-center justify-between text-xs">
+<div class="flex items-center gap-2">
+<div class="size-2 rounded-full bg-red-400"></div>
+<span class="text-slate-600 dark:text-slate-400 font-medium">Cancelled</span>
+</div>
+<span class="font-bold">10%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Detailed Report Table/List Section -->
+<section class="pb-8">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-lg font-bold">Detailed Report</h2>
+<button class="text-primary text-sm font-semibold">View All</button>
+</div>
+<div class="overflow-x-auto no-scrollbar -mx-4 px-4">
+<table class="w-full text-left border-separate border-spacing-y-2">
+<thead>
+<tr class="text-[10px] uppercase text-slate-400 font-bold tracking-widest">
+<th class="px-4 py-2">Order ID</th>
+<th class="px-4 py-2">Patient / Test</th>
+<th class="px-4 py-2">Status</th>
+<th class="px-4 py-2 text-right">TAT/Amt</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- Order Row 1 -->
+<tr class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm">
+<td class="px-4 py-4 font-bold text-slate-500 rounded-l-xl">#PC-4829</td>
+<td class="px-4 py-4">
+<p class="font-bold truncate max-w-[100px]">Arjun Sharma</p>
+<p class="text-[10px] text-slate-400">CBC, Lipid Profile</p>
+</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-1 text-green-500 text-[10px] font-bold uppercase">
+<span class="size-1.5 rounded-full bg-green-500"></span> Done
+                                </span>
+</td>
+<td class="px-4 py-4 text-right rounded-r-xl">
+<p class="font-bold">12.2h</p>
+<p class="text-[10px] text-slate-400">$120.00</p>
+</td>
+</tr>
+<!-- Order Row 2 -->
+<tr class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm">
+<td class="px-4 py-4 font-bold text-slate-500 rounded-l-xl">#PC-4830</td>
+<td class="px-4 py-4">
+<p class="font-bold truncate max-w-[100px]">Sarah Jenkins</p>
+<p class="text-[10px] text-slate-400">Thyroid Panel</p>
+</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase">
+<span class="size-1.5 rounded-full bg-yellow-500"></span> Pending
+                                </span>
+</td>
+<td class="px-4 py-4 text-right rounded-r-xl">
+<p class="font-bold">-</p>
+<p class="text-[10px] text-slate-400">$85.00</p>
+</td>
+</tr>
+<!-- Order Row 3 -->
+<tr class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden shadow-sm">
+<td class="px-4 py-4 font-bold text-slate-500 rounded-l-xl">#PC-4831</td>
+<td class="px-4 py-4">
+<p class="font-bold truncate max-w-[100px]">Michael Chen</p>
+<p class="text-[10px] text-slate-400">Vit D, B12</p>
+</td>
+<td class="px-4 py-4">
+<span class="flex items-center gap-1 text-green-500 text-[10px] font-bold uppercase">
+<span class="size-1.5 rounded-full bg-green-500"></span> Done
+                                </span>
+</td>
+<td class="px-4 py-4 text-right rounded-r-xl">
+<p class="font-bold">8.5h</p>
+<p class="text-[10px] text-slate-400">$150.00</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+<!-- Export Action Bar -->
+<div class="fixed bottom-20 left-4 right-4 z-40">
+<div class="bg-slate-900/90 dark:bg-slate-100/10 backdrop-blur-lg rounded-2xl p-3 flex gap-2 shadow-2xl border border-white/10">
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary py-3 rounded-xl text-slate-900 font-bold text-sm shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl">picture_as_pdf</span>
+                Export PDF
+            </button>
+<button class="flex-1 flex items-center justify-center gap-2 bg-slate-800 dark:bg-slate-700 py-3 rounded-xl text-white font-bold text-sm">
+<span class="material-symbols-outlined text-xl">table_chart</span>
+                Export Excel
+            </button>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-slate-100 dark:border-slate-800 px-4 pt-3 pb-8 z-50">
+<div class="flex items-center justify-around">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined font-variation-fill">bar_chart</span>
+<span class="text-[10px] font-bold">Reports</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">Patients</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Background Pattern -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 opacity-30 pointer-events-none">
+<div class="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-primary rounded-full blur-[120px] opacity-20"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[300px] h-[300px] bg-primary rounded-full blur-[120px] opacity-20"></div>
+</div>
+</body></html>

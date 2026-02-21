@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Live Order Tracking - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { box-shadow: 0 0 0 0px rgba(19, 236, 200, 0.4); }
+            100% { box-shadow: 0 0 0 10px rgba(19, 236, 200, 0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased min-h-screen pb-24">
+<!-- Header / Navigation -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center justify-between px-4 h-16">
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">arrow_back_ios</span>
+</button>
+<div>
+<p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">Orders</p>
+<h1 class="text-sm font-bold truncate max-w-[180px]">#PNC-210226-0042</h1>
+</div>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-xs font-semibold">
+<span class="material-symbols-outlined text-sm">help</span>
+                Need Help?
+            </button>
+</div>
+</header>
+<main class="p-4 space-y-6">
+<!-- Live Status Stepper Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<div class="size-2 bg-primary rounded-full pulse"></div>
+<h2 class="text-xl font-bold tracking-tight">En route to you</h2>
+</div>
+<p class="text-sm text-slate-500">ETA: 10:45 AM (8 mins away)</p>
+</div>
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Live</div>
+</div>
+<!-- Horizontal Stepper -->
+<div class="relative flex justify-between items-center mb-2">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800 -translate-y-1/2 z-0"></div>
+<div class="absolute top-1/2 left-0 w-1/2 h-1 bg-primary -translate-y-1/2 z-0"></div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="size-6 bg-primary rounded-full flex items-center justify-center text-white ring-4 ring-white dark:ring-slate-900">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-[10px] font-bold text-slate-400">Pending</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="size-6 bg-primary rounded-full flex items-center justify-center text-white ring-4 ring-white dark:ring-slate-900">
+<span class="material-symbols-outlined text-sm">directions_run</span>
+</div>
+<span class="text-[10px] font-bold text-primary">En route</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="size-6 bg-slate-200 dark:bg-slate-700 rounded-full ring-4 ring-white dark:ring-slate-900"></div>
+<span class="text-[10px] font-bold text-slate-400">Collected</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="size-6 bg-slate-200 dark:bg-slate-700 rounded-full ring-4 ring-white dark:ring-slate-900"></div>
+<span class="text-[10px] font-bold text-slate-400">Lab</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="size-6 bg-slate-200 dark:bg-slate-700 rounded-full ring-4 ring-white dark:ring-slate-900"></div>
+<span class="text-[10px] font-bold text-slate-400">Ready</span>
+</div>
+</div>
+</section>
+<!-- Tracking Map -->
+<section class="overflow-hidden rounded-xl border border-slate-100 dark:border-slate-800 shadow-sm relative h-64 bg-slate-200">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract map showing city streets and routes" data-location="New York City" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA7rXco85bFFgPQs_sQYO54LOP7IKi5QAGWUG8NeKhVUZmox8LxiPDVMCBwkdCbyV40nyAsqZjf2BY6IVeFQfWci8xIeRPE7l0DvST9xr7MCtlUHcSVEkcc2JUPZ5M5FPGhqsNrBh59e4wgwgEWSobS8_V5DOFfS6YSFU3hOLtC4O2xDeh3mS0XGRjnA-kLd0ITiHWAnJTecVb6gn3zk_p5WPxbb_0xYAq26KDCh9wQgs7ncO-1_UoDEsRvid51uRNHEVhYvqM6jrs')"></div>
+<!-- Map Overlay UI -->
+<div class="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur p-2 rounded-lg shadow-lg flex items-center gap-3 border border-primary/20">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-slate-500 uppercase">Distance</p>
+<p class="text-sm font-bold">1.2 miles</p>
+</div>
+</div>
+<!-- Pulsing Location Pin -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="size-10 bg-primary/30 rounded-full flex items-center justify-center pulse">
+<div class="size-4 bg-primary rounded-full border-2 border-white"></div>
+</div>
+</div>
+</section>
+<!-- Phlebotomist Profile -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-4 mb-4">
+<div class="relative">
+<img alt="Sarah Jenkins" class="size-16 rounded-full object-cover border-2 border-primary/20" data-alt="Professional female phlebotomist in medical uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQwV-pxvb8es_5r4-Yv-Wddte9isg5RbjPpbbXhk-UHf6DP-zMMZ4o0cYsRm3TQ0SXOT0qs9W8VgHxWTMeY4odaNy_nij6A7KdkLapAW3LZmqmXPN-VG1_KWwIFafAXYqF0lcz2F4vyt7DU2yImmkwNMnkNEx5N6-VvvdoxTEfyALNLflJRjaEPez-47OkqQulb2gh19UvFGmCKelxGNB5RJF5uT3wuhqWcj-GqrPlwelE1etvMCg-PdlknqVoUjDZ2eyJTttLuQQ"/>
+<div class="absolute -bottom-1 -right-1 bg-primary text-white p-0.5 rounded-full border-2 border-white dark:border-slate-900">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+</div>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-lg">Sarah Jenkins</h3>
+<p class="text-sm text-slate-500">Certified Phlebotomist • 5+ yrs</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-yellow-400 text-sm fill-current">star</span>
+<span class="text-sm font-bold">4.9</span>
+<span class="text-xs text-slate-400">(128 reviews)</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 py-3 bg-primary text-slate-900 font-bold rounded-xl transition-transform active:scale-95">
+<span class="material-symbols-outlined">call</span>
+                    Call
+                </button>
+<button class="flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl transition-transform active:scale-95">
+<span class="material-symbols-outlined">chat_bubble</span>
+                    Message
+                </button>
+</div>
+</section>
+<!-- Patient & Order Details -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-3 text-slate-400">
+<span class="material-symbols-outlined text-sm">person</span>
+<h4 class="text-xs font-bold uppercase tracking-wider">Patient Information</h4>
+</div>
+<p class="font-bold text-slate-900 dark:text-slate-100">Robert M. Peterson</p>
+<p class="text-sm text-slate-500">DOB: 12/04/1985</p>
+<div class="mt-3 pt-3 border-t border-slate-50 dark:border-slate-800">
+<p class="text-[10px] font-bold text-slate-400 uppercase">Collection Window</p>
+<p class="text-sm font-medium">Today, 10:30 AM - 11:30 AM</p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-3 text-slate-400">
+<span class="material-symbols-outlined text-sm">biotech</span>
+<h4 class="text-xs font-bold uppercase tracking-wider">Requested Tests</h4>
+</div>
+<ul class="space-y-2">
+<li class="flex items-center justify-between text-sm">
+<span class="font-medium">Complete Blood Count (CBC)</span>
+<span class="material-symbols-outlined text-primary text-xs">check_circle</span>
+</li>
+<li class="flex items-center justify-between text-sm">
+<span class="font-medium">Lipid Panel</span>
+<span class="material-symbols-outlined text-primary text-xs">check_circle</span>
+</li>
+</ul>
+</div>
+</section>
+<!-- Activity Timeline -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-800">
+<h3 class="font-bold text-lg mb-6">Activity Log</h3>
+<div class="space-y-6 relative before:absolute before:inset-y-0 before:left-3 before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+<!-- Timeline Item 1 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 size-6 bg-primary rounded-full flex items-center justify-center text-white ring-4 ring-white dark:ring-slate-900">
+<span class="material-symbols-outlined text-[14px]">local_shipping</span>
+</div>
+<div>
+<p class="font-bold text-sm">Phlebotomist is en route</p>
+<p class="text-xs text-slate-500 mt-0.5">10:37 AM • Sarah has left the clinic and is heading your way.</p>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 size-6 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-[14px]">person_check</span>
+</div>
+<div>
+<p class="font-bold text-sm">Assigned to Phlebotomist</p>
+<p class="text-xs text-slate-500 mt-0.5">09:15 AM • Sarah Jenkins has been assigned to your collection.</p>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative pl-10">
+<div class="absolute left-0 top-1 size-6 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+<span class="material-symbols-outlined text-[14px]">description</span>
+</div>
+<div>
+<p class="font-bold text-sm">Order Confirmed</p>
+<p class="text-xs text-slate-500 mt-0.5">08:00 AM • Your home collection request was successfully processed.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Navigation Tab Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-t border-slate-100 dark:border-slate-800 px-6 py-2 pb-8 z-50">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-current">receipt_long</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">lab_profile</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Reports</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

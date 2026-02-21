@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Settings - Prick &amp; Care</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                        "navy-accent": "#0d1b19", // Derived from primary hue for harmony
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- Main Mobile Container -->
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between bg-white dark:bg-slate-900 px-4 py-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
+<div class="flex items-center gap-3">
+<button class="text-navy-accent dark:text-primary">
+<span class="material-symbols-outlined text-2xl">menu</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight text-navy-accent dark:text-white">System Settings</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="size-9 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 overflow-hidden">
+<img alt="Admin Profile" class="size-full object-cover" data-alt="User profile avatar circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEyREhNeKf9vBBCNeWxVVYAKr3oTR6dWi6zuRQ9pfMNO-PhRVXmVbwpYRpoaIK0bdMvUVH542N2vWCJ5hFdZ91L_utCte_INs6sk26rCYrMe8IY-rfN5IY7iwDutxj76ISqxiV0rzh0ie0-qaF8g6CsAbi5nqdFsXV6G2PkZmp7DS9R5BmTUr-90w6Zs-rPGIUMqcEEKxVRrHUuZzUsh1oF6pICgP7OgXxDXkl7WamYQbMpMrCGzc6il_QvnOccVzE8V5hVBwS4Js"/>
+</div>
+</div>
+</header>
+<!-- Tab Bar (Horizontal Scrollable) -->
+<nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0">
+<div class="flex overflow-x-auto no-scrollbar px-4 gap-6">
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent py-4 shrink-0" href="#">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">General</span>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-primary py-4 shrink-0" href="#">
+<span class="text-sm font-bold text-navy-accent dark:text-primary">Packages &amp; Tests</span>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent py-4 shrink-0" href="#">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Time Slots</span>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent py-4 shrink-0" href="#">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Notifications</span>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent py-4 shrink-0" href="#">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Holidays</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto px-4 pb-24">
+<!-- Search and Action Bar -->
+<div class="py-5 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-lg font-bold text-navy-accent dark:text-white">Packages</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Manage 24 active diagnostics</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-navy-accent px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-lg">add</span>
+                        Add Package
+                    </button>
+</div>
+<!-- Search Input Component -->
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl leading-5 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm" placeholder="Search by package or test name..." type="text"/>
+</div>
+</div>
+<!-- Package Cards (The "Table" in Mobile) -->
+<div class="space-y-4">
+<!-- Package Card 1 -->
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-bold text-base text-navy-accent dark:text-white leading-tight">CBC (Complete Blood Count)</h3>
+<span class="text-[10px] uppercase tracking-wider font-semibold text-primary mt-1 block">Full Profile</span>
+</div>
+<!-- Custom Toggle Switch -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs py-3 border-t border-slate-100 dark:border-slate-700/50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">water_drop</span>
+<span class="text-slate-600 dark:text-slate-400">Blood</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">biotech</span>
+<span class="text-slate-600 dark:text-slate-400">EDTA Tube</span>
+</div>
+<div class="flex items-center gap-2 font-bold text-navy-accent dark:text-white">
+<span class="text-slate-400 font-normal">Price:</span>
+                                ₹500
+                            </div>
+<div class="flex items-center justify-end gap-3">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-lg">edit_note</span>
+</button>
+<button class="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-red-400 text-lg">delete</span>
+</button>
+</div>
+</div>
+<!-- Expandable Section Mockup -->
+<div class="mt-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Included Tests (4)</span>
+<span class="material-symbols-outlined text-primary text-sm">expand_more</span>
+</div>
+<div class="mt-2 space-y-1">
+<div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
+<span>Hemoglobin (Hb)</span>
+<span class="font-medium">Active</span>
+</div>
+<div class="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-400">
+<span>WBC Differential Count</span>
+<span class="font-medium">Active</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Package Card 2 -->
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-bold text-base text-navy-accent dark:text-white leading-tight">Thyroid Profile (Total)</h3>
+<span class="text-[10px] uppercase tracking-wider font-semibold text-primary mt-1 block">T3, T4, TSH</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs py-3 border-t border-slate-100 dark:border-slate-700/50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">science</span>
+<span class="text-slate-600 dark:text-slate-400">Serum</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">vaccines</span>
+<span class="text-slate-600 dark:text-slate-400">SST Tube</span>
+</div>
+<div class="flex items-center gap-2 font-bold text-navy-accent dark:text-white">
+<span class="text-slate-400 font-normal">Price:</span>
+                                ₹1,200
+                            </div>
+<div class="flex items-center justify-end gap-3">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-lg">edit_note</span>
+</button>
+<button class="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-red-400 text-lg">delete</span>
+</button>
+</div>
+</div>
+<div class="mt-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Included Tests (3)</span>
+<span class="material-symbols-outlined text-primary text-sm">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Package Card 3 -->
+<div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
+<div class="p-4">
+<div class="flex justify-between items-start mb-3">
+<div>
+<h3 class="font-bold text-base text-navy-accent dark:text-white leading-tight">Lipid Profile</h3>
+<span class="text-[10px] uppercase tracking-wider font-semibold text-primary mt-1 block">Cardiac Screening</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="grid grid-cols-2 gap-y-3 gap-x-2 text-xs py-3 border-t border-slate-100 dark:border-slate-700/50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">bloodtype</span>
+<span class="text-slate-600 dark:text-slate-400">Serum</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">medication</span>
+<span class="text-slate-600 dark:text-slate-400">Plain Tube</span>
+</div>
+<div class="flex items-center gap-2 font-bold text-navy-accent dark:text-white">
+<span class="text-slate-400 font-normal">Price:</span>
+                                ₹800
+                            </div>
+<div class="flex items-center justify-end gap-3">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors">
+<span class="material-symbols-outlined text-slate-400 text-lg">edit_note</span>
+</button>
+<button class="p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors">
+<span class="material-symbols-outlined text-red-400 text-lg">delete</span>
+</button>
+</div>
+</div>
+<div class="mt-2 bg-slate-50 dark:bg-slate-900/50 rounded-lg p-3">
+<div class="flex items-center justify-between">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Included Tests (5)</span>
+<span class="material-symbols-outlined text-primary text-sm">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<div class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 pb-safe fixed bottom-0 left-0 right-0 z-50">
+<div class="flex gap-2 px-4 pb-3 pt-2">
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">dashboard</span>
+</div>
+<p class="text-[10px] font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<p class="text-[10px] font-medium leading-normal">Orders</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<p class="text-[10px] font-medium leading-normal">Inventory</p>
+</a>
+<a class="flex flex-1 flex-col items-center justify-end gap-1 text-navy-accent dark:text-primary" href="#">
+<div class="flex h-8 items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">settings</span>
+</div>
+<p class="text-[10px] font-bold leading-normal">Settings</p>
+</a>
+</div>
+</div>
+</div>
+</body></html>

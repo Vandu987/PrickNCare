@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orders Management - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen pb-24">
+<!-- Mobile Header/Navigation -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40">
+<div class="px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="p-2 -ml-2 text-slate-600 dark:text-slate-400">
+<span class="material-icons">menu</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Orders Management</h1>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary/20">
+<img class="w-full h-full object-cover" data-alt="Admin user profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYcVzQQ1IwnIqxHbaKqzUqAvbfoBipNiEphrlUN2oAsWe9MkP_WBTAnKwc8joltAIpUkr1BuQG0L53dztg9nfaP5XS9y-n1tu3TGHf-D6k0RKkC5p45CZbeSQyTv9yrLsB_RtWrW2PusDrLyzDgm7tJ8fsOkCZYXARNQjv0kaTU6nBfK14YtQIqxDo21gIMPzcJu32QLrgRCZH5pC2eZxYEZhJY4rkPtD6JU55o2DeqVHmXZ0vdgq-SaRj-5t7bN4v4MbKX-7uXxQ"/>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="px-4 pb-4 flex gap-2">
+<button class="flex-1 flex items-center justify-center gap-2 bg-primary text-slate-900 font-semibold py-2.5 rounded-lg text-sm transition-opacity active:opacity-80">
+<span class="material-icons text-lg">add</span>
+                Create Order
+            </button>
+<button class="flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors active:bg-slate-50">
+<span class="material-icons text-lg">file_download</span>
+                Export
+            </button>
+</div>
+</header>
+<!-- Filter Bar -->
+<section class="px-4 py-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-2 whitespace-nowrap">
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-xs font-semibold">
+<span class="material-icons text-sm">filter_list</span>
+                Filters
+            </button>
+<div class="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs text-slate-600 dark:text-slate-400">Date Range</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs text-slate-600 dark:text-slate-400">City</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs text-slate-600 dark:text-slate-400">Status</span>
+<span class="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-full text-xs text-slate-600 dark:text-slate-400">Client</span>
+</div>
+</section>
+<!-- Data Table Container -->
+<main class="w-full overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[1000px]">
+<thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+<tr>
+<th class="p-4 w-12 sticky left-0 bg-slate-50 dark:bg-slate-800/50 z-10">
+<input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Order ID</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Patient</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Status</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Schedule</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Client</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Phlebotomist</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Area</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500">Amount</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="p-4 sticky left-0 bg-white dark:bg-slate-900 z-10">
+<input checked="" class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="p-4 text-sm font-medium text-slate-900 dark:text-slate-100">#PC-9821</td>
+<td class="p-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Sarah Jenkins</span>
+<span class="text-xs text-slate-500">+1 202-555-0143</span>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary/20 text-teal-700 dark:text-teal-300">
+                            Completed
+                        </span>
+</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">
+                        Oct 24, 08:30 AM
+                    </td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">City General</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">David Wilson</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Downtown</td>
+<td class="p-4 text-sm font-medium">$85.00</td>
+<td class="p-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">visibility</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">person_add_alt</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="p-4 sticky left-0 bg-white dark:bg-slate-900 z-10">
+<input class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="p-4 text-sm font-medium text-slate-900 dark:text-slate-100">#PC-9822</td>
+<td class="p-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Mark Thompson</span>
+<span class="text-xs text-slate-500">+1 202-555-0199</span>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                            In Progress
+                        </span>
+</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">
+                        Oct 24, 09:15 AM
+                    </td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Westside Clinic</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Elena Rodri</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Northside</td>
+<td class="p-4 text-sm font-medium">$120.00</td>
+<td class="p-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">visibility</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">person_add_alt</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="p-4 sticky left-0 bg-white dark:bg-slate-900 z-10">
+<input checked="" class="rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+</td>
+<td class="p-4 text-sm font-medium text-slate-900 dark:text-slate-100">#PC-9823</td>
+<td class="p-4">
+<div class="flex flex-col">
+<span class="text-sm font-semibold">Lucy Chen</span>
+<span class="text-xs text-slate-500">+1 202-555-0155</span>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                            Scheduled
+                        </span>
+</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">
+                        Oct 24, 10:00 AM
+                    </td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">HealthPlus</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Michael S.</td>
+<td class="p-4 text-sm text-slate-600 dark:text-slate-400">Heights</td>
+<td class="p-4 text-sm font-medium">$65.00</td>
+<td class="p-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">visibility</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">edit</span></button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">person_add_alt</span></button>
+</div>
+</td>
+</tr>
+<!-- Repeating rows for density as requested (12 rows total) -->
+<!-- Simplified rows for visual representation -->
+<script>
+                    const data = [
+                        { id: '9824', name: 'James Miller', status: 'Scheduled', color: 'blue' },
+                        { id: '9825', name: 'Anna Scott', status: 'Cancelled', color: 'red' },
+                        { id: '9826', name: 'Robert Fox', status: 'Completed', color: 'teal' },
+                        { id: '9827', name: 'Emily Davis', status: 'Scheduled', color: 'blue' },
+                        { id: '9828', name: 'Kevin Hart', status: 'In Progress', color: 'yellow' },
+                        { id: '9829', name: 'Sophie Turner', status: 'Scheduled', color: 'blue' },
+                        { id: '9830', name: 'Chris Evans', status: 'Completed', color: 'teal' },
+                        { id: '9831', name: 'Taylor Swift', status: 'Scheduled', color: 'blue' },
+                        { id: '9832', name: 'Ben Affleck', status: 'In Progress', color: 'yellow' },
+                    ];
+
+                    data.forEach(item => {
+                        const statusClass = item.color === 'teal' ? 'bg-primary/20 text-teal-700 dark:text-teal-300' :
+                                          item.color === 'red' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                          item.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                          'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+
+                        document.write(`
+                            <tr class="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                <td class="p-4 sticky left-0 bg-white dark:bg-slate-900 z-10">
+                                    <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary">
+                                </td>
+                                <td class="p-4 text-sm font-medium text-slate-900 dark:text-slate-100">#PC-${item.id}</td>
+                                <td class="p-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-semibold">${item.name}</span>
+                                        <span class="text-xs text-slate-500">+1 202-555-0${item.id}</span>
+                                    </div>
+                                </td>
+                                <td class="p-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusClass}">
+                                        ${item.status}
+                                    </span>
+                                </td>
+                                <td class="p-4 text-sm text-slate-600 dark:text-slate-400">Oct 24, 11:30 AM</td>
+                                <td class="p-4 text-sm text-slate-600 dark:text-slate-400">Westside Clinic</td>
+                                <td class="p-4 text-sm text-slate-600 dark:text-slate-400">Elena Rodri</td>
+                                <td class="p-4 text-sm text-slate-600 dark:text-slate-400">East Park</td>
+                                <td class="p-4 text-sm font-medium">$95.00</td>
+                                <td class="p-4 text-right">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">visibility</span></button>
+                                        <button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">edit</span></button>
+                                        <button class="p-2 text-slate-400 hover:text-primary transition-colors"><span class="material-icons text-xl">person_add_alt</span></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                </script>
+</tbody>
+</table>
+</main>
+<!-- Pagination Footer -->
+<footer class="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<span class="text-xs text-slate-500">Showing 1-12 of 128 orders</span>
+<div class="flex gap-1">
+<button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-400">
+<span class="material-icons text-lg leading-none">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary text-slate-900 font-bold text-xs">1</button>
+<button class="w-8 h-8 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs">2</button>
+<button class="w-8 h-8 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs">3</button>
+<button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-icons text-lg leading-none">chevron_right</span>
+</button>
+</div>
+</footer>
+<!-- Bulk Actions Floating Bar -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-primary text-slate-900 shadow-xl rounded-xl p-3 flex items-center justify-between z-50">
+<div class="flex items-center gap-3 pl-2">
+<span class="bg-white/30 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+<span class="text-sm font-semibold tracking-tight">Orders Selected</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg bg-white/20 hover:bg-white/40 transition-colors">
+<span class="material-icons text-xl">person_add</span>
+</button>
+<button class="p-2 rounded-lg bg-white/20 hover:bg-white/40 transition-colors">
+<span class="material-icons text-xl">sync</span>
+</button>
+<div class="h-6 w-px bg-slate-900/10"></div>
+<button class="p-2 rounded-lg bg-red-500 text-white shadow-sm hover:bg-red-600 transition-colors">
+<span class="material-icons text-xl">delete</span>
+</button>
+</div>
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-6 py-2 flex justify-between items-center z-40">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons text-2xl">dashboard</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons text-2xl">receipt_long</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Orders</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons text-2xl">people</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Staff</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons text-2xl">analytics</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-icons text-2xl">settings</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Setup</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Collection Order - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex flex-col">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-4 py-4 flex items-center">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back_ios</span>
+</button>
+<h1 class="flex-1 text-center text-lg font-bold mr-10">Place New Order</h1>
+</header>
+<main class="flex-1 pb-40">
+<!-- Warning Banner for Out of Zone -->
+<div class="px-4 mt-4">
+<div class="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-4 rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-red-600 dark:text-red-400">error</span>
+<div>
+<p class="text-sm font-semibold text-red-800 dark:text-red-300">Service not available</p>
+<p class="text-xs text-red-700 dark:text-red-400 mt-1">Phlebotomy services are currently unavailable for pincode 110092. Please select another location.</p>
+</div>
+</div>
+</div>
+<!-- Form Sections -->
+<div class="px-4 py-6 space-y-8">
+<!-- Patient Details Section -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">person_outline</span>
+<h2 class="text-xl font-bold">Patient Details</h2>
+</div>
+<div class="space-y-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Patient Name</label>
+<input class="w-full h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none" placeholder="e.g. John Doe" type="text"/>
+</div>
+<div class="flex gap-4">
+<div class="flex-1 flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Phone Number</label>
+<input class="w-full h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<div class="w-24 flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Age</label>
+<input class="w-full h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-center" placeholder="0" type="number"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<p class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Gender</p>
+<div class="grid grid-cols-3 gap-2 p-1 bg-primary/5 rounded-lg border border-primary/10">
+<button class="py-2 px-4 rounded bg-primary text-white font-medium shadow-sm">Male</button>
+<button class="py-2 px-4 rounded text-slate-600 dark:text-slate-400 font-medium hover:bg-primary/10">Female</button>
+<button class="py-2 px-4 rounded text-slate-600 dark:text-slate-400 font-medium hover:bg-primary/10">Other</button>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Collection Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">location_on</span>
+<input class="w-full h-12 pl-10 pr-4 rounded-lg border border-red-300 dark:border-red-900/50 bg-white dark:bg-slate-900/50 focus:ring-2 focus:ring-red-400 outline-none" type="text" value="110092, Krishna Nagar, Delhi"/>
+</div>
+<p class="text-[10px] text-red-500 font-medium px-1">Enter a valid pincode within service area</p>
+</div>
+</div>
+</section>
+<!-- Collection Details Section -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<h2 class="text-xl font-bold">Collection Details</h2>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Date</label>
+<div class="relative">
+<input class="w-full h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary outline-none appearance-none" type="date"/>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Time Slot</label>
+<select class="w-full h-12 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 px-4 focus:ring-2 focus:ring-primary outline-none appearance-none">
+<option>08:00 - 09:00 AM</option>
+<option>09:00 - 10:00 AM</option>
+<option>10:00 - 11:00 AM</option>
+<option>04:00 - 05:00 PM</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<p class="text-sm font-medium text-slate-600 dark:text-slate-400 px-1">Visit Type</p>
+<div class="flex gap-4">
+<label class="flex-1 cursor-pointer group">
+<input checked="" class="hidden peer" name="visit_type" type="radio"/>
+<div class="p-3 text-center rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 peer-checked:bg-primary/20 peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined block mb-1">home</span>
+<span class="text-sm font-medium">Home Visit</span>
+</div>
+</label>
+<label class="flex-1 cursor-pointer group">
+<input class="hidden peer" name="visit_type" type="radio"/>
+<div class="p-3 text-center rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 peer-checked:bg-primary/20 peer-checked:border-primary transition-all">
+<span class="material-symbols-outlined block mb-1">domain</span>
+<span class="text-sm font-medium">Lab Visit</span>
+</div>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-white dark:bg-slate-900/50 rounded-lg border border-primary/20">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-orange-500">priority_high</span>
+<div>
+<p class="text-sm font-bold">Urgent Priority</p>
+<p class="text-[10px] text-slate-500">Collect sample within 2 hours</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</section>
+<!-- Tests & Packages Section -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-primary">biotech</span>
+<h2 class="text-xl font-bold">Tests &amp; Packages</h2>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-3 text-slate-400">search</span>
+<input class="w-full h-12 pl-10 pr-4 rounded-lg border border-primary/20 bg-white dark:bg-slate-900/50 focus:ring-2 focus:ring-primary outline-none" placeholder="Search CBC, Vitamin D, etc." type="text"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/20 border border-primary text-slate-800 dark:text-slate-100 rounded-full text-sm font-medium">
+                        CBC (Complete Blood Count)
+                        <button class="material-symbols-outlined text-xs">close</button>
+</div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/20 border border-primary text-slate-800 dark:text-slate-100 rounded-full text-sm font-medium">
+                        Lipid Profile
+                        <button class="material-symbols-outlined text-xs">close</button>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-sm font-medium hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-xs">add</span>
+                        Add More
+                    </button>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Order Summary Section -->
+<div class="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl border-t border-primary/10 shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+<div class="max-w-md mx-auto space-y-4">
+<!-- Collapse/Expand Indicator -->
+<div class="flex justify-center -mt-2 mb-2">
+<div class="w-12 h-1 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+</div>
+<!-- Summary Breakdown -->
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-500">2 Tests Selected</span>
+<span class="text-sm font-medium">$85.00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm text-slate-500">Home Collection Fee</span>
+<span class="text-sm font-medium">$15.00</span>
+</div>
+<div class="flex justify-between items-center border-t border-slate-100 dark:border-slate-800 pt-2">
+<span class="font-bold">Order Total</span>
+<span class="font-bold text-primary text-lg">$100.00</span>
+</div>
+</div>
+<!-- Primary Action -->
+<button class="w-full h-14 bg-primary text-background-dark font-bold text-lg rounded-xl shadow-lg shadow-primary/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:grayscale" disabled="">
+                Place Order
+                <span class="material-symbols-outlined">chevron_right</span>
+</button>
+<p class="text-[10px] text-center text-red-500 font-medium -mt-2">Address is outside service zone</p>
+</div>
+</div>
+<!-- Mobile Bottom Navigation (Visible when not scrolling long form) -->
+<div class="fixed bottom-0 left-0 right-0 hidden">
+<div class="flex items-center bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900 pb-8 pt-3 px-6 justify-between">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">clinical_notes</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">Patients</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Client Detail and Rates Configuration - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen pb-24">
+<!-- Header Section -->
+<header class="sticky top-0 z-20 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center justify-between px-4 h-16">
+<div class="flex items-center gap-3">
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">arrow_back_ios</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Client Details</h1>
+</div>
+<button class="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">more_vert</span>
+</button>
+</div>
+<!-- Breadcrumb & Title -->
+<div class="px-4 pb-2">
+<div class="flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+<span>Clients</span>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-primary">City Diagnostics Pvt Ltd</span>
+</div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">City Diagnostics Pvt Ltd</h2>
+</div>
+<!-- Scrollable Tabs -->
+<div class="flex overflow-x-auto hide-scrollbar border-b border-slate-100 dark:border-slate-800 px-4 gap-6 mt-2">
+<a class="border-b-2 border-primary text-primary pb-3 text-sm font-semibold whitespace-nowrap" href="#">Overview</a>
+<a class="border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 text-sm font-semibold whitespace-nowrap" href="#">Rate Configuration</a>
+<a class="border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 text-sm font-semibold whitespace-nowrap" href="#">Users</a>
+<a class="border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 text-sm font-semibold whitespace-nowrap" href="#">Orders</a>
+<a class="border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 text-sm font-semibold whitespace-nowrap" href="#">Invoices</a>
+</div>
+</header>
+<main class="p-4 space-y-4">
+<!-- Stats Row -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Total Orders</p>
+<div class="flex items-end justify-between">
+<span class="text-2xl font-bold">1,240</span>
+<span class="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-full">+12%</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Outstanding</p>
+<div class="flex items-end justify-between">
+<span class="text-2xl font-bold text-slate-900 dark:text-white">₹2,45k</span>
+<span class="material-symbols-outlined text-red-400">account_balance_wallet</span>
+</div>
+</div>
+</div>
+<!-- Company Information Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+                    Company Info
+                </h3>
+<button class="text-primary text-sm font-bold">Edit</button>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">GST Number</span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">27AAAAA0000A1Z5</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Address</span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">123 Health Avenue, Bandra West, Mumbai, MH 400050</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Primary Contact</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-sm text-slate-400">call</span>
+<span class="text-sm font-medium text-slate-700 dark:text-slate-300">+91 98765 43210</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Rate Configuration Section -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+                    Rate Configuration
+                </h3>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+<div class="divide-y divide-slate-100 dark:divide-slate-800">
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">First Collection</p>
+<p class="text-xs text-slate-500">Standard home visit fee</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-900 dark:text-white">₹250.00</p>
+<p class="text-[10px] text-primary font-medium">Per Visit</p>
+</div>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Follow-up Collection</p>
+<p class="text-xs text-slate-500">Within 7 days of first</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-900 dark:text-white">₹150.00</p>
+<p class="text-[10px] text-primary font-medium">Per Visit</p>
+</div>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div>
+<p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Stat/Urgent Visit</p>
+<p class="text-xs text-slate-500">Immediate priority service</p>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-slate-900 dark:text-white">₹500.00</p>
+<p class="text-[10px] text-primary font-medium">Premium</p>
+</div>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-3 text-center">
+<button class="text-xs font-bold text-primary flex items-center justify-center gap-1 w-full uppercase tracking-widest">
+                    Manage All Rates
+                </button>
+</div>
+</div>
+<!-- Portal Users Section -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+<div class="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">group</span>
+                    Portal Users
+                </h3>
+<button class="bg-primary/20 text-primary-dark hover:bg-primary/30 p-1.5 rounded-lg flex items-center">
+<span class="material-symbols-outlined text-lg">person_add</span>
+</button>
+</div>
+<div class="divide-y divide-slate-100 dark:divide-slate-800">
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Profile picture of Rahul S., Admin User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOpWsEoFiZ2BXMb9fpjzkiX5eU7dKd5pKEjw_TVcLdUxOKWUmMkw_3ZAP3CcYepx5hCnQkoK_qngkyt9ugDx6HwZ2kN4XQkEVogh-nnG7HgPIIm2OyXH6vkLA_xWESTtkS104vAdhnUTdkuVIll4l7K8QwI4VJ3gva3a3cQlrCM7pBlxzSomWRPf2XM2ht32nqe1dS1ePqWogoYaEp6io5ykUSw_7ySBmHheq4BNJRoODA6AXf0MYHxQGtF6PnCoerpsFCs8Fx-Ls"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-200">Rahul Sharma</p>
+<p class="text-xs text-slate-500">Super Admin</p>
+</div>
+</div>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Active</span>
+</div>
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Profile picture of Priya M., Staff User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8pNxzRieQ4BIlPGb_ntlAQgrjKIonK-yO3JbLIX0rmlLrHa2u5N7eRwISN4AaY7qauruWgIoVb5ifY2jfePrvR2pXMGc7qYKTaQ7Q9GqSqUtUZBuAPLyJnHlbcZezOvt9vGILknG6bX35RQyqu2bcfqXv75_LwdYJFSN_2dGfyb0jkteB09fQFTZmFsE7hsc3FwL-ZIJ_aAGeMeOjT5bFx3IU_IITP3zywN3UmtQwtp8tiI5uu5ihZDi0yVtuln3mvRusqo77MWg"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-200">Priya Mehta</p>
+<p class="text-xs text-slate-500">Operation Lead</p>
+</div>
+</div>
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Active</span>
+</div>
+<div class="p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Profile picture of Anuj K., Billing User" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRXqRPPnSzw3_SxbjvKT4YeEiSxFhrvKgu7SXMwuIzdrVo8_a3YH7h5BsKZeqcQM_yHvn8HOI5Aq3Skyv7i8_9VOe5wBCeJjpjKm9WrFn_im_75ibQzhMHPOnKkHviQAjvgCaXM054ob1Vyalq4k9hy8KVS5tmk8bCHwU3_OAy0ukQGlUq_tWt-wflcd2OncJCuD9LStxWA8o16LE5qTAtxhuzullXCtSqtxu6DaqilOxEmDm_TfBK0_572w-Ub4RxfIb40tQdE1Q"/>
+</div>
+<div>
+<p class="text-sm font-bold text-slate-800 dark:text-slate-200">Anuj Kapoor</p>
+<p class="text-xs text-slate-500">Billing Manager</p>
+</div>
+</div>
+<span class="bg-slate-100 dark:bg-slate-800 text-slate-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Inactive</span>
+</div>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-3 text-center">
+<button class="text-xs font-bold text-primary flex items-center justify-center gap-1 w-full uppercase tracking-widest">
+                    View All Users (8)
+                </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 z-30 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<div class="flex justify-around items-center h-16">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-medium">Clients</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[10px] font-medium">Orders</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</div>
+</nav>
+<!-- Floating Action Button for iOS Feel -->
+<button class="fixed right-6 bottom-20 bg-primary text-slate-900 w-14 h-14 rounded-full shadow-lg flex items-center justify-center z-40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined font-bold text-2xl">save</span>
+</button>
+</body></html>

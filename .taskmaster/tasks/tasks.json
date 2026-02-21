@@ -232,7 +232,7 @@
         "dependencies": [
           "2"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -309,10 +309,10 @@
               5
             ],
             "details": "Create middleware/rate_limit.py implementing RateLimitMiddleware class using sliding window counter algorithm in Redis. Features: 1) Per-IP rate limiting (default 100 requests/minute for unauthenticated), 2) Per-user rate limiting (configurable based on role: 500/min for admins, 200/min for clients, 100/min for phlebotomists), 3) Per-endpoint rate limiting using route path patterns (e.g., /auth/login limited to 5/min to prevent brute force), 4) Configurable limits via settings or route decorators @rate_limit(requests=10, window=60). Use Redis MULTI/EXEC for atomic increment and expiry. Return proper 429 response with Retry-After header. Add X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset headers to responses. Implement rate limit bypass for whitelisted IPs (internal services). Create Redis connection pool shared across middleware.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test rate limiting blocks requests exceeding limit. Verify different limits applied per role. Test Retry-After header contains correct value. Verify rate limit resets after window expires. Test per-endpoint limits work independently. Verify whitelisted IPs bypass limits. Test sliding window accuracy.",
             "parentId": "undefined",
-            "updatedAt": "2026-02-21T14:05:48.371Z"
+            "updatedAt": "2026-02-21T18:59:22.733Z"
           },
           {
             "id": 7,
@@ -323,15 +323,16 @@
               5
             ],
             "details": "Create middleware/logging.py with RequestLoggingMiddleware: 1) Generate unique correlation_id (UUID) for each request, add to request.state and X-Correlation-ID response header, 2) Log request details: method, path, query params, user_id (if authenticated), client IP, user agent, 3) Log response: status code, response time, content length, 4) Use structlog or standard logging with JSON formatter for production. Create middleware/error_handler.py with custom exception handlers: map domain exceptions to HTTP status codes, ensure consistent error response format {\"error\": {\"code\": str, \"message\": str, \"details\": dict}}, mask sensitive data in error messages, log full stack traces with correlation_id. Create middleware/audit.py logging security events: login attempts, permission denials, data modifications (POST/PUT/DELETE), to separate audit log file or database table. Register all middleware in main.py in correct order: correlation_id -> logging -> rate_limit -> error_handler -> audit.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test correlation ID added to all responses. Verify request/response logging captures required fields. Test error handler returns consistent format for all exception types. Verify sensitive data masked in logs. Test audit log captures login, logout, CRUD operations. Verify middleware order processes correctly.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:12:16.592Z"
           }
         ],
         "complexity": 7,
         "recommendedSubtasks": 7,
         "expansionPrompt": "Break down the backend core implementation into: 1) FastAPI application structure with config using pydantic-settings and environment management, 2) SQLAlchemy async session management and database connection pooling, 3) JWT authentication with RS256/HS256 and refresh token flow using Redis storage, 4) OTP generation and verification with SMS gateway integration (MSG91/Twilio stub), 5) Role-based access control (RBAC) decorator/dependency system for the 4 user roles, 6) Rate limiting middleware using Redis with configurable limits per endpoint, 7) Logging, error handling, and request correlation ID middleware. Include session timeout (30 min inactivity) and token expiry (15 min access, 7 day refresh).",
-        "updatedAt": "2026-02-21T14:05:48.371Z"
+        "updatedAt": "2026-02-21T19:12:16.592Z"
       },
       {
         "id": "4",
@@ -343,7 +344,7 @@
         "dependencies": [
           "3"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -351,9 +352,10 @@
             "description": "Build complete CRUD API endpoints for client management including create, read (list and detail), update, and soft-delete operations with pagination, search by name/GST, and city filtering capabilities.",
             "dependencies": [],
             "details": "Create `api/v1/clients.py` with FastAPI router. Implement `POST /clients` for client creation with validation (name, gst_number, address, city, pincode, payment_terms). Implement `GET /clients` with query parameters: skip (default 0), limit (default 20, max 100), city filter, and search (case-insensitive partial match on name and gst_number). Use SQLAlchemy's `ilike` for search and proper pagination with total count in response. Implement `GET /clients/{client_id}` returning detailed client info including associated users and rate configuration. Implement `PUT /clients/{client_id}` for updates and `DELETE /clients/{client_id}` for soft-delete (set is_active=False). Create Pydantic schemas: `ClientCreate`, `ClientUpdate`, `ClientResponse`, `ClientDetailResponse`, `ClientListResponse` (with pagination metadata). Add role-based access control requiring SUPER_ADMIN or CITY_ADMIN roles.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test create client with valid/invalid data. Verify GST number format validation. Test pagination returns correct page sizes and total counts. Test search functionality matches partial name/GST. Test city filter returns only matching clients. Test 404 for non-existent client_id. Test soft-delete marks client inactive. Verify RBAC blocks unauthorized roles.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2026-02-21T19:13:03.480Z"
           },
           {
             "id": 2,
@@ -417,7 +419,8 @@
         ],
         "complexity": 6,
         "recommendedSubtasks": 6,
-        "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation."
+        "expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
+        "updatedAt": "2026-02-21T19:13:03.480Z"
       },
       {
         "id": "5",
@@ -1675,9 +1678,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2026-02-21T14:05:48.377Z",
+      "lastModified": "2026-02-21T19:13:03.482Z",
       "taskCount": 18,
-      "completedCount": 2,
+      "completedCount": 3,
       "tags": [
         "master"
       ]
