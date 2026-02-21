@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -42,6 +42,15 @@ class AuditLog(UUIDMixin, Base):
     # Request context
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(Text, nullable=True)
+    request_method: Mapped[str] = mapped_column(
+        String(10), nullable=False, server_default="UNKNOWN"
+    )
+    request_path: Mapped[str] = mapped_column(
+        String(500), nullable=False, server_default="/"
+    )
+    response_status: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="0"
+    )
 
     # Timestamp (only created_at — audit logs are immutable)
     created_at: Mapped[datetime] = mapped_column(
