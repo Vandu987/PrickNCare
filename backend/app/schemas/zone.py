@@ -38,3 +38,38 @@ class CityResponse(BaseModel):
 class CityListResponse(BaseModel):
     items: list[CityResponse]
     total: int
+
+
+# ── Zone schemas ─────────────────────────────────────────────────────────
+
+
+class ZoneCreate(BaseModel):
+    name: str
+    city_id: uuid.UUID
+
+
+class ZoneUpdate(BaseModel):
+    name: str | None = None
+    city_id: uuid.UUID | None = None
+
+
+class ZoneActiveUpdate(BaseModel):
+    is_active: bool
+
+
+class ZoneResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    city_id: uuid.UUID
+    city_name: str
+    is_active: bool
+    pincode_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class ZoneListResponse(BaseModel):
+    items: list[ZoneResponse]
+    total: int
