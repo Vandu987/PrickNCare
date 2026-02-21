@@ -1,4 +1,4 @@
-"""Report schemas — task 14.1."""
+"""Report schemas — tasks 14.1, 14.2 & 14.3."""
 
 from __future__ import annotations
 
@@ -32,3 +32,80 @@ class DailyCollectionReport(BaseModel):
     cancelled: int = 0
     uncollected: int = 0
     orders: list[DailyCollectionOrderItem] = Field(default_factory=list)
+
+
+# --- Task 14.3: Client-wise and Zone-wise report schemas ---
+
+
+class ClientWiseReportItem(BaseModel):
+    """Single row in the client-wise report."""
+
+    client_id: uuid.UUID
+    client_name: str
+    payment_terms: str
+    total_orders: int = 0
+    completed: int = 0
+    cancelled: int = 0
+    rejected_samples: int = 0
+    total_revenue: float = 0.0
+    outstanding_amount: float = 0.0
+
+    model_config = {"from_attributes": True}
+
+
+class ClientWiseReport(BaseModel):
+    """Aggregated client-wise report."""
+
+    date_from: date
+    date_to: date
+    items: list[ClientWiseReportItem] = Field(default_factory=list)
+
+
+class ZoneWiseReportItem(BaseModel):
+    """Single row in the zone-wise report."""
+
+    zone_id: uuid.UUID
+    zone_name: str
+    city_id: uuid.UUID
+    total_orders: int = 0
+    completed: int = 0
+    cancelled: int = 0
+    active_phlebotomists: int = 0
+    avg_tat: float | None = None
+
+    model_config = {"from_attributes": True}
+
+
+class ZoneWiseReport(BaseModel):
+    """Aggregated zone-wise report."""
+
+    date_from: date
+    date_to: date
+    items: list[ZoneWiseReportItem] = Field(default_factory=list)
+
+
+# ── Task 14.2: Phlebotomist Performance Report ──────────────────────────
+
+
+class PhlebotomistPerformanceItem(BaseModel):
+    """Performance metrics for a single phlebotomist."""
+
+    phlebotomist_id: uuid.UUID
+    phlebotomist_name: str
+    total_collections: int = 0
+    completed: int = 0
+    success_rate: float = Field(0.0, description="Success rate as percentage")
+    average_tat_minutes: float | None = Field(
+        None, description="Average turnaround time (assigned → collected) in minutes"
+    )
+    earnings: float = Field(0.0, description="Total earnings in the period")
+
+    model_config = {"from_attributes": True}
+
+
+class PhlebotomistPerformanceReport(BaseModel):
+    """Aggregated phlebotomist performance report."""
+
+    date_from: date
+    date_to: date
+    phlebotomists: list[PhlebotomistPerformanceItem] = Field(default_factory=list)
