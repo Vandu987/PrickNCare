@@ -1,10 +1,12 @@
-"""Package/Test Master CRUD endpoints — task 7.1."""
+"""Package/Test Master CRUD endpoints — tasks 7.1 & 7.2."""
 
 from __future__ import annotations
 
+import csv
+import io
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +15,7 @@ from app.core.database import get_db
 from app.models.packages import Package, SampleType
 from app.models.users import User
 from app.schemas.package import (
+    BulkImportResult,
     PackageCreate,
     PackageListResponse,
     PackageResponse,
@@ -22,6 +25,222 @@ from app.schemas.package import (
 router = APIRouter(prefix="/packages", tags=["packages"])
 
 _super_admin = require_roles("super_admin")
+
+
+EXPECTED_COLUMNS = [
+    "name",
+    "code",
+    "sample_types",
+    "base_price",
+    "description",
+    "preparation_instructions",
+    "tat_hours",
+]
+
+REQUIRED_FIELDS = {"name", "code", "base_price"}
+
+_VALID_SAMPLE_TYPES = {st.value for st in SampleType}
+
+
+def _parse_rows_from_csv(content: bytes) -> list[dict[str, str]]:
+    text = content.decode("utf-8-sig")
+    reader = csv.DictReader(io.StringIO(text))
+    return list(reader)
+
+
+def _parse_rows_from_xlsx(content: bytes) -> list[dict[str, str]]:
+    import openpyxl
+
+    wb = openpyxl.load_workbook(io.BytesIO(content), read_only=True)
+    ws = wb.active
+    rows_iter = ws.iter_rows(values_only=True)
+    headers = [str(h).strip().lower() if h else "" for h in next(rows_iter)]
+    result: list[dict[str, str]] = []
+    for row in rows_iter:
+        record = {
+            headers[i]: (str(row[i]).strip() if row[i] is not None else "")
+            for i in range(len(headers))
+            if i < len(row)
+        }
+        result.append(record)
+    wb.close()
+    return result
+
+
+def _validate_and_build(
+    row_num: int, row: dict[str, str], seen_codes: set[str]
+) -> tuple[dict | None, list[dict]]:
+    """Validate a single row. Returns (package_dict | None, errors)."""
+    errors: list[dict] = []
+
+    # Required fields
+    for field in REQUIRED_FIELDS:
+        val = row.get(field, "").strip()
+        if not val:
+            errors.append(
+                {"row": row_num, "field": field, "message": f"{field} is required"}
+            )
+
+    # Code uniqueness within file
+    code = row.get("code", "").strip()
+    if code:
+        if code in seen_codes:
+            errors.append(
+                {
+                    "row": row_num,
+                    "field": "code",
+                    "message": f"Duplicate code '{code}' in file",
+                }
+            )
+        seen_codes.add(code)
+
+    # Numeric: base_price
+    base_price_str = row.get("base_price", "").strip()
+    base_price = 0.0
+    if base_price_str:
+        try:
+            base_price = float(base_price_str)
+            if base_price < 0:
+                errors.append(
+                    {
+                        "row": row_num,
+                        "field": "base_price",
+                        "message": "base_price must be >= 0",
+                    }
+                )
+        except ValueError:
+            errors.append(
+                {
+                    "row": row_num,
+                    "field": "base_price",
+                    "message": "base_price must be numeric",
+                }
+            )
+
+    # Numeric: tat_hours
+    tat_str = row.get("tat_hours", "").strip()
+    tat_hours = 24
+    if tat_str:
+        try:
+            tat_hours = int(float(tat_str))
+            if tat_hours < 0:
+                errors.append(
+                    {
+                        "row": row_num,
+                        "field": "tat_hours",
+                        "message": "tat_hours must be >= 0",
+                    }
+                )
+        except ValueError:
+            errors.append(
+                {
+                    "row": row_num,
+                    "field": "tat_hours",
+                    "message": "tat_hours must be numeric",
+                }
+            )
+
+    # Sample types
+    sample_types_str = row.get("sample_types", "").strip()
+    sample_types: list[str] = []
+    if sample_types_str:
+        for st in sample_types_str.split(","):
+            st = st.strip()
+            if st not in _VALID_SAMPLE_TYPES:
+                errors.append(
+                    {
+                        "row": row_num,
+                        "field": "sample_types",
+                        "message": f"Invalid sample type '{st}'",
+                    }
+                )
+            else:
+                sample_types.append(st)
+
+    if errors:
+        return None, errors
+
+    return {
+        "name": row.get("name", "").strip(),
+        "code": code,
+        "description": row.get("description", "").strip() or None,
+        "preparation_instructions": row.get("preparation_instructions", "").strip()
+        or None,
+        "tat_hours": tat_hours,
+        "sample_types": sample_types,
+        "base_price": base_price,
+    }, []
+
+
+@router.post("/bulk-import", response_model=BulkImportResult)
+async def bulk_import_packages(
+    file: UploadFile,
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(_super_admin),
+) -> dict:
+    filename = (file.filename or "").lower()
+    content = await file.read()
+
+    if filename.endswith(".csv"):
+        rows = _parse_rows_from_csv(content)
+    elif filename.endswith(".xlsx"):
+        rows = _parse_rows_from_xlsx(content)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Only .csv and .xlsx files are supported",
+        )
+
+    if not rows:
+        return {
+            "total_rows": 0,
+            "successful": 0,
+            "failed": 0,
+            "errors": [],
+        }
+
+    # Fetch existing codes from DB
+    existing_result = await db.execute(select(Package.code))
+    existing_codes = {r[0] for r in existing_result.all()}
+
+    all_errors: list[dict] = []
+    successful = 0
+    seen_codes: set[str] = set()
+
+    for idx, row in enumerate(rows, start=2):  # row 1 is header
+        pkg_data, row_errors = _validate_and_build(idx, row, seen_codes)
+        if row_errors:
+            all_errors.extend(row_errors)
+            continue
+
+        assert pkg_data is not None
+        if pkg_data["code"] in existing_codes:
+            all_errors.append(
+                {
+                    "row": idx,
+                    "field": "code",
+                    "message": (
+                        f"Package with code '{pkg_data['code']}'"
+                        " already exists in database"
+                    ),
+                }
+            )
+            continue
+
+        package = Package(**pkg_data)
+        db.add(package)
+        existing_codes.add(pkg_data["code"])
+        successful += 1
+
+    if successful > 0:
+        await db.commit()
+
+    return {
+        "total_rows": len(rows),
+        "successful": successful,
+        "failed": len(rows) - successful,
+        "errors": all_errors,
+    }
 
 
 @router.post(

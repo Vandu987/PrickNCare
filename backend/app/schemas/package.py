@@ -52,3 +52,16 @@ class PackageListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+class BulkImportError(BaseModel):
+    row: int
+    field: str
+    message: str
+
+
+class BulkImportResult(BaseModel):
+    total_rows: int
+    successful: int
+    failed: int
+    errors: list[BulkImportError]

@@ -11,3 +11,4 @@ redis==5.2.*
 celery==5.4.*
 httpx==0.28.*
 python-multipart==0.0.*
+openpyxl==3.1.*
