@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Collection Complete Receipt</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,FILL@0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecda",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102220",
+                        "success-green": "#25D366"
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .receipt-edge {
+            background-image: radial-gradient(circle, transparent, transparent 50%, #ffffff 50%, #ffffff 100%);
+            background-size: 10px 10px;
+            background-position: bottom;
+            background-repeat: repeat-x;
+            height: 5px;
+            width: 100%;
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+        }
+        .barcode-bg {
+            background: repeating-linear-gradient(
+                90deg,
+                #111,
+                #111 2px,
+                #fff 2px,
+                #fff 4px,
+                #111 4px,
+                #111 5px,
+                #fff 5px,
+                #fff 8px
+            );
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-slate-100 min-h-screen flex justify-center">
+<!-- Main Mobile Container (iPhone 15 Pro Ratio approx) -->
+<div class="relative w-full max-w-[430px] bg-background-light dark:bg-background-dark min-h-screen flex flex-col overflow-hidden shadow-2xl border-x border-slate-200 dark:border-slate-800">
+<!-- Header / Status Bar Area -->
+<div class="pt-12 px-6 pb-4 bg-white dark:bg-slate-900 shadow-sm">
+<div class="flex items-center justify-between mb-4">
+<button class="flex items-center text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+<span class="text-sm font-medium">Back</span>
+</button>
+<h1 class="text-lg font-bold">Summary</h1>
+<div class="w-10"></div> <!-- Spacer -->
+</div>
+<!-- Progress Bar Section -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-end">
+<span class="text-sm font-semibold text-primary">Step 6: Collection Complete</span>
+<span class="text-xs font-medium text-slate-500">6 of 6</span>
+</div>
+<div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Success Message -->
+<div class="flex flex-col items-center pt-8 pb-4 px-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-5xl font-bold">check_circle</span>
+</div>
+<h2 class="text-2xl font-bold tracking-tight text-center">Collection Complete!</h2>
+<p class="text-slate-500 text-sm mt-1">Order processed successfully</p>
+</div>
+<!-- Receipt Card Container -->
+<div class="px-6 py-4 flex-1 overflow-y-auto">
+<div class="relative bg-white dark:bg-slate-900 rounded-t-xl shadow-lg border border-slate-100 dark:border-slate-800 p-6 flex flex-col gap-6">
+<!-- Receipt Header -->
+<div class="flex justify-between items-start border-b border-dashed border-slate-200 dark:border-slate-700 pb-4">
+<div class="flex flex-col">
+<div class="flex items-center gap-2 mb-1">
+<div class="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xs">colorize</span>
+</div>
+<span class="font-bold text-sm tracking-tight">Prick &amp; Care</span>
+</div>
+<p class="text-[10px] text-slate-400 font-medium">PHLEBOTOMY FIELD UNIT</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Receipt No</p>
+<p class="text-xs font-bold text-slate-800 dark:text-slate-200">PNC-REC-0042</p>
+<p class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Date</p>
+<p class="text-xs font-medium text-slate-600 dark:text-slate-400">21 Feb 2026</p>
+</div>
+</div>
+<!-- Patient & Order Details -->
+<div class="flex flex-col gap-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Patient Name</span>
+<span class="text-base font-semibold">Amit Sharma</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tests Collected</span>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-background-light dark:bg-slate-800 rounded text-xs font-medium border border-slate-100 dark:border-slate-700">CBC (Complete Blood Count)</span>
+<span class="px-2 py-1 bg-background-light dark:bg-slate-800 rounded text-xs font-medium border border-slate-100 dark:border-slate-700">Thyroid Profile</span>
+<span class="px-2 py-1 bg-background-light dark:bg-slate-800 rounded text-xs font-medium border border-slate-100 dark:border-slate-700">Vitamin D</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 py-2">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Vials Used</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-primary">experiment</span>
+<span class="text-sm font-semibold">2 Vials (Purple, Red)</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Payment Method</span>
+<span class="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 rounded text-[10px] font-bold">CASH</span>
+</div>
+</div>
+</div>
+<!-- Total Amount -->
+<div class="bg-primary/5 dark:bg-primary/10 rounded-lg p-4 flex justify-between items-center border border-primary/20">
+<span class="font-bold text-slate-700 dark:text-slate-300">Total Amount Collected</span>
+<span class="text-xl font-extrabold text-slate-900 dark:text-white">₹1,800</span>
+</div>
+<!-- Barcode Section -->
+<div class="flex flex-col items-center gap-2 pt-2 pb-2">
+<div class="w-full h-12 barcode-bg opacity-80"></div>
+<span class="text-[10px] font-mono text-slate-400 tracking-[0.3em]">PNC-0042-8821-X</span>
+</div>
+<!-- Receipt Jagged Edge (Visual only) -->
+<div class="receipt-edge"></div>
+</div>
+</div>
+<!-- Action Buttons Footer -->
+<div class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+<button class="w-full bg-success-green hover:opacity-90 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-xl">chat</span>
+                Send via WhatsApp
+            </button>
+<button class="w-full border-2 border-primary/40 text-primary dark:text-primary font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-all">
+<span class="material-symbols-outlined">download</span>
+                Download PDF Receipt
+            </button>
+<button class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 mt-2 transition-all shadow-lg shadow-primary/20">
+                Back to Orders
+            </button>
+<!-- Safe Area Spacer for iOS -->
+<div class="h-4"></div>
+</div>
+<!-- Tab Bar (BottomNavBar Template adaptation) -->
+<div class="flex border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-8 pt-3">
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">Home</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">assignment</span>
+<p class="text-[10px] font-medium leading-normal">Orders</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-[10px] font-medium leading-normal">Patients</p>
+</a>
+<a class="flex flex-1 flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<p class="text-[10px] font-medium leading-normal">Profile</p>
+</a>
+</div>
+</div>
+</body></html>

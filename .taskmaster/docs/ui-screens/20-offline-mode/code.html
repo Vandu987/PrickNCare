@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>Prick &amp; Care - Offline Mode</title>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light text-slate-900 flex justify-center items-center min-h-screen p-4">
+<!-- iPhone 15 Pro Frame -->
+<div class="relative w-[393px] h-[852px] bg-white rounded-[55px] shadow-2xl overflow-hidden border-[8px] border-slate-900 flex flex-col">
+<!-- Status Bar Area -->
+<div class="h-11 w-full flex justify-between items-center px-8 pt-2">
+<span class="text-xs font-bold">9:41</span>
+<!-- Dynamic Island -->
+<div class="absolute left-1/2 -translate-x-1/2 top-2 h-7 w-28 bg-black rounded-full"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-icons text-[16px] text-slate-400">signal_wifi_off</span>
+<span class="material-icons text-[16px]">signal_cellular_alt</span>
+<span class="material-icons text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- Offline Banner -->
+<div class="bg-amber-100 border-b border-amber-200 py-2.5 px-4 flex items-center justify-center gap-2">
+<span class="material-icons text-amber-600 text-[18px]">sensors_off</span>
+<p class="text-[12px] font-medium text-amber-800 uppercase tracking-wide">You're offline — Actions will sync when connected</p>
+</div>
+<!-- Header -->
+<header class="px-6 pt-6 pb-2">
+<div class="flex justify-between items-center mb-1">
+<h1 class="text-2xl font-bold text-slate-900">My Collections</h1>
+<div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Professional phlebotomist profile headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQWFCl8bLI3K3dQ4km--pzF8TtD91sKa9uCeOvgBS3YU_6fTKnahcWioITUQxu4gRipEiZxP636szJ_4SDePp0gCqGvRXjmO2GC1P8LdqyZD58HuFbDWOY6vXoK_KwIV_EoT0s4xypNxAUdcnAGCJDBNvN3cEhVcc2lAqzYxVoeK_ugY5sRuAz6A53NY1yWwJNoZyAZw7SvBAjnSU5RCpJnocv8I97DMfnHldVXgE-78LDZCllwA9aguKroVZTVhl2T9CmZIkltMo"/>
+</div>
+</div>
+<p class="text-slate-500 text-sm">Today, Oct 24th</p>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto px-6 pb-24">
+<!-- Pending Sync Badge -->
+<div class="flex justify-center my-4">
+<div class="bg-primary/10 border border-primary/30 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+<span class="material-icons text-primary text-[16px]">hourglass_empty</span>
+<span class="text-xs font-semibold text-slate-700">2 actions pending sync ⏳</span>
+</div>
+</div>
+<!-- List Section -->
+<div class="space-y-4 mt-2">
+<!-- Order Card 1 (Pending Sync / Completed) -->
+<div class="relative bg-white border border-slate-200 rounded-xl p-4 shadow-sm saturate-[0.6] opacity-90">
+<div class="absolute top-4 right-4 bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                        Pending Sync
+                    </div>
+<div class="flex items-start gap-3">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-icons text-primary">bloodtype</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800">Sarah Connor</h3>
+<p class="text-xs text-slate-500 mb-2">Ref: #PC-88219</p>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">schedule</span>
+                                    09:30 AM
+                                </div>
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">science</span>
+                                    Routine CBC
+                                </div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-medium italic">Collection completed offline</span>
+<span class="material-icons text-slate-300">chevron_right</span>
+</div>
+</div>
+<!-- Order Card 2 (Pending Sync / Completed) -->
+<div class="relative bg-white border border-slate-200 rounded-xl p-4 shadow-sm saturate-[0.6] opacity-90">
+<div class="absolute top-4 right-4 bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-1 rounded uppercase">
+                        Pending Sync
+                    </div>
+<div class="flex items-start gap-3">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-icons text-primary">bloodtype</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800">Marcus Wright</h3>
+<p class="text-xs text-slate-500 mb-2">Ref: #PC-88220</p>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">schedule</span>
+                                    09:50 AM
+                                </div>
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">science</span>
+                                    Metabolic Panel
+                                </div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
+<span class="text-[11px] text-slate-400 font-medium italic">Collection completed offline</span>
+<span class="material-icons text-slate-300">chevron_right</span>
+</div>
+</div>
+<!-- Order Card 3 (Upcoming) -->
+<div class="relative bg-white border border-slate-200 rounded-xl p-4 shadow-sm saturate-[0.4] opacity-80">
+<div class="flex items-start gap-3">
+<div class="bg-slate-100 p-2 rounded-lg">
+<span class="material-icons text-slate-400">person</span>
+</div>
+<div>
+<h3 class="font-bold text-slate-800">John Doe</h3>
+<p class="text-xs text-slate-500 mb-2">Ref: #PC-88225</p>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">schedule</span>
+                                    10:15 AM
+                                </div>
+<div class="flex items-center gap-1 text-[11px] text-slate-500">
+<span class="material-icons text-[14px]">location_on</span>
+                                    2.4 miles away
+                                </div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex gap-2">
+<button class="flex-1 py-2 bg-slate-100 text-slate-400 text-xs font-bold rounded-lg uppercase tracking-wider">Details</button>
+<button class="flex-1 py-2 bg-slate-200 text-slate-400 text-xs font-bold rounded-lg uppercase tracking-wider">Collect</button>
+</div>
+</div>
+<!-- Map Placeholder -->
+<div class="relative h-32 w-full rounded-xl overflow-hidden saturate-0 opacity-60 mt-4 border border-slate-200">
+<img class="w-full h-full object-cover" data-alt="Simplified city street map view" data-location="Los Angeles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxNfTzIGJs7A1YoaCpKCS236XsHkBltt8f4j0JFOHWTd-u_uOWi2ry7BIZG_JFZtnLIupjDENMqZCETksdNZAybA6k80XlYS9wwsJAg_jHtDcLMqq2rm6tdaCZpFHWLzUyMaz4NgEkI-pplvRJkChyOLDy3o595ApDVRRwLU9tJ2vUXttlgyTfDe7kLwfLG-DmO2BepQlbbVUFuHi2Cj5GltAf8fh5Rj1PPvmvGpV96aOJlIdjPp55agvpBo2LbdB_JKIK3hIQ1Lk"/>
+<div class="absolute inset-0 bg-slate-900/10 flex items-center justify-center">
+<div class="bg-white/90 px-3 py-1 rounded-full text-[10px] font-bold text-slate-600 shadow-sm uppercase">Map unavailable offline</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (Grayed Out) -->
+<div class="absolute bottom-24 right-6">
+<button class="w-14 h-14 bg-slate-300 text-slate-100 rounded-full shadow-lg flex items-center justify-center cursor-not-allowed">
+<span class="material-icons text-[28px]">sync</span>
+</button>
+</div>
+<!-- Bottom Navigation -->
+<nav class="h-20 bg-slate-900 flex items-center justify-around px-6 pb-4">
+<div class="flex flex-col items-center gap-1 text-primary">
+<span class="material-icons">event_note</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Schedule</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons">map</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Routes</span>
+</div>
+<div class="relative flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons">cloud_upload</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Sync</span>
+<div class="absolute top-[-2px] right-[-2px] w-2 h-2 bg-amber-500 rounded-full border-2 border-slate-900"></div>
+</div>
+<div class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-icons">settings</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Settings</span>
+</div>
+</nav>
+<!-- Home Indicator -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1.5 bg-slate-800 rounded-full"></div>
+</div>
+</body></html>

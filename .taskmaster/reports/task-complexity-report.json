@@ -1,0 +1,157 @@
+{
+	"meta": {
+		"generatedAt": "2026-02-21T07:26:15.414Z",
+		"tasksAnalyzed": 18,
+		"totalTasks": 18,
+		"analysisCount": 18,
+		"thresholdScore": 5,
+		"projectName": "Winngur",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Setup Project Infrastructure and Monorepo Structure",
+			"complexityScore": 5,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the infrastructure setup into: 1) Git repository and .gitignore configuration for Python/Node/Flutter, 2) Backend FastAPI project scaffolding with proper directory structure, 3) Next.js monorepo setup with Turborepo for admin and client apps with shared packages, 4) Flutter mobile project initialization, 5) Docker Compose configuration with PostgreSQL and Redis services, 6) Pre-commit hooks and linting setup (black/ruff for Python, eslint/prettier for TS). Include environment variable templates for all platforms.",
+			"reasoning": "This is a greenfield project with no existing code. The task involves standard project scaffolding across three technology stacks (Python/FastAPI, Next.js/TypeScript, Flutter/Dart). While not algorithmically complex, it requires careful coordination of tooling configurations, Docker setup, and establishing consistent patterns that will be used throughout the project. The existing .gitignore is incomplete (missing Python and Flutter patterns). Moderate complexity due to multi-platform coordination."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Design and Implement PostgreSQL Database Schema",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the database schema implementation into: 1) Core User model with polymorphic identity for roles (super_admin, city_admin, client_user, phlebotomist), 2) Client and ClientUser models with payment terms and rate configurations, 3) Phlebotomist model with zone assignments and document storage, 4) Geographic hierarchy models (City, Zone, Pincode, Locality), 5) Order model with full lifecycle statuses and OrderStatusHistory, 6) Package/OrderPackage and SampleAccessioning models, 7) Payment and PhlebotomistCashReconciliation models, 8) AuditLog model and Alembic migration setup with proper indexes. Ensure all models have proper UUID primary keys, timestamps, and foreign key relationships.",
+			"reasoning": "The PRD defines 15+ interconnected entities with complex relationships: polymorphic users, hierarchical geographic data (City→Zone→Pincode→Locality), order lifecycle with history tracking, and financial tracking. This requires careful schema design to ensure referential integrity, proper indexing for query performance, and extensibility. The schema must support the full order workflow including assignments, accessioning, and reconciliation. High complexity due to relationship mapping and business rule constraints."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Build FastAPI Backend Core with Authentication & RBAC",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the backend core implementation into: 1) FastAPI application structure with config using pydantic-settings and environment management, 2) SQLAlchemy async session management and database connection pooling, 3) JWT authentication with RS256/HS256 and refresh token flow using Redis storage, 4) OTP generation and verification with SMS gateway integration (MSG91/Twilio stub), 5) Role-based access control (RBAC) decorator/dependency system for the 4 user roles, 6) Rate limiting middleware using Redis with configurable limits per endpoint, 7) Logging, error handling, and request correlation ID middleware. Include session timeout (30 min inactivity) and token expiry (15 min access, 7 day refresh).",
+			"reasoning": "This task establishes the security foundation for the entire platform. It requires implementing JWT with proper key management, Redis-based session storage, OTP flows with external SMS providers, and a flexible RBAC system supporting 4 distinct roles. Rate limiting must be configurable per endpoint. The middleware stack is critical for audit logging and error handling. High complexity due to security requirements and multiple integration points."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Implement Client and Phlebotomist Management APIs",
+			"complexityScore": 6,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the management APIs into: 1) Client CRUD endpoints with pagination, search, and filtering by city, 2) Client rate configuration API (rate_first_collection, rate_second_collection, rate_priority), 3) ClientUser management for multi-user client organizations, 4) Phlebotomist CRUD with document upload to S3 (id_proof, certification, photo), 5) Phlebotomist zone/pincode assignment and availability management APIs, 6) Performance metrics calculation endpoint and location update API for mobile app. Include proper Pydantic schemas with validation.",
+			"reasoning": "Standard CRUD operations but with important business logic: client-specific rate configurations, multi-user organizations under clients, phlebotomist zone assignments (many-to-many), document uploads requiring S3 integration, and real-time availability tracking. The performance metrics calculation adds analytical complexity. Moderate-high complexity due to the number of related entities and file upload requirements."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Implement Zone and Area Management APIs",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the zone management APIs into: 1) City CRUD with serviceable flag toggle, 2) Zone CRUD with city association, 3) Pincode management with zone assignment and bulk import from Excel/CSV, 4) Locality management with pincode association and bulk import, 5) NSA (No Service Area) management and service availability check endpoint with Redis caching for pincode lookups. Include auto-suggest endpoints for order form integration.",
+			"reasoning": "Hierarchical geographic data management (City→Zone→Pincode→Locality) with bulk import capability. The service availability check is critical for order validation. Redis caching for pincode lookups improves performance. NSA management adds business logic for marking unserviceable areas. Moderate complexity due to hierarchical relationships and bulk import validation."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Implement Order Management and Assignment APIs",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the order management into: 1) Order creation with pincode validation, amount calculation, and unique booking_id generation, 2) Order listing with comprehensive filters (status, date range, client, phlebotomist, priority, search), 3) Order status management with valid transition enforcement and history logging, 4) Manual assignment API with phlebotomist validation (zone coverage, availability), 5) Auto-assignment algorithm based on zone matching and workload balancing, 6) Re-routing and bulk assignment APIs, 7) Phlebotomist order actions (accept, reject, start-transit, collect with proof), 8) Order cancellation and rescheduling with history tracking, 9) Bulk order upload from Excel with validation and error reporting. This is the core workflow of the platform.",
+			"reasoning": "This is the heart of the platform with complex business logic: order lifecycle state machine with valid transitions only (e.g., cannot go PENDING→COLLECTED), auto-assignment algorithm requiring zone matching and workload balancing, proof collection (photo + signature URLs), and bulk import with comprehensive validation. The task has dependencies on both client/phlebotomist (Task 4) and zone (Task 5) modules. Very high complexity due to state management and algorithmic requirements."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Implement Package/Test Master and Pricing Engine",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the package and pricing implementation into: 1) Package CRUD with sample_types as JSON array, code, TAT, and preparation instructions, 2) Package bulk import from Excel/CSV, 3) Pricing engine service that calculates order amount based on client-specific rates (first collection + additional collections + priority surcharge), 4) Pricing calculation API endpoint for real-time quote during order entry. Ensure pricing logic matches PRD specifications for multi-sample discounts.",
+			"reasoning": "Package management is straightforward CRUD with JSON array storage for sample types. The pricing engine implements specific business rules: first collection rate + additional collection rates + priority surcharge, all configurable per client. The logic is well-defined in the PRD. Moderate complexity as the calculation rules are clear but must integrate with client rate configurations."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Implement Sample Accessioning and Lab Receiving Module",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the sample accessioning into: 1) Pending samples listing (orders with COLLECTED status not yet accessioned), 2) Sample accessioning creation with vial type, quantity, integrity status (OK, lipemic, leaked, hemolyzed, clotted, insufficient), and accept/hold/reject decisions, 3) Order status updates based on accessioning results with client notification triggers, 4) Barcode/booking_id lookup for quick accessioning workflow, 5) Accessioning report API with integrity breakdown, rejection rates, and date range filtering.",
+			"reasoning": "Lab receiving workflow with integrity checks and multiple outcome paths (accept/hold/reject). Requires order status updates based on accessioning results and notification triggers for rejected samples. The barcode scanning support is for workflow efficiency. Moderate-high complexity due to multiple integrity statuses and workflow branching."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Implement Payment Management and Cash Reconciliation",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the payment management into: 1) Payment recording API during order completion (cash/UPI/card/wallet modes), 2) Phlebotomist daily cash summary calculation (expected vs actual), 3) Cash reconciliation creation with discrepancy handling (fuel allowance, shortage, overage, refund), 4) Reconciliation verification workflow marking payments as RECONCILED, 5) Client invoice generation aggregating orders in date range with PDF export, 6) Payment and reconciliation reports API. Include proper tracking of outstanding dues.",
+			"reasoning": "Financial tracking with multiple payment modes, daily settlement workflow, and discrepancy management. The reconciliation logic must calculate expected vs actual amounts and categorize discrepancies. Invoice generation requires PDF creation (using reportlab or similar). High complexity due to financial accuracy requirements and multiple discrepancy types."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Implement Notification Service (SMS, Email, Push)",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the notification service into: 1) Base notification service architecture with channel abstraction (SMS, Email, Push), 2) SMS service implementation with MSG91/Twilio provider abstraction and OTP templates, 3) Email service with SendGrid/AWS SES integration for transactional emails, 4) Push notification service with Firebase Cloud Messaging and topic subscriptions, 5) Notification template management API with variable substitution and admin CRUD endpoints. Include retry logic for failed notifications.",
+			"reasoning": "Multi-channel notification system requiring integration with 3+ external providers (SMS, Email, FCM). Template management with variable substitution adds flexibility. The abstraction layer for provider switching is important for maintainability. Moderate-high complexity due to multiple external integrations and template system."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Build Next.js Client Portal Web Application",
+			"complexityScore": 7,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Break down the client portal into: 1) Next.js 14 App Router project setup with shadcn/ui, Tailwind, and React Query, 2) Authentication flow (login, OTP verification, forgot password) with JWT token management, 3) Dashboard layout with sidebar navigation and stats overview, 4) Order entry form with complex validation (Zod), pincode auto-suggest, locality dropdown, package selection, and real-time pricing calculation, 5) Orders list page with filters, pagination, status badges, and actions (cancel, reschedule), 6) Order detail page with status timeline and history, 7) Reports page with date range picker, charts (Recharts), and Excel/PDF export. Include responsive design for tablet viewports.",
+			"reasoning": "Full-featured client portal with complex order entry form requiring multiple dependent dropdowns (pincode→locality), real-time pricing, and multi-select package selection. The order management requires comprehensive filtering and real-time status updates. Reports with charts and exports add additional complexity. High complexity due to form validation, dependent fields, and data visualization requirements."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Build Next.js Admin Panel Web Application",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the admin panel into: 1) Next.js 14 App Router setup with shared UI components from client portal monorepo, 2) Dashboard with live stats, Google Maps integration showing phlebotomist locations, and pending assignments widget, 3) Client management pages (list, create, edit) with rate configuration UI, 4) Phlebotomist management with zone assignment UI and document preview, 5) Zone/Area management with city→zone→pincode→locality hierarchy and bulk import UI, 6) Order management with assignment interface (drag-drop or quick-assign) and auto-assign trigger, 7) Sample accessioning page with barcode scanner integration and integrity selection UI, 8) Cash reconciliation page with discrepancy entry and daily settlement workflow, 9) Settings pages for packages, notification templates, and time slots. Include RBAC-based menu filtering for Super Admin vs City Admin.",
+			"reasoning": "Comprehensive admin panel covering all operational workflows. Google Maps integration for live tracking, drag-drop assignment interface, barcode scanner support, and extensive CRUD for all entities. The admin panel has the highest feature density of all frontend apps. Very high complexity due to feature breadth, maps integration, and advanced UI patterns."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Build Flutter Phlebotomist Mobile Application",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the Flutter app into: 1) Flutter project setup with Riverpod state management, Dio HTTP client, and Hive local storage, 2) Authentication with OTP and biometric login (local_auth package), 3) Dashboard with today's assignments, pending/completed counts, and earnings summary, 4) Order list with accept/reject actions and status updates (in_transit, collected, uncollected), 5) Collection workflow: patient OTP verification, photo capture (image_picker), signature capture (signature package), payment collection UI, 6) Google Maps navigation integration using url_launcher, 7) Offline mode support with action queuing in Hive and sync on connectivity (connectivity_plus), 8) Attendance check-in/out with GPS verification (geolocator). Include push notification handling with FCM.",
+			"reasoning": "Native mobile app with complex workflows: biometric auth, camera integration, signature capture, GPS tracking, offline support, and push notifications. The collection workflow has multiple steps that must work reliably in field conditions. Offline mode with sync adds significant complexity. Very high complexity due to device hardware integrations and offline-first architecture."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Implement Reports and Analytics APIs",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the reports APIs into: 1) Daily collection report with status breakdown and order details, 2) Phlebotomist performance report (collections, success rate, average TAT, earnings), 3) Client-wise and zone-wise reports with aggregations, 4) Revenue report with period grouping (day/week/month) and breakdown by client, 5) TAT analysis report with SLA compliance calculation and export functionality (Excel/PDF using openpyxl/reportlab). Include dashboard analytics endpoint for real-time stats.",
+			"reasoning": "Analytics queries requiring aggregations across multiple tables with date range filtering. Performance metrics involve calculating averages, rates, and compliance percentages. Export to Excel/PDF adds file generation complexity. Moderate-high complexity due to query optimization needs and multiple report types."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Implement File Storage and Document Management",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down the file storage implementation into: 1) S3 client configuration with boto3 and credential management, 2) File upload service with folder organization (documents, collections, reports, invoices) and CloudFront URL generation, 3) Presigned URL generation for private file access with configurable expiration, 4) API endpoints for upload and download with proper authentication. Include file type validation and size limits.",
+			"reasoning": "Standard S3 integration with CloudFront CDN delivery. The folder organization and presigned URL generation are well-documented patterns. Security through private bucket + CloudFront signed URLs. Moderate complexity as it's a well-understood pattern but requires proper credential management and access controls."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Implement Security Measures and Audit Logging",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the security implementation into: 1) Audit logging middleware capturing all CRUD operations with user, action, entity, old/new values, and IP address, 2) Data encryption service using Fernet for sensitive fields (patient phone), 3) Input validation enhancement with Pydantic validators for SQL injection prevention, 4) Granular rate limiting configuration per endpoint type, 5) Sensitive data masking in logs and HIPAA-aware data handling, 6) Audit log API endpoint with filtering and data retention policy implementation (7-year retention for HIPAA). Include XSS prevention in stored data.",
+			"reasoning": "Comprehensive security implementation covering encryption, audit trails, input validation, and compliance requirements. The audit logging must capture before/after values for all changes. HIPAA awareness requires careful handling of patient data. High complexity due to security criticality and compliance requirements."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Setup CI/CD Pipeline and Deployment Infrastructure",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down the CI/CD setup into: 1) GitHub Actions workflow for backend (test, build Docker image, push to ECR), 2) GitHub Actions workflow for web apps (build, deploy to Vercel), 3) GitHub Actions workflow for Flutter (build APK/IPA, deploy to Play Store/TestFlight), 4) Terraform/IaC for AWS infrastructure (VPC, RDS PostgreSQL, ElastiCache Redis, ECS cluster, ALB), 5) ECS service configuration with auto-scaling policies, 6) Secrets management and environment configuration for all environments (dev, staging, production). Include database migration automation in deployment.",
+			"reasoning": "Multi-platform CI/CD covering Python backend, Next.js web apps, and Flutter mobile. Infrastructure provisioning with Terraform requires AWS expertise. Auto-scaling and production-grade deployment configuration adds operational complexity. High complexity due to multi-platform deployment and infrastructure-as-code requirements."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Implement Integration Tests and Load Testing",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the testing implementation into: 1) Test infrastructure setup with pytest fixtures, test database, and mocked external services, 2) Integration tests for authentication flow (login, OTP, token refresh, RBAC), 3) Integration tests for complete order lifecycle (create→assign→accept→collect→accession→reconcile), 4) Integration tests for payment and reconciliation workflows, 5) Load testing with Locust simulating 500+ concurrent users across client and phlebotomist personas. Include performance baseline documentation.",
+			"reasoning": "Comprehensive testing covering all critical workflows. Integration tests require proper test database setup and external service mocking (SMS, S3). Load testing must validate the 500+ concurrent user requirement from the PRD. Moderate-high complexity due to end-to-end workflow coverage and performance testing setup."
+		}
+	]
+}

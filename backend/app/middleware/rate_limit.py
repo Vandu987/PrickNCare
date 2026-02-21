@@ -1,0 +1,239 @@
+"""Redis-backed sliding-window rate limiting middleware — task 3.6.
+
+Limits are applied in this priority order (most specific wins):
+  1. Per-endpoint override (registered via ``add_endpoint_limit``)
+  2. Per-role limit (from ``settings.RATE_LIMIT_*``)
+  3. Per-IP default (``settings.RATE_LIMIT_DEFAULT``)
+
+Responses include standard headers::
+
+    X-RateLimit-Limit     – max requests allowed in the window
+    X-RateLimit-Remaining – requests still available
+    X-RateLimit-Reset     – UNIX timestamp when the window resets
+    Retry-After           – seconds to wait (only on 429)
+
+Whitelisted IPs (e.g. internal services) bypass all limits.
+"""
+
+from __future__ import annotations
+
+import time
+from collections.abc import Callable, Coroutine
+from typing import Any
+
+from fastapi import Request, Response
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
+
+from app.core.config import settings
+from app.core.redis import get_redis
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+_RL_PREFIX = "rl:"  # rl:<key> → JSON list of timestamps
+
+# Whitelisted client IPs that always bypass rate limiting.
+_WHITELISTED_IPS: frozenset[str] = frozenset({"127.0.0.1", "::1"})
+
+# Role → requests-per-minute mapping (pulled from settings at import time).
+_ROLE_LIMITS: dict[str, int] = {
+    "super_admin": settings.RATE_LIMIT_ADMIN,
+    "city_admin": settings.RATE_LIMIT_ADMIN,
+    "client_user": settings.RATE_LIMIT_CLIENT,
+    "phlebotomist": settings.RATE_LIMIT_PHLEBOTOMIST,
+}
+
+# Endpoint path prefix → (max_requests, window_seconds).
+# Populated via ``add_endpoint_limit`` or pre-seeded below.
+_ENDPOINT_LIMITS: dict[str, tuple[int, int]] = {
+    "/api/v1/auth/login": (settings.RATE_LIMIT_LOGIN, 60),
+    "/api/v1/auth/otp/request": (settings.RATE_LIMIT_LOGIN, 60),
+}
+
+_DEFAULT_WINDOW = 60  # seconds
+
+
+# ---------------------------------------------------------------------------
+# Public helper — lets route modules register custom limits at startup
+# ---------------------------------------------------------------------------
+
+
+def add_endpoint_limit(path_prefix: str, max_requests: int, window: int = 60) -> None:
+    """Register a per-endpoint rate limit.
+
+    Call this at module level in any router file **before** ``app`` is built::
+
+        add_endpoint_limit("/api/v1/bookings", max_requests=30, window=60)
+    """
+    _ENDPOINT_LIMITS[path_prefix] = (max_requests, window)
+
+
+# ---------------------------------------------------------------------------
+# Sliding-window counter (Redis list of timestamps)
+# ---------------------------------------------------------------------------
+
+
+async def _sliding_window_check(
+    key: str,
+    max_requests: int,
+    window: int,
+) -> tuple[bool, int, int]:
+    """Atomic sliding-window check using a Redis list.
+
+    Returns ``(allowed, remaining, reset_ts)`` where:
+      - ``allowed`` – True if the request should be served
+      - ``remaining`` – requests left after this one
+      - ``reset_ts``  – UNIX timestamp of window expiry
+    """
+    redis = get_redis()
+    now = time.time()
+    window_start = now - window
+    full_key = f"{_RL_PREFIX}{key}"
+
+    # Lua script: remove expired entries, append current ts, get count.
+    # All ops are atomic.
+    lua_script = """
+local key        = KEYS[1]
+local now        = tonumber(ARGV[1])
+local window_start = tonumber(ARGV[2])
+local window     = tonumber(ARGV[3])
+local max_req    = tonumber(ARGV[4])
+
+-- Remove timestamps older than the window
+redis.call('ZREMRANGEBYSCORE', key, '-inf', window_start)
+
+-- Count current requests in window
+local count = redis.call('ZCARD', key)
+
+if count >= max_req then
+    -- Get oldest timestamp to calculate reset time
+    local oldest = redis.call('ZRANGE', key, 0, 0, 'WITHSCORES')
+    local reset_ts = now + window
+    if #oldest >= 2 then
+        reset_ts = tonumber(oldest[2]) + window
+    end
+    return {0, 0, math.floor(reset_ts)}
+end
+
+-- Add current request timestamp (score = ts, member = ts:random)
+redis.call('ZADD', key, now, now .. ':' .. math.random(1000000))
+redis.call('EXPIRE', key, window + 1)
+
+local new_count = redis.call('ZCARD', key)
+local remaining = max_req - new_count
+local reset_ts  = math.floor(now + window)
+return {1, remaining, reset_ts}
+"""
+    result = await redis.eval(
+        lua_script,
+        1,
+        full_key,
+        str(now),
+        str(window_start),
+        str(window),
+        str(max_requests),
+    )
+    allowed = bool(result[0])
+    remaining = int(result[1])
+    reset_ts = int(result[2])
+    return allowed, remaining, reset_ts
+
+
+# ---------------------------------------------------------------------------
+# Middleware
+# ---------------------------------------------------------------------------
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """Sliding-window rate limiting middleware.
+
+    Mount **after** the application is created::
+
+        app.add_middleware(RateLimitMiddleware)
+    """
+
+    def __init__(self, app: ASGIApp, whitelist: frozenset[str] | None = None) -> None:
+        super().__init__(app)
+        self._whitelist: frozenset[str] = whitelist or _WHITELISTED_IPS
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Coroutine[Any, Any, Response]],
+    ) -> Response:
+        client_ip = self._get_client_ip(request)
+
+        # Whitelisted IPs bypass all limits.
+        if client_ip in self._whitelist:
+            return await call_next(request)
+
+        path = request.url.path
+        max_requests, window = self._resolve_limit(path, request)
+
+        # Build a rate-limit key scoped to IP (+ path for endpoint overrides).
+        rl_key = self._build_key(client_ip, path, request)
+
+        allowed, remaining, reset_ts = await _sliding_window_check(
+            rl_key, max_requests, window
+        )
+
+        if not allowed:
+            retry_after = max(0, reset_ts - int(time.time()))
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Too many requests. Please slow down."},
+                headers={
+                    "X-RateLimit-Limit": str(max_requests),
+                    "X-RateLimit-Remaining": "0",
+                    "X-RateLimit-Reset": str(reset_ts),
+                    "Retry-After": str(retry_after),
+                },
+            )
+
+        response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(max_requests)
+        response.headers["X-RateLimit-Remaining"] = str(remaining)
+        response.headers["X-RateLimit-Reset"] = str(reset_ts)
+        return response
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _get_client_ip(request: Request) -> str:
+        """Extract the real client IP, honouring X-Forwarded-For."""
+        forwarded_for = request.headers.get("X-Forwarded-For")
+        if forwarded_for:
+            return forwarded_for.split(",")[0].strip()
+        return request.client.host if request.client else "unknown"
+
+    def _resolve_limit(self, path: str, request: Request) -> tuple[int, int]:
+        """Return (max_requests, window_seconds) for this request."""
+        # 1. Endpoint-specific override (longest matching prefix wins).
+        for prefix, limit_pair in sorted(
+            _ENDPOINT_LIMITS.items(), key=lambda x: len(x[0]), reverse=True
+        ):
+            if path.startswith(prefix):
+                return limit_pair
+
+        # 2. Per-role limit (JWT role stored in request state by RBAC dep).
+        role: str | None = getattr(request.state, "user_role", None)
+        if role and role in _ROLE_LIMITS:
+            return _ROLE_LIMITS[role], _DEFAULT_WINDOW
+
+        # 3. Default per-IP limit.
+        return settings.RATE_LIMIT_DEFAULT, _DEFAULT_WINDOW
+
+    @staticmethod
+    def _build_key(client_ip: str, path: str, request: Request) -> str:
+        """Derive a Redis key for this (client, path) combination."""
+        # Endpoint-specific: scope to IP + path prefix.
+        for prefix in _ENDPOINT_LIMITS:
+            if path.startswith(prefix):
+                return f"ip:{client_ip}:ep:{prefix}"
+        # Role-based or default: scope to IP only (global bucket per client).
+        return f"ip:{client_ip}"

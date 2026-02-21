@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Prick &amp; Care - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "brand-teal": "#2EAE7D",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark flex items-center justify-center min-h-screen p-4">
+<!-- iPhone 15 Pro Frame Emulator -->
+<div class="relative w-full max-w-[393px] h-[852px] bg-white dark:bg-slate-900 rounded-[55px] shadow-2xl overflow-hidden border-[8px] border-slate-800 flex flex-col">
+<!-- Status Bar Area / Dynamic Island Placeholder -->
+<div class="h-11 w-full flex justify-center items-end pb-1">
+<div class="w-28 h-7 bg-black rounded-full"></div>
+</div>
+<!-- Top App Bar / Logo -->
+<div class="flex items-center justify-center p-6 pb-2">
+<div class="flex flex-col items-center gap-1">
+<div class="bg-primary/10 p-2 rounded-xl text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">bloodtype</span>
+</div>
+<h2 class="text-primary text-sm font-bold tracking-tight uppercase">Prick &amp; Care</h2>
+</div>
+</div>
+<!-- Hero Illustration -->
+<div class="px-8 py-4 flex justify-center">
+<div class="w-full aspect-square max-w-[240px] bg-gradient-to-br from-primary/5 to-brand-teal/5 rounded-full flex items-center justify-center relative overflow-hidden">
+<!-- Abstract Phlebotomist Illustration Representation -->
+<div class="absolute inset-0 bg-cover bg-center opacity-90" data-alt="Friendly professional phlebotomist holding a medical kit illustration" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB5ijI26aSnEmRcgVvYOJTUwmJPECLDLQN4EAYANSiV7xT1BTTN5MVNDQN3rp0zHvok37xBzFbd9wqE8AYF-xuUmKRo7C_BF9OB7z71wz-JnjR1_Xjdo-YCcGgrTOiH0ske3gt-12aNAzqnjfYHE0K2wmwuYDnlvT6DeJ9cuU6d5HciZVi9Mg8Apw3pDiUoFO1sgkGFbUSG6moCS0Y_HL5HL_NEBQGA__5F4vNMNEoMv39-5FrkyAZWt2vQ73NpxWHA6IaMHfuFxs4')">
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<div class="flex-1 px-8 pt-4 flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-3xl font-bold leading-tight text-center">Welcome Back</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal text-center mt-2">Login to your phlebotomist account</p>
+<!-- Login Form -->
+<div class="mt-10 space-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-slate-700 dark:text-slate-300 text-sm font-semibold ml-1">Phone Number</label>
+<div class="relative flex items-center">
+<div class="absolute left-4 flex items-center gap-2 border-r border-slate-200 dark:border-slate-700 pr-3">
+<span class="text-lg">🇮🇳</span>
+<span class="text-slate-900 dark:text-slate-100 font-medium">+91</span>
+</div>
+<input class="w-full h-14 pl-24 pr-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-teal focus:border-transparent transition-all outline-none text-lg tracking-widest" inputmode="numeric" placeholder="00000 00000" type="tel"/>
+</div>
+</div>
+<button class="w-full h-14 bg-brand-teal hover:bg-emerald-600 text-white font-bold text-lg rounded-xl shadow-lg shadow-brand-teal/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span>Send OTP</span>
+<span class="material-symbols-outlined text-xl">arrow_forward</span>
+</button>
+</div>
+<!-- Spacer for layout -->
+<div class="flex-1"></div>
+<!-- Footer Help -->
+<div class="pb-10 text-center">
+<p class="text-slate-500 dark:text-slate-400 text-sm">
+                    Need help?
+                    <a class="text-primary font-semibold hover:underline decoration-2 underline-offset-4" href="#">Contact admin</a>
+</p>
+</div>
+</div>
+<!-- Home Indicator -->
+<div class="h-8 w-full flex justify-center items-center">
+<div class="w-32 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,428 @@
+# PricknCare — Phlebotomist Blood Sample Collection Platform
+# Product Requirements Document (PRD)
+# Version: 1.0 | Date: February 2026
+# Prepared By: Epik Technocravers Private Limited
+
+---
+
+## 1. Executive Summary
+
+Build a PAN India Phlebotomist Blood Sample Collection Platform that enables diagnostic labs and healthcare providers to manage home blood collection services efficiently. The platform consists of a web-based admin panel, client portal, and mobile application for field phlebotomists.
+
+## 2. Project Objectives
+
+- Build a scalable platform for managing home blood sample collection across India
+- Enable clients (labs/hospitals) to place collection requests via web portal
+- Provide mobile app for phlebotomists to manage daily collections
+- Centralized admin panel for operations management
+- Real-time tracking and status updates
+- Automated assignment and route optimization
+- Multi-tier pricing based on collection type and priority
+
+## 3. System Architecture
+
+### 3.1 Platform Components
+
+| Component | Type | Users |
+|-----------|------|-------|
+| Admin Panel | Web Application | Operations team, Super Admin |
+| Client Portal | Web Application | Diagnostic labs, Hospitals, Clinics |
+| Phlebotomist App | Mobile App (Android/iOS) | Field phlebotomists |
+| API Backend | REST APIs | All platforms |
+
+### 3.2 Technology Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend (Web) | Next.js |
+| Mobile App | Flutter (Android + iOS) |
+| Backend | FastAPI (Python) |
+| Database | PostgreSQL |
+| Cache | Redis |
+| File Storage | AWS S3 / CloudFront |
+| Maps | Google Maps API |
+| SMS | MSG91 / Twilio |
+| Push Notifications | Firebase Cloud Messaging |
+| Hosting | AWS / GCP |
+
+### 3.3 User Roles
+
+| Role | Access Level |
+|------|-------------|
+| Super Admin | Full system access, all cities |
+| City Admin | Manage specific city operations |
+| Client | Create orders, view status, reports |
+| Phlebotomist | Mobile app for collection management |
+
+### 3.4 Integrations
+
+| Integration | Purpose |
+|------------|---------|
+| Google Maps | Navigation, distance calculation |
+| SMS Gateway (MSG91/Twilio) | OTP, notifications |
+| Payment Gateway (Razorpay/Paytm) | Online payment (if needed) |
+| Email Service (SendGrid/AWS SES) | Email notifications |
+| WhatsApp Business API | Order notifications (optional) |
+| LIMS Integration | Lab Information System (optional) |
+
+
+## 4. Functional Requirements
+
+### 4.1 Client Portal (Web - Next.js)
+
+#### 4.1.1 Authentication & Profile
+- Email/password login with OTP verification
+- Company profile management
+- Multiple user accounts under one client organization
+- Password reset functionality
+- Session management with auto-timeout
+
+#### 4.1.2 Order Entry Form
+Complete order creation with the following fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| Title | Dropdown | MR, MRS, Master, Baby, S/O, D/O, Other, Dr |
+| Patient Name | Text | Full name of patient |
+| Age | Number | Patient age |
+| Gender | Dropdown | Male, Female, Other |
+| Mobile Number | Phone | Patient contact (with OTP option) |
+| Appointment Date | Date Picker | Preferred collection date |
+| Appointment Time | Time Picker | Preferred time slot |
+| Pincode | Auto-complete | With locality auto-suggestion |
+| Locality | Dropdown | Auto-populated based on pincode |
+| Address | Text Area | Full address |
+| Landmark | Text | Nearby landmark |
+| Package Name | Dropdown/Search | Test package selection |
+| Sample Type | Auto-populated | Based on package (Blood, Urine, etc.) |
+| Amount to Collect | Auto-calculated | Based on package + priority |
+| Priority | Radio | High / Normal |
+| Special Instructions | Text Area | Fasting required, etc. |
+
+#### 4.1.3 Order Management
+- View all orders with real-time status
+- Filter by date, status, phlebotomist
+- Cancel/reschedule orders
+- Download order receipts
+- Bulk order upload via Excel file
+
+#### 4.1.4 Reports & Analytics
+- Collection summary reports
+- Payment reconciliation
+- Monthly/weekly statistics
+- Export to Excel/PDF
+
+
+### 4.2 Admin Panel (Web - Next.js)
+
+#### 4.2.1 Dashboard
+- Today's collection overview (total orders, completed, pending, failed)
+- Pending assignments count
+- Active phlebotomists on map
+- Revenue statistics (daily/weekly/monthly)
+- City-wise performance metrics
+- Real-time order tracking map with live phlebotomist locations
+
+#### 4.2.2 Client Management
+
+| Feature | Description |
+|---------|-------------|
+| Create Client | Add new lab/hospital client with company details |
+| Client Profile | Company details, contact info, GST number |
+| Rate Configuration | Custom rates per client |
+| Client Rate - 1st Collection | Base rate for first sample |
+| Client Rate - 2nd Collection | Rate for additional samples same visit |
+| Client Rate - Priority | Premium rate for urgent collections |
+| Credit Limit | Set credit limit for postpaid clients |
+| Payment Terms | Prepaid / Postpaid / Wallet |
+
+#### 4.2.3 Phlebotomist Management
+
+| Feature | Description |
+|---------|-------------|
+| Create Phlebotomist | Add new phlebo with personal details |
+| Pincodes Assigned | Multiple pincodes (service area) |
+| Localities Assigned | Multiple localities within pincodes |
+| Working Hours | Shift timings configuration |
+| Leave Management | Mark availability/leave |
+| Performance Metrics | Collections/day, ratings, TAT |
+| Document Verification | ID proof, certifications upload |
+| Bank Details | For payment disbursement |
+
+
+#### 4.2.4 Zone & Area Management
+
+| Feature | Description |
+|---------|-------------|
+| Create City | Add serviceable cities |
+| Create Zone | Group multiple pincodes into zones |
+| Zone Configuration | Multiple pincodes per zone |
+| Locality Mapping | Map localities to zones |
+| Service Availability | Enable/disable zones |
+| NSA Management | No Service Area marking |
+
+#### 4.2.5 Order Management
+
+**Order Lifecycle:**
+New Order → Pending Assignment → Assigned → Accepted → In Transit → Collected → Sample Handed Over → Completed
+
+**Order Statuses:**
+
+| Status | Description |
+|--------|-------------|
+| Pending | Awaiting assignment |
+| Assigned | Phlebo assigned, notification sent |
+| Accepted | Phlebo accepted the order |
+| Re-routed | Reassigned to another phlebo |
+| In Transit | Phlebo on the way |
+| Collected | Sample collected successfully |
+| Uncollected | Collection failed (patient not home, etc.) |
+| Cancelled | Order cancelled |
+| NSA | No Service Area |
+
+**Assignment Features:**
+- Manual assignment to specific phlebotomist
+- Auto-assignment based on zone/pincode matching
+- Bulk assignment of multiple orders
+- Re-routing to another phlebotomist
+- Priority flagging for urgent orders
+
+
+#### 4.2.6 Collection Tracking
+
+| Field | Description |
+|-------|-------------|
+| Booking ID | Unique order identifier |
+| Patient Area | Location/locality |
+| Preferred Time | Requested time slot |
+| Assigned Phlebotomist | Phlebo name |
+| Assignment Status | Assigned/Pending/Re-routed/NSA |
+| Action/Notes | Notification sent, Fasting sample, etc. |
+
+#### 4.2.7 Payment Management
+- Client invoicing (auto-generated)
+- Phlebotomist payment calculation
+- Cash collection tracking
+- Online payment reconciliation
+- Commission/incentive management
+
+#### 4.2.8 Reports
+
+| Report | Description |
+|--------|-------------|
+| Daily Collection Report | All collections for a day |
+| Phlebo Performance | Individual performance metrics |
+| Client-wise Report | Collections per client |
+| Zone-wise Report | Area performance |
+| Revenue Report | Income and payouts |
+| TAT Report | Turnaround time analysis |
+
+#### 4.2.9 Sample Accessioning (Lab Receiving)
+
+When samples arrive at the lab, this module allows verification and acceptance.
+
+| Field | Description |
+|-------|-------------|
+| Order ID | Unique order identifier |
+| Patient Name | Patient name from order |
+| Sample Type (Vial) | EDTA (Purple), SST (Yellow), Fluoride (Grey), Urine Container |
+| Quantity | Number of vials/containers |
+| Integrity | OK, Lipemic, Leaked, Hemolyzed, Clotted, Insufficient |
+| Status | Accepted, Hold, Rejected |
+| Rejection Reason | If rejected - reason selection |
+| Received By | Lab technician name |
+| Received Time | Timestamp |
+
+**Integrity Checks:**
+- OK — Sample accepted for processing
+- Lipemic — Fatty sample, may affect results (Hold)
+- Leaked — Sample damaged, rejected
+- Hemolyzed — Red cell damage, may need recollection
+- Clotted — Blood clotted in anticoagulant tube
+- Insufficient — Not enough sample volume
+
+**Workflow:**
+Phlebo hands over samples → Lab scans barcode → Verify integrity → Accept/Hold/Reject → Update status in system → Notify client if rejected
+
+
+#### 4.2.10 Phlebotomist Cash Reconciliation
+
+Daily settlement of cash collected by phlebotomists.
+
+| Field | Description |
+|-------|-------------|
+| Phlebo Name | Phlebotomist name |
+| Total Appointments | Number of collections done |
+| Cash Collected | Total cash received from patients |
+| Online/UPI | Total digital payments collected |
+| Total Collection | Cash + Online amount |
+| Handed Over | Yes / Partial / No |
+| Discrepancy | Difference with notes (Fuel, Shortage, etc.) |
+
+**Reconciliation Workflow:**
+End of day → Phlebo submits cash → Admin verifies amount → Record discrepancies (fuel allowance, shortages) → Mark as Handed Over → Generate daily settlement report
+
+**Discrepancy Types:**
+- Fuel allowance deduction
+- Cash shortage
+- Overage
+- Patient refund
+- Incentive adjustment
+
+**Reports:**
+- Daily collection summary by phlebo
+- Weekly/monthly settlement reports
+- Discrepancy tracking
+- Outstanding dues
+
+#### 4.2.11 Settings
+- Package/Test master (CRUD for all lab tests and packages)
+- Pricing rules engine
+- Notification templates (SMS/Email/Push)
+- Time slot configuration
+- Holiday calendar
+- System configuration
+
+
+### 4.3 Phlebotomist Mobile App (Flutter - Android & iOS)
+
+#### 4.3.1 Authentication
+- Mobile number + OTP login
+- Biometric login (fingerprint/face)
+- Auto-logout on inactivity
+
+#### 4.3.2 Dashboard
+- Today's assigned collections list
+- Pending/Completed count
+- Earnings summary
+- Push notifications
+
+#### 4.3.3 Order Management
+
+| Feature | Description |
+|---------|-------------|
+| View Assignments | List of assigned orders for the day |
+| Order Details | Patient info, address, package, special instructions |
+| Accept/Reject | Accept or reject order with reason |
+| Navigation | Google Maps integration for turn-by-turn directions |
+| Update Status | Mark as In Transit, Collected, Uncollected, etc. |
+| Collection Proof | Photo capture of collected samples |
+| Patient Signature | Digital signature capture on screen |
+| OTP Verification | Verify patient identity via OTP |
+
+#### 4.3.4 Collection Workflow
+1. View assigned order
+2. Accept order
+3. Mark "On the way" (In Transit)
+4. Navigate to patient location via Google Maps
+5. Verify patient (OTP/ID)
+6. Collect sample
+7. Capture photo proof of samples
+8. Get patient digital signature
+9. Collect payment (Cash/UPI)
+10. Generate receipt
+11. Mark as Collected
+12. Hand over samples at lab
+
+#### 4.3.5 Payment Collection
+- Cash collection from patient
+- UPI/QR code payment support
+- Payment receipt generation (PDF/digital)
+- Daily cash reconciliation submission
+
+#### 4.3.6 Attendance & Leave
+- Check-in/Check-out with GPS location
+- GPS-based attendance verification
+- Apply for leave
+- View leave balance
+
+#### 4.3.7 Earnings & Incentives
+- Daily earnings view
+- Incentive tracking (per collection bonuses)
+- Payment history
+- Download pay slips (PDF)
+
+#### 4.3.8 Support
+- Raise support tickets
+- Contact admin (in-app chat/call)
+- FAQs section
+
+
+## 5. Non-Functional Requirements
+
+| Requirement | Specification |
+|-------------|--------------|
+| Availability | 99.9% uptime |
+| Response Time | < 2 seconds for API calls |
+| Concurrent Users | Support 1000+ simultaneous users |
+| Data Backup | Daily automated backups |
+| Security | SSL/TLS, data encryption at rest and in transit |
+| Mobile Offline | Basic offline mode for phlebo app (queue orders when no network) |
+| Scalability | Horizontal scaling support |
+
+## 6. Security & Compliance
+
+- HTTPS/SSL encryption on all endpoints
+- Role-based access control (RBAC) with granular permissions
+- Data encryption at rest (AES-256) and in transit (TLS 1.3)
+- HIPAA-aware data handling for patient information
+- Audit logs for all user actions (who did what, when)
+- GDPR-compliant data management
+- Secure OTP verification with rate limiting
+- Session management with auto-timeout
+- API rate limiting and throttling
+- Input validation and SQL injection prevention
+
+## 7. Deliverables
+
+| # | Deliverable | Description |
+|---|------------|-------------|
+| 1 | Functional Requirements Document | Detailed FRD |
+| 2 | System Architecture Document | Technical architecture |
+| 3 | UI/UX Wireframes | All screens design |
+| 4 | Admin Panel (Web) | Full-featured admin dashboard (Next.js) |
+| 5 | Client Portal (Web) | Client-facing web application (Next.js) |
+| 6 | Phlebotomist App (Android) | Android mobile application (Flutter) |
+| 7 | Phlebotomist App (iOS) | iOS mobile application (Flutter) |
+| 8 | Backend APIs | RESTful API backend (FastAPI) |
+| 9 | Database Setup | PostgreSQL production database with migrations |
+| 10 | Testing Documentation | Test cases and results |
+| 11 | Deployment | Production deployment on AWS/GCP |
+| 12 | User Manuals | Admin, Client, Phlebo guides |
+| 13 | Source Code | Complete source code handover |
+
+## 8. Assumptions
+
+- Client will provide test/package master data (list of all lab tests)
+- Client will provide pincode-locality mapping data for all service areas
+- SMS/Email gateway credentials provided by client
+- Google Maps API key provided by client
+- Payment gateway merchant account setup by client (if required)
+- Content (terms of service, privacy policy) provided by client
+- Existing LIMS integration specifications provided (if applicable)
+
+## 9. Out of Scope
+
+- Lab Information Management System (LIMS) internal operations
+- Pathology report generation
+- Patient-facing mobile app (can be added as Phase 2)
+- Hardware procurement (barcode scanners, printers)
+- Third-party logistics integration
+- Custom integrations not specified in this document
+
+## 10. Acceptance Criteria
+
+- All features implemented as per approved functional requirements
+- Mobile apps approved and published on Google Play Store and Apple App Store
+- Load testing passed for 500+ concurrent users
+- Security audit passed with no critical/high vulnerabilities
+- User Acceptance Testing (UAT) sign-off from client
+- All critical and high priority bugs resolved before go-live
+
+## 11. Support & Maintenance
+
+| Period | Coverage |
+|--------|---------|
+| Development Phase | Full support included |
+| Post-Launch (3 months) | Bug fixes included at no extra cost |
+| AMC (Annual) | Optional, quoted separately |

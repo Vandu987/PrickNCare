@@ -8,6 +8,7 @@ from app.api.v1.router import router as v1_router
 from app.core.config import settings
 from app.core.database import close_db, init_db
 from app.core.redis import close_redis
+from app.middleware.rate_limit import RateLimitMiddleware
 
 
 @asynccontextmanager
@@ -27,6 +28,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allowed_origins_list,

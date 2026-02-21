@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OTP Verification - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "brand-teal": "#2EAE7D",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .ios-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark flex items-center justify-center min-h-screen p-4">
+<!-- iPhone 15 Pro Frame Mockup -->
+<div class="relative w-[393px] h-[852px] bg-white dark:bg-slate-900 rounded-[55px] shadow-2xl overflow-hidden border-[8px] border-slate-800 flex flex-col">
+<!-- Status Bar Space (Dynamic Island Area) -->
+<div class="h-11 w-full flex justify-center items-end pb-1">
+<div class="w-32 h-7 bg-black rounded-full"></div>
+</div>
+<!-- Top Navigation -->
+<div class="flex items-center px-6 py-4">
+<button class="text-slate-900 dark:text-slate-100 p-1 -ml-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-2xl">arrow_back</span>
+</button>
+</div>
+<!-- Content Container -->
+<div class="flex-1 px-8 flex flex-col">
+<!-- Header Section -->
+<div class="mt-8">
+<h1 class="text-primary dark:text-blue-400 text-3xl font-bold tracking-tight">Verify OTP</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-3 text-base leading-relaxed">
+                    We sent a 6-digit code to <span class="font-medium text-slate-700 dark:text-slate-300">+91 98765 XXXXX</span>
+</p>
+</div>
+<!-- OTP Input Grid -->
+<div class="mt-12">
+<fieldset class="flex justify-between gap-2">
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+<input class="w-12 h-14 bg-white dark:bg-slate-800 border-0 ios-shadow rounded-lg text-center text-xl font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-primary transition-all" maxlength="1" placeholder="-" type="number"/>
+</fieldset>
+</div>
+<!-- Resend Timer -->
+<div class="mt-8 text-center">
+<p class="text-slate-400 dark:text-slate-500 text-sm font-medium">
+                    Resend OTP in <span class="text-slate-600 dark:text-slate-300">00:28</span>
+</p>
+</div>
+<!-- CTA Button -->
+<div class="mt-auto mb-12">
+<button class="w-full bg-brand-teal hover:bg-[#259b6f] text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-brand-teal/20 transition-all active:scale-[0.98]">
+                    Verify &amp; Login
+                </button>
+<!-- Secondary Action -->
+<div class="mt-6 text-center">
+<button class="text-primary dark:text-blue-400 font-semibold text-sm hover:underline">
+                        Change Number
+                    </button>
+</div>
+</div>
+</div>
+<!-- Home Indicator (iOS) -->
+<div class="h-8 w-full flex justify-center items-center pb-2">
+<div class="w-32 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full"></div>
+</div>
+</div>
+</body></html>

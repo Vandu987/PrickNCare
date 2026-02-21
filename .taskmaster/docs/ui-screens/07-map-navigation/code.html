@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>In-App Map Navigation - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                        "accent-teal": "#14b8a6",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-slate-200 font-display flex items-center justify-center min-h-screen">
+<!-- iPhone 15 Pro Frame -->
+<div class="relative w-[393px] h-[852px] bg-background-light dark:bg-background-dark rounded-[55px] border-[8px] border-slate-900 shadow-2xl overflow-hidden">
+<!-- Dynamic Island -->
+<div class="absolute top-2 left-1/2 -translate-x-1/2 w-[120px] h-[35px] bg-black rounded-full z-50"></div>
+<!-- Full Screen Map Background -->
+<div class="absolute inset-0 z-0">
+<!-- Simulated Map Component -->
+<div class="relative w-full h-full bg-[#e5e7eb] flex items-center justify-center overflow-hidden">
+<img alt="Map showing a navigation route through city streets" class="w-full h-full object-cover grayscale-[0.2]" data-location="Mumbai, India" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpFLWjarKkqfk9jkHUXATgG0EaijhkM37QmzaVuHX5LHyuj57heZmVZ_xHS1IxnzgXEGDsCuGZMOlI70yQNqLT_QEZeZZyTGPeZTru3bQxMncJ06mYLub-fbBuY27ovwhDnpfDRrGAHUZ2A1z4wIY9aXnZKF4WmwvfrrbfbmwfqH9myDzavOwl-6_txqbr8r5CG6K4l0JxanbijU_9HgBxWVb6KA66X8wXT1pi-uDx1AP5W0kgLyqxL2h8Q0ZT4v0w6B-fwQm-2MA"/>
+<!-- SVG Route Overlay -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" viewbox="0 0 393 852">
+<!-- Route Path -->
+<path class="opacity-90" d="M196 600 Q 200 500, 150 450 T 220 300" fill="none" stroke="#1b4e88" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"></path>
+<!-- Current Location (Blue Dot) -->
+<circle cx="196" cy="600" fill="white" r="10"></circle>
+<circle cx="196" cy="600" fill="#1b4e88" r="6"></circle>
+<circle class="animate-pulse opacity-20" cx="196" cy="600" fill="#1b4e88" r="12"></circle>
+<!-- Destination (Red Pin) -->
+<g transform="translate(210, 275)">
+<path d="M10 0C4.477 0 0 4.477 0 10c0 7.5 10 20 10 20s10-12.5 10-20c0-5.523-4.477-10-10-10z" fill="#ef4444"></path>
+<circle cx="10" cy="10" fill="white" r="4"></circle>
+</g>
+</svg>
+<!-- Map Controls -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-3">
+<button class="flex size-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg text-slate-800">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="flex size-12 items-center justify-center rounded-xl bg-white/90 backdrop-blur-sm shadow-lg text-slate-800">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="mt-4 flex size-12 items-center justify-center rounded-xl bg-primary text-white shadow-lg">
+<span class="material-symbols-outlined">near_me</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Top Navigation Bar -->
+<div class="absolute top-0 left-0 w-full pt-14 pb-4 px-6 bg-white/70 backdrop-blur-md border-b border-primary/10 flex items-center z-40">
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-primary">arrow_back_ios</span>
+</button>
+<div class="flex-1 text-center pr-10">
+<h1 class="text-primary font-bold text-lg">Navigating to Patient</h1>
+</div>
+</div>
+<!-- Bottom Sheet -->
+<div class="absolute bottom-0 left-0 w-full z-40">
+<!-- Handle for dragging feel -->
+<div class="flex justify-center mb-2">
+<div class="w-12 h-1.5 bg-slate-400/50 rounded-full"></div>
+</div>
+<div class="bg-white rounded-t-[32px] shadow-[0_-10px_30px_rgba(0,0,0,0.1)] p-6 space-y-6">
+<!-- Patient Info Header -->
+<div class="flex justify-between items-start">
+<div>
+<h2 class="text-2xl font-bold text-slate-900">Amit Sharma</h2>
+<p class="text-slate-500 mt-1 leading-tight max-w-[200px]">
+                            123 Medical Lane, Health City, HC 56789
+                        </p>
+</div>
+<div class="bg-primary/10 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-primary text-3xl">person_pin_circle</span>
+</div>
+</div>
+<!-- Metrics Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+<p class="text-slate-500 text-sm font-medium uppercase tracking-wider">ETA</p>
+<p class="text-2xl font-bold text-slate-900">15 min</p>
+</div>
+<div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+<p class="text-slate-500 text-sm font-medium uppercase tracking-wider">Distance</p>
+<p class="text-2xl font-bold text-slate-900">3.2 km</p>
+</div>
+</div>
+<!-- Traffic Status -->
+<div class="flex items-center gap-2 px-1">
+<span class="size-2.5 rounded-full bg-accent-teal shadow-[0_0_8px_rgba(20,184,166,0.6)]"></span>
+<span class="text-accent-teal font-semibold text-sm">Light traffic on your route</span>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-3 pb-4">
+<button class="w-full flex items-center justify-center gap-2 py-4 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-xl">map</span>
+                        Open in Google Maps
+                    </button>
+<button class="w-full flex items-center justify-center gap-2 py-4 bg-accent-teal text-white font-bold rounded-xl shadow-lg shadow-accent-teal/30 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">check_circle</span>
+                        I've Arrived
+                    </button>
+</div>
+<!-- iOS Home Indicator Space -->
+<div class="h-6"></div>
+</div>
+</div>
+<!-- Home Indicator -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-[134px] h-[5px] bg-black rounded-full z-50"></div>
+</div>
+</body></html>

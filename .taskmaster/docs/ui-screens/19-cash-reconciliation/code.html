@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>End of Day Cash Settlement - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecec",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102222",
+                        "navy-custom": "#0a1919",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ios-shadow { shadow-[0_2px_10px_rgba(0,0,0,0.05)] }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-slate-200 flex items-center justify-center min-h-screen">
+<!-- iPhone 15 Pro Frame Container -->
+<div class="relative w-[393px] h-[852px] bg-background-light dark:bg-background-dark rounded-[55px] shadow-2xl overflow-hidden border-[8px] border-slate-900">
+<!-- Status Bar Simulation -->
+<div class="flex justify-between items-center px-8 pt-4 pb-2 w-full">
+<span class="text-xs font-bold text-slate-900 dark:text-slate-100">9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- Header -->
+<div class="flex items-center px-4 py-2 justify-between">
+<div class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">Cash Settlement</h2>
+</div>
+<!-- Main Content Area (Scrollable) -->
+<div class="h-[660px] overflow-y-auto px-4 pb-20">
+<!-- Summary Card -->
+<div class="mt-4 p-5 rounded-xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex flex-col gap-1">
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Summary</p>
+<div class="flex items-baseline gap-1">
+<span class="text-slate-900 dark:text-slate-100 text-3xl font-extrabold">₹5,400</span>
+</div>
+<p class="text-slate-600 dark:text-slate-300 text-sm mt-1">Total Cash Collected Today</p>
+</div>
+<div class="mt-4 h-2 w-full bg-primary/10 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full"></div>
+</div>
+</div>
+<!-- Order Checklist Section -->
+<h3 class="text-slate-900 dark:text-slate-100 text-sm font-bold uppercase tracking-wider px-1 pb-2 pt-6">Verified Orders</h3>
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+<div class="divide-y divide-slate-50 dark:divide-slate-700">
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-semibold text-base">Amit Sharma</span>
+<span class="text-slate-500 text-xs">Order ID: #PC-8902</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-slate-900 dark:text-slate-100 font-bold text-base">₹1,800</span>
+<div class="bg-green-100 dark:bg-green-900/30 text-green-600 p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] font-bold">check</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-semibold text-base">Priya Singh</span>
+<span class="text-slate-500 text-xs">Order ID: #PC-8915</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-slate-900 dark:text-slate-100 font-bold text-base">₹2,100</span>
+<div class="bg-green-100 dark:bg-green-900/30 text-green-600 p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] font-bold">check</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex flex-col">
+<span class="text-slate-900 dark:text-slate-100 font-semibold text-base">Rahul Verma</span>
+<span class="text-slate-500 text-xs">Order ID: #PC-8921</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-slate-900 dark:text-slate-100 font-bold text-base">₹1,500</span>
+<div class="bg-green-100 dark:bg-green-900/30 text-green-600 p-0.5 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px] font-bold">check</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Reconciliation Input -->
+<div class="mt-8 space-y-4">
+<div class="flex flex-col gap-2">
+<label class="text-slate-900 dark:text-slate-100 text-sm font-bold px-1">Cash in Hand</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
+<input class="w-full bg-white dark:bg-slate-800 border-2 border-primary rounded-xl py-4 pl-8 pr-4 text-xl font-bold text-slate-900 dark:text-slate-100 focus:ring-0 focus:outline-none" type="text" value="5,400"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 text-primary">
+<span class="material-symbols-outlined">edit</span>
+</div>
+</div>
+</div>
+<!-- Discrepancy Status -->
+<div class="flex items-center gap-2 px-1 text-emerald-600 dark:text-emerald-400 font-medium text-sm">
+<span class="material-symbols-outlined text-base">check_circle</span>
+<span>No Discrepancy Found</span>
+</div>
+</div>
+<!-- Action Section -->
+<div class="mt-8 space-y-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+                    Submit Settlement
+                    <span class="material-symbols-outlined">send</span>
+</button>
+<div class="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-100 dark:border-amber-900/30">
+<span class="material-symbols-outlined text-amber-600 shrink-0">info</span>
+<p class="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+                        Important: Please ensure all cash is deposited at the nearest collection hub by <span class="font-bold">8:00 PM</span> today to avoid penalties.
+                    </p>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="absolute bottom-0 left-0 right-0 border-t border-slate-100 dark:border-slate-800 bg-navy-custom px-4 pb-8 pt-2">
+<div class="flex gap-2 justify-around">
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">home</span>
+<p class="text-[10px] font-medium leading-normal">Home</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">assignment</span>
+<p class="text-[10px] font-medium leading-normal">Orders</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-primary" href="#">
+<div class="flex flex-col items-center justify-center relative">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">account_balance_wallet</span>
+<div class="w-1 h-1 bg-primary rounded-full mt-0.5"></div>
+</div>
+<p class="text-[10px] font-medium leading-normal">Cash</p>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-medium leading-normal">Profile</p>
+</a>
+</div>
+</div>
+<!-- Home Indicator -->
+<div class="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-slate-700/50 rounded-full"></div>
+</div>
+</body></html>

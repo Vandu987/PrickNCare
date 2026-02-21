@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Phlebotomist Profile Settings - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1461b8",
+              "background-light": "#f6f7f8",
+              "background-dark": "#111921",
+              "navy-bottom": "#0a192f",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ios-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<!-- Header / Navigation Bar (iOS Style) -->
+<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md px-4 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+<button class="flex items-center text-primary">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+<span class="font-medium">Back</span>
+</button>
+<h1 class="text-lg font-bold">Profile</h1>
+<div class="w-10"></div> <!-- Spacer for symmetry -->
+</header>
+<main class="flex-1 overflow-y-auto pb-32">
+<!-- Profile Header Section -->
+<div class="flex flex-col items-center py-8 px-4">
+<div class="relative">
+<div class="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden bg-slate-200" data-alt="Professional portrait of a male phlebotomist smiling" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrWK3Y9LEBJXok39lntSU88c1UkzsqxVkbzjm64P_M5K_-InsMViObSQL2mX_yps54v1PHSJzttuqY4rJASkNaZhWDChanOs2aanVk50iJFqwhzA_CY2vkJb8OIs5fkWp2cd5XJ-7xKf08wEvrOcfqR7geXREva3qCU0FCAgSieBHZIxhYEerbLsPPSwHbQJvXAbaZb-q_cn4pe00UOr86flLFyATjFthDttkpA0DIMhtj_MgoNr3GGN9WiLAPcsCIarPvrNcLm7k'); background-size: cover; background-position: center;">
+</div>
+<button class="absolute bottom-1 right-1 bg-primary text-white p-2 rounded-full shadow-md border-2 border-white dark:border-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<div class="mt-4 flex flex-col items-center text-center">
+<div class="flex items-center gap-1">
+<h2 class="text-2xl font-bold">Rajesh Kumar</h2>
+<span class="material-symbols-outlined text-primary fill-1" style="font-variation-settings: 'FILL' 1">verified</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 font-medium mt-1">ID: PNC-PH-0023</p>
+<!-- Stats Row -->
+<div class="flex gap-6 mt-6 w-full max-w-xs justify-center">
+<div class="text-center">
+<div class="flex items-center justify-center text-amber-500 font-bold text-xl">
+<span class="material-symbols-outlined mr-1 fill-1" style="font-variation-settings: 'FILL' 1">star</span>
+                            4.7
+                        </div>
+<p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Rating</p>
+</div>
+<div class="w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+<div class="text-center">
+<div class="text-slate-900 dark:text-slate-100 font-bold text-xl">
+                            3 Years
+                        </div>
+<p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Exp</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Groups -->
+<div class="px-4 space-y-6">
+<!-- My Zones -->
+<section>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2">My Operational Zones</h3>
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 ios-shadow flex flex-wrap gap-2">
+<div class="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full text-sm font-medium border border-primary/20">
+<span class="material-symbols-outlined text-base">location_on</span>
+                        South Delhi
+                    </div>
+<button class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-full text-sm font-medium border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-base">add</span>
+                        Add Zone
+                    </button>
+</div>
+</section>
+<!-- Verification & Documents -->
+<section>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2">Verification Documents</h3>
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden ios-shadow divide-y divide-slate-100 dark:divide-slate-800">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">badge</span>
+<span class="font-medium">Aadhaar Card</span>
+</div>
+<span class="material-symbols-outlined text-emerald-500 fill-1" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">credit_card</span>
+<span class="font-medium">PAN Card</span>
+</div>
+<span class="material-symbols-outlined text-emerald-500 fill-1" style="font-variation-settings: 'FILL' 1">check_circle</span>
+</div>
+</div>
+</section>
+<!-- App Navigation -->
+<section>
+<h3 class="text-xs font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2">Performance &amp; Account</h3>
+<div class="bg-white dark:bg-slate-900 rounded-xl overflow-hidden ios-shadow divide-y divide-slate-100 dark:divide-slate-800">
+<a class="flex items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-800 transition-colors" href="#">
+<div class="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="font-medium">Performance Metrics</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-800 transition-colors" href="#">
+<div class="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary">settings</span>
+<span class="font-medium">App Settings</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+<a class="flex items-center justify-between p-4 active:bg-slate-50 dark:active:bg-slate-800 transition-colors" href="#">
+<div class="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+<span class="material-symbols-outlined text-primary">help_center</span>
+<span class="font-medium">Help &amp; Support</span>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</a>
+</div>
+</section>
+<!-- Logout Section -->
+<section class="pt-4">
+<button class="w-full bg-white dark:bg-slate-900 py-4 rounded-xl text-red-600 font-bold ios-shadow active:bg-red-50 dark:active:bg-red-950/20 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </button>
+<p class="text-center text-slate-400 text-xs mt-6 font-medium">App Version v1.0.0</p>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Navy Style) -->
+<nav class="fixed bottom-0 left-0 right-0 bg-navy-bottom text-white px-6 pt-3 safe-area-bottom rounded-t-xl border-t border-white/5">
+<div class="flex justify-between items-center max-w-md mx-auto">
+<a class="flex flex-col items-center gap-1 text-slate-400 opacity-80 py-2" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 opacity-80 py-2" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Schedule</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 opacity-80 py-2" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-medium uppercase tracking-wider">Earnings</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary py-2 border-t-2 border-primary -mt-[2px]" href="#">
+<span class="material-symbols-outlined fill-1" style="font-variation-settings: 'FILL' 1">person</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Profile</span>
+</a>
+</div>
+</nav>
+<!-- iPhone 15 Pro Home Indicator -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full pointer-events-none z-[60]"></div>
+</body></html>

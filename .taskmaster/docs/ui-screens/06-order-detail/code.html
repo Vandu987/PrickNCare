@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Order Details - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                        "status-teal": "#0d9488",
+                        "status-orange": "#f97316",
+                        "instruction-yellow": "#fef9c3",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .pulse-navy {
+            animation: pulse-bg 2s infinite;
+        }
+        @keyframes pulse-bg {
+            0% { background-color: rgba(27, 78, 136, 0.2); }
+            50% { background-color: rgba(27, 78, 136, 0.6); }
+            100% { background-color: rgba(27, 78, 136, 0.2); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="max-w-[430px] mx-auto bg-background-light dark:bg-background-dark min-h-screen flex flex-col shadow-2xl relative">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-4 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button class="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">arrow_back</span>
+</button>
+<h1 class="text-base font-bold tracking-tight">Order #PNC-210226-0042</h1>
+</div>
+<button class="p-2 bg-primary/10 text-primary rounded-full">
+<span class="material-symbols-outlined fill-1">call</span>
+</button>
+</header>
+<main class="flex-1 overflow-y-auto pb-32">
+<!-- Horizontal Stepper -->
+<div class="px-4 py-6 overflow-x-auto no-scrollbar">
+<div class="flex items-center justify-between min-w-[500px]">
+<!-- Assigned -->
+<div class="flex flex-col items-center gap-2">
+<div class="size-8 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Assigned</span>
+</div>
+<div class="h-[2px] flex-1 bg-primary mx-1"></div>
+<!-- Accepted -->
+<div class="flex flex-col items-center gap-2">
+<div class="size-8 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<span class="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Accepted</span>
+</div>
+<div class="h-[2px] flex-1 bg-primary/30 mx-1"></div>
+<!-- In Transit -->
+<div class="flex flex-col items-center gap-2">
+<div class="size-8 rounded-full pulse-navy text-white flex items-center justify-center border-2 border-primary">
+<span class="material-symbols-outlined text-sm animate-pulse">directions_car</span>
+</div>
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">In Transit</span>
+</div>
+<div class="h-[2px] flex-1 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<!-- Collected -->
+<div class="flex flex-col items-center gap-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">colorize</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Collected</span>
+</div>
+<div class="h-[2px] flex-1 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<!-- Handed Over -->
+<div class="flex flex-col items-center gap-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-400 flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">inventory_2</span>
+</div>
+<span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Handed Over</span>
+</div>
+</div>
+</div>
+<!-- Patient Card -->
+<div class="px-4 mb-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex gap-4 items-start mb-4">
+<div class="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center text-lg font-bold">AS</div>
+<div class="flex-1">
+<h3 class="font-bold text-lg leading-tight">Amit Sharma</h3>
+<p class="text-slate-500 text-sm font-medium">+91 XXXXX XXXXX</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg">
+<span class="material-symbols-outlined text-xl">chat</span>
+</button>
+<button class="p-2 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-lg">
+<span class="material-symbols-outlined text-xl">call</span>
+</button>
+</div>
+</div>
+<div class="flex items-start gap-3 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg mb-4">
+<span class="material-symbols-outlined text-primary text-xl">location_on</span>
+<div class="flex-1">
+<p class="text-sm font-medium text-slate-700 dark:text-slate-300">123 Maple Heights, Near City Center, Mumbai</p>
+<button class="mt-2 flex items-center gap-1 text-primary text-sm font-bold">
+<span class="material-symbols-outlined text-sm">near_me</span>
+                                Open in Maps
+                            </button>
+</div>
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-slate-200 dark:border-slate-700">
+<img alt="Map view of delivery location" class="w-full h-full object-cover" data-location="Mumbai" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQpBCaOIWGl59_WuAxJZjnrTNBcPZVhGQHgbou6o64E-2fNJThrGF-Y5sK6O8LEka_2FiHLjwZfugbcCxD0vrSRrt85H1apDYl-Ku3ftcCeUlchOtMj5E-6jYwiU5eE85Ld8IuyplBei06_7_6WPbngi1DaG31rpr9cU94lvm56m1agdBHkA5IMqFedG6kIH7MQyDHhqVeELgx0zMAtofH4FUq0zzbyiXerygv8lboKwyBzcv9gB473IWH6zhuQntGyOwOm9l1riQ"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Appointment Card -->
+<div class="px-4 mb-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+<div class="size-10 bg-primary/10 text-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">calendar_today</span>
+</div>
+<div>
+<p class="text-xs text-slate-500 font-bold uppercase tracking-wide">Appointment</p>
+<p class="font-bold text-slate-800 dark:text-slate-100">Oct 24, 2023 | 08:00 AM - 09:00 AM</p>
+</div>
+</div>
+</div>
+<!-- Tests & Packages Card -->
+<div class="px-4 mb-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">science</span>
+<h3 class="font-bold text-slate-800 dark:text-slate-100">Tests &amp; Packages</h3>
+</div>
+<div class="space-y-4">
+<!-- Test Item 1 -->
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-purple-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-purple-600 text-lg">syringe</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">CBC (Complete Blood Count)</p>
+<p class="text-xs text-slate-500">Lavender Top Tube</p>
+</div>
+<p class="font-bold text-sm">₹400</p>
+</div>
+<!-- Test Item 2 -->
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-yellow-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600 text-lg">syringe</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Thyroid Profile (T3, T4, TSH)</p>
+<p class="text-xs text-slate-500">Yellow Top Tube (SST)</p>
+</div>
+<p class="font-bold text-sm">₹600</p>
+</div>
+<!-- Test Item 3 -->
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-yellow-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-yellow-600 text-lg">syringe</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold">Vitamin D Total</p>
+<p class="text-xs text-slate-500">Yellow Top Tube (SST)</p>
+</div>
+<p class="font-bold text-sm">₹800</p>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+<span class="font-bold text-slate-500">Total Amount</span>
+<span class="text-lg font-bold text-primary">₹1,800</span>
+</div>
+</div>
+</div>
+<!-- Special Instructions -->
+<div class="px-4 mb-4">
+<div class="bg-instruction-yellow dark:bg-yellow-900/30 rounded-xl p-4 border border-yellow-200 dark:border-yellow-800/50 flex gap-3">
+<span class="material-symbols-outlined text-yellow-700 dark:text-yellow-400">priority_high</span>
+<div>
+<h4 class="font-bold text-yellow-800 dark:text-yellow-200 text-sm">Special Instructions</h4>
+<p class="text-yellow-700 dark:text-yellow-300/80 text-sm mt-1">Patient is diabetic and requires a fasting sample. Be careful during extraction.</p>
+</div>
+</div>
+</div>
+<!-- Payment Card -->
+<div class="px-4 mb-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">payments</span>
+<span class="font-medium text-slate-600 dark:text-slate-400">Payment: <span class="font-bold text-slate-900 dark:text-slate-100 ml-1">Cash</span></span>
+</div>
+<div class="bg-status-orange/10 text-status-orange px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                        Pending
+                    </div>
+</div>
+</div>
+</main>
+<!-- Fixed Bottom Buttons -->
+<div class="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-background-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 p-4 pb-8 flex gap-3">
+<button class="flex-1 flex items-center justify-center gap-2 h-14 rounded-xl bg-status-teal text-white font-bold transition-transform active:scale-95 shadow-lg shadow-status-teal/20">
+<span class="material-symbols-outlined">navigation</span>
+                Start Navigation
+            </button>
+<button class="flex-1 flex items-center justify-center gap-2 h-14 rounded-xl bg-primary text-white font-bold transition-transform active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">check_circle</span>
+                Mark In Transit
+            </button>
+</div>
+</div>
+</body></html>

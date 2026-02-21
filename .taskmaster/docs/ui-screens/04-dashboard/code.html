@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Phlebotomist Dashboard - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                        "teal-accent": "#0d9488",
+                        "orange-accent": "#f59e0b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 flex justify-center">
+<!-- Device Frame: iPhone 15 Pro -->
+<div class="relative w-full max-w-[393px] h-[852px] bg-white dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col border-[8px] border-slate-800 rounded-[3rem]">
+<!-- Status Bar (Safe Area) -->
+<div class="h-11 w-full bg-primary flex items-end justify-center pb-1">
+<div class="w-32 h-7 bg-black rounded-3xl"></div> <!-- Dynamic Island Placeholder -->
+</div>
+<!-- Header Section -->
+<div class="bg-primary px-5 pt-4 pb-8 text-white rounded-b-xl shadow-lg">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="size-12 rounded-full border-2 border-white/20 overflow-hidden bg-slate-200">
+<img alt="Rajesh Profile" class="w-full h-full object-cover" data-alt="Professional portrait of a male healthcare worker" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNWpsw2QOzlCexBqxg_pKw5tYn1RxfQIp3FcIblfZIOvMwhg8HFrrcE6MMoot5bz61f7N7qBkj9wjhqgCjrXtim-e2D6dDzGnhg9k4_Ut4TvK4qY1neO_HSKsDjBGgUAjLXRLp_S8rbmifL0C3vIZtnnIyXXZCbMEAOghGIBNcDXcMFsq6NF_VpfldKqXCTvO-BKpuPAL1VQ0vH53HwpR76Afge2hUiPsqd4fNAVxf5OOBLvDhc9zqt5eTPl6pqdBakQH53i6JwcU"/>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-tight">Good Morning, Rajesh 👋</h1>
+<p class="text-xs text-white/80 font-medium">21 Feb 2026 • Delhi</p>
+</div>
+</div>
+<div class="relative">
+<button class="size-10 flex items-center justify-center bg-white/10 rounded-full">
+<span class="material-symbols-outlined text-white">notifications</span>
+</button>
+<span class="absolute top-0 right-0 size-5 bg-red-500 border-2 border-primary text-[10px] font-bold flex items-center justify-center rounded-full">3</span>
+</div>
+</div>
+</div>
+<!-- Main Scrollable Content -->
+<div class="flex-1 overflow-y-auto hide-scrollbar -mt-4 px-4 pb-24">
+<!-- Quick Stats: Horizontal Scroll -->
+<div class="flex gap-3 overflow-x-auto hide-scrollbar py-2">
+<div class="min-w-[130px] flex-1 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-primary/10">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Today's Orders</p>
+<p class="text-2xl font-bold text-primary">8</p>
+</div>
+<div class="min-w-[130px] flex-1 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-teal-accent/10">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Completed</p>
+<p class="text-2xl font-bold text-teal-accent">3</p>
+</div>
+<div class="min-w-[130px] flex-1 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-orange-accent/10">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Pending</p>
+<p class="text-2xl font-bold text-orange-accent">5</p>
+</div>
+</div>
+<!-- Earnings Card -->
+<div class="mt-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border-l-4 border-teal-accent p-5 flex flex-col gap-3 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl">payments</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Earnings Overview</p>
+<h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Today's Earnings: ₹1,240</h2>
+</div>
+<div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700 pt-3">
+<p class="text-sm text-slate-600 dark:text-slate-400">Monthly Total: <span class="font-bold">₹28,500</span></p>
+<button class="text-xs font-bold text-primary flex items-center gap-1 uppercase tracking-wider">
+                        Details <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Upcoming Orders Header -->
+<div class="mt-6 mb-4 flex items-center justify-between">
+<h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">Upcoming Orders</h3>
+<a class="text-primary text-sm font-semibold" href="#">See All</a>
+</div>
+<!-- Order Cards -->
+<div class="flex flex-col gap-4">
+<!-- Card 1 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2 bg-primary/5 text-primary px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-xs font-bold">08:30 AM</span>
+</div>
+<span class="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Assigned</span>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-base">Amit Sharma</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Full Body Checkup • <span class="text-primary font-medium">4 Tubes</span></p>
+</div>
+<button class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">directions</span>
+</button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2 bg-primary/5 text-primary px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-xs font-bold">09:15 AM</span>
+</div>
+<span class="px-3 py-1 bg-teal-100 text-teal-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Accepted</span>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-base">Priya Singh</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Diabetes Profile • <span class="text-primary font-medium">2 Tubes</span></p>
+</div>
+<button class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">directions</span>
+</button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-start mb-3">
+<div class="flex items-center gap-2 bg-primary/5 text-primary px-2 py-1 rounded">
+<span class="material-symbols-outlined text-sm">schedule</span>
+<span class="text-xs font-bold">10:00 AM</span>
+</div>
+<span class="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded-full tracking-wide">Assigned</span>
+</div>
+<div class="flex justify-between items-center">
+<div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-base">Rahul Verma</h4>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Thyroid Test • <span class="text-primary font-medium">1 Tube</span></p>
+</div>
+<button class="size-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">directions</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="absolute bottom-0 w-full bg-primary flex items-center justify-around py-3 pb-8 rounded-t-xl shadow-[0_-4px_10px_rgba(0,0,0,0.1)]">
+<a class="flex flex-col items-center gap-1 group" href="#">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-teal-accent">
+<span class="material-symbols-outlined fill-[1]">home</span>
+</div>
+<p class="text-[10px] font-bold text-teal-accent uppercase tracking-tighter">Home</p>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<div class="flex h-10 w-10 items-center justify-center text-white/60 group-hover:text-white transition-colors">
+<span class="material-symbols-outlined">assignment</span>
+</div>
+<p class="text-[10px] font-bold text-white/60 uppercase tracking-tighter">Orders</p>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<div class="flex h-10 w-10 items-center justify-center text-white/60">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<p class="text-[10px] font-bold text-white/60 uppercase tracking-tighter">Earnings</p>
+</a>
+<a class="flex flex-col items-center gap-1" href="#">
+<div class="flex h-10 w-10 items-center justify-center text-white/60">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-[10px] font-bold text-white/60 uppercase tracking-tighter">Profile</p>
+</a>
+</div>
+<!-- Home Indicator (iOS) -->
+<div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/30 rounded-full"></div>
+</div>
+</body></html>

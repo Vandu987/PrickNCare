@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Step 3: Sample Photo Capture - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b4e88",
+                        "accent-teal": "#14b8a6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#121920",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .ios-status-bar { height: 47px; }
+        .ios-home-indicator { height: 34px; }
+        .viewfinder-overlay {
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen flex justify-center">
+<!-- iPhone 15 Pro Frame Emulator (Simplified for Web) -->
+<div class="relative w-full max-w-[393px] min-h-screen bg-white dark:bg-slate-950 shadow-2xl overflow-hidden flex flex-col">
+<!-- Status Bar Area -->
+<div class="ios-status-bar w-full flex items-center justify-between px-8 pt-4">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-[18px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[18px]">wifi</span>
+<span class="material-symbols-outlined text-[18px]">battery_full</span>
+</div>
+</div>
+<!-- Header -->
+<header class="px-4 pt-4 pb-2">
+<div class="flex items-center justify-between mb-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Prick &amp; Care</h1>
+<div class="w-10"></div> <!-- Spacer -->
+</div>
+<!-- Progress Bar Section -->
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Collection Progress</span>
+<span class="text-sm font-bold text-primary">Step 3 / 6</span>
+</div>
+<div class="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/2 rounded-full"></div>
+</div>
+<p class="text-sm font-medium text-slate-600 dark:text-slate-400">Current: Photo Capture</p>
+</div>
+</header>
+<!-- Main Content (Scrollable) -->
+<main class="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
+<h2 class="text-2xl font-bold text-center">Capture Sample Photos</h2>
+<!-- Photo Slots Grid -->
+<div class="grid grid-cols-3 gap-3">
+<!-- Slot 1: Captured -->
+<div class="flex flex-col items-center gap-2">
+<div class="relative w-full aspect-square rounded-xl bg-cover bg-center border-2 border-accent-teal" data-alt="Blood sample tubes with patient labels" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA_YngaDzwww9p4P9NWhU08sBTkVQ8SifDTCXvFFwFmcem6tCt6grO29fDo8NY8ukBfRGUCaJx2MV-ToSc2zssW-kq0eHxH9p-RV7NOUeCre2W5qUSaTKhM4NFiA1o59591KyvPx1EZF5Skxg8-zM12WIE0wWW3ENZlkliBVZMKBoRyQstuF5NPLKXI_Z8iMoYYV9LrC4hP93qCNMK3AD-Z-yDPYa6edtqhxzwz09WX6JMWMoLGUTu3U_hbvFhr7CJwSCMPgry4e88')">
+<div class="absolute top-1 right-1 bg-accent-teal text-white rounded-full p-0.5">
+<span class="material-symbols-outlined text-[14px] block">check</span>
+</div>
+</div>
+<span class="text-[10px] font-semibold text-center leading-tight">Tubes with Labels</span>
+</div>
+<!-- Slot 2: Active (Current) -->
+<div class="flex flex-col items-center gap-2">
+<div class="w-full aspect-square rounded-xl bg-primary/10 border-2 border-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl">photo_camera</span>
+</div>
+<span class="text-[10px] font-bold text-primary text-center leading-tight">Sample Packaging</span>
+</div>
+<!-- Slot 3: Locked/Disabled -->
+<div class="flex flex-col items-center gap-2 opacity-40">
+<div class="w-full aspect-square rounded-xl bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-500">lock</span>
+</div>
+<span class="text-[10px] font-semibold text-center leading-tight text-slate-500">Additional</span>
+</div>
+</div>
+<!-- Viewfinder Area -->
+<div class="relative w-full aspect-[4/5] bg-slate-900 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center group">
+<!-- Mock Camera Feed -->
+<div class="absolute inset-0 bg-cover bg-center opacity-80" data-alt="Medical box packaging on clean surface" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA2DIpaBADuTn4Xoqa_Tr8h_m55TTeoIuO8ERDy_Z5UkNolerSw6CTGu2JUMZQHytzqWA6O_swsPy3aKqVerr24VLPIJkzgEjHsxZV0lLWlFSEWBeGPnrTccuiqDr8nTziK8zL_qzmTGD66XTaClx_nhVbX1Z_G9qp356z0OAAnXEj0gsOFIv1tuyOKdmelyPzfuH9yVqptnzClcyVN06Ql8qldMXwUdeg9gjcnMzJ4dl33_DkaVEhyERVEwyVnOdf-pMOwXmLHM4w')">
+</div>
+<!-- Overlay Guides -->
+<div class="relative z-10 viewfinder-overlay w-3/4 h-2/3 rounded-lg flex flex-col items-center justify-center p-4 text-center">
+<p class="text-white text-sm font-medium drop-shadow-md">Center the packaging clearly in the frame</p>
+</div>
+<!-- Exposure Slider (Visual Decor) -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 text-white/60">
+<span class="material-symbols-outlined text-[18px]">sunny</span>
+<div class="w-[2px] h-24 bg-white/20 rounded-full relative">
+<div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rounded-full border border-slate-400"></div>
+</div>
+</div>
+</div>
+<!-- Camera Actions -->
+<div class="flex gap-4 px-2">
+<button class="flex-1 py-3 px-4 rounded-xl border-2 border-slate-200 dark:border-slate-800 font-bold text-slate-600 dark:text-slate-300 flex items-center justify-center gap-2 active:bg-slate-100">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+                    Retake
+                </button>
+<button class="flex-1 py-3 px-4 rounded-xl bg-primary text-white font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-[20px]">check</span>
+                    Use Photo
+                </button>
+</div>
+</main>
+<!-- Bottom Navigation Area -->
+<footer class="p-4 space-y-4 bg-white dark:bg-slate-950 border-t border-slate-100 dark:border-slate-900">
+<div class="text-center">
+<p class="text-xs font-medium text-slate-500 dark:text-slate-400">Minimum 1 photo required for compliance</p>
+</div>
+<button class="w-full py-4 rounded-xl bg-accent-teal text-white font-bold text-lg flex items-center justify-center gap-2 shadow-lg shadow-accent-teal/20 active:opacity-90">
+                Next: Signature
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Home Indicator -->
+<div class="ios-home-indicator w-full flex justify-center items-end pb-2">
+<div class="w-32 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+</div>
+</footer>
+</div>
+</body></html>

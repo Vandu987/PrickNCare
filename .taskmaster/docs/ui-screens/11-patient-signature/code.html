@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Step 4: Patient Signature - Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecda",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102220",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- iPhone 15 Pro Frame Simulation (Centered on desktop) -->
+<div class="relative mx-auto min-h-screen max-w-[430px] bg-background-light dark:bg-background-dark shadow-2xl flex flex-col overflow-hidden">
+<!-- Top App Bar -->
+<header class="flex items-center px-4 pt-6 pb-2 justify-between sticky top-0 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md z-10">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined text-slate-900 dark:text-slate-100">arrow_back_ios_new</span>
+</button>
+<h1 class="text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">Patient Signature</h1>
+</header>
+<!-- Progress Section -->
+<div class="flex flex-col gap-2 p-6">
+<div class="flex items-center justify-between mb-1">
+<p class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Step 4 of 6</p>
+<p class="text-sm font-bold text-primary">66% Complete</p>
+</div>
+<div class="h-2 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+<div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 66.6%;"></div>
+</div>
+</div>
+<!-- Content Area -->
+<main class="flex-1 px-6 pb-24 overflow-y-auto">
+<!-- Declaration Box -->
+<div class="mb-8 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<p class="text-base leading-relaxed text-slate-700 dark:text-slate-300">
+                    I, <span class="font-bold text-slate-900 dark:text-white">Amit Sharma</span>, confirm that my blood sample(s) have been collected by the phlebotomist in a safe and hygienic manner.
+                </p>
+</div>
+<!-- Signature Pad Area -->
+<div class="flex flex-col gap-4">
+<div class="relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 h-64 w-full cursor-crosshair group">
+<!-- Placeholder / Instruction -->
+<div class="flex flex-col items-center gap-2 pointer-events-none transition-opacity group-active:opacity-10">
+<span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600">draw</span>
+<p class="text-lg font-semibold text-slate-400 dark:text-slate-500">Sign above</p>
+<p class="text-xs text-slate-400 dark:text-slate-500 text-center px-4">Use your finger or a stylus to sign inside the box</p>
+</div>
+<!-- Decorative corner markers for signature pad -->
+<div class="absolute top-4 left-4 w-4 h-4 border-t-2 border-l-2 border-slate-200 dark:border-slate-800"></div>
+<div class="absolute top-4 right-4 w-4 h-4 border-t-2 border-r-2 border-slate-200 dark:border-slate-800"></div>
+<div class="absolute bottom-4 left-4 w-4 h-4 border-b-2 border-l-2 border-slate-200 dark:border-slate-800"></div>
+<div class="absolute bottom-4 right-4 w-4 h-4 border-b-2 border-r-2 border-slate-200 dark:border-slate-800"></div>
+</div>
+<!-- Utility Button: Clear -->
+<div class="flex justify-end">
+<button class="flex items-center gap-2 px-4 py-2 border border-red-500/50 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-sm font-semibold">
+<span class="material-symbols-outlined text-sm">ink_eraser</span>
+                        Clear Signature
+                    </button>
+</div>
+</div>
+<!-- Disclaimer Footer -->
+<div class="mt-8 flex items-start gap-3 opacity-60">
+<span class="material-symbols-outlined text-sm mt-0.5">verified_user</span>
+<p class="text-[10px] leading-tight">
+                    This digital signature is legally binding and equivalent to a handwritten signature. By signing, you agree to the Prick &amp; Care Terms of Service.
+                </p>
+</div>
+</main>
+<!-- Fixed Bottom Action Bar -->
+<footer class="absolute bottom-0 left-0 w-full p-6 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-800">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:brightness-105 active:scale-[0.98] transition-all h-14 rounded-xl shadow-lg shadow-primary/20">
+<span class="text-slate-900 font-bold text-lg tracking-tight">Next: Payment</span>
+<span class="material-symbols-outlined text-slate-900">arrow_forward</span>
+</button>
+<!-- iOS Home Indicator Spacing -->
+<div class="h-4"></div>
+</footer>
+</div>
+</body></html>

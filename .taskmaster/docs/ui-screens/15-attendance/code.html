@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Prick &amp; Care - Attendance &amp; Leave</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0f60bd",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101822",
+                        "status-green": "#22c55e",
+                        "status-red": "#ef4444",
+                        "status-yellow": "#f59e0b",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<!-- iPhone 15 Pro Frame Wrapper (Simulated) -->
+<div class="relative mx-auto my-8 w-full max-w-[393px] min-h-[852px] bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden border-[8px] border-slate-800 rounded-[3rem] flex flex-col">
+<!-- Status Bar (iOS Style) -->
+<div class="flex justify-between items-center px-8 pt-6 pb-2 text-xs font-semibold">
+<span>9:45</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[14px]">wifi</span>
+<span class="material-symbols-outlined text-[14px]">battery_full</span>
+</div>
+</div>
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-4">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-10 rounded-full bg-white dark:bg-slate-800 shadow-sm">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-300">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold tracking-tight">Attendance</h1>
+</div>
+<div class="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="flex-1 overflow-y-auto px-6 pb-24">
+<!-- Daily Status Card -->
+<div class="mt-2 bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="flex items-center justify-between mb-4">
+<span class="text-sm font-medium text-slate-500 dark:text-slate-400">Session Status</span>
+<span class="px-2 py-1 bg-status-green/10 text-status-green text-[10px] font-bold uppercase tracking-wider rounded">Active</span>
+</div>
+<h2 class="text-xl font-bold mb-1">Sat, 21 Feb 2026</h2>
+<div class="flex flex-col gap-2 mt-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-status-green text-xl">check_circle</span>
+<p class="text-base font-medium">Checked In at <span class="text-primary">7:30 AM</span></p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-xl">schedule</span>
+<p class="text-base font-medium">Duration: <span class="font-bold">2h 15m</span></p>
+</div>
+</div>
+</div>
+<!-- Primary Action Button -->
+<div class="mt-6">
+<button class="w-full bg-status-red hover:bg-status-red/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-status-red/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+<span class="material-symbols-outlined">logout</span>
+                    Check Out
+                </button>
+</div>
+<!-- Attendance History Calendar -->
+<section class="mt-8">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold">February 2026</h3>
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-slate-400">chevron_left</span>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+<div class="grid grid-cols-7 gap-y-4 text-center">
+<!-- Days Header -->
+<div class="text-[10px] font-bold text-slate-400 uppercase">Mon</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Tue</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Wed</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Thu</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Fri</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Sat</div>
+<div class="text-[10px] font-bold text-slate-400 uppercase">Sun</div>
+<!-- Calendar Grid (Subset for Feb 2026) -->
+<div class="relative py-1">
+<span class="text-sm font-medium">16</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-green"></div>
+</div>
+<div class="relative py-1">
+<span class="text-sm font-medium">17</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-green"></div>
+</div>
+<div class="relative py-1">
+<span class="text-sm font-medium">18</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-red"></div>
+</div>
+<div class="relative py-1">
+<span class="text-sm font-medium">19</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-yellow"></div>
+</div>
+<div class="relative py-1">
+<span class="text-sm font-medium">20</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-green"></div>
+</div>
+<div class="relative py-1 bg-primary/10 rounded-lg">
+<span class="text-sm font-bold text-primary">21</span>
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 size-1.5 rounded-full bg-status-green"></div>
+</div>
+<div class="relative py-1">
+<span class="text-sm font-medium">22</span>
+</div>
+</div>
+</div>
+<div class="flex justify-center gap-4 mt-3">
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-status-green"></div>
+<span class="text-[10px] text-slate-500 font-medium">Present</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-status-red"></div>
+<span class="text-[10px] text-slate-500 font-medium">Absent</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-status-yellow"></div>
+<span class="text-[10px] text-slate-500 font-medium">Leave</span>
+</div>
+</div>
+</section>
+<!-- Leave Management Section -->
+<section class="mt-8 mb-4">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-lg font-bold">Leave Balance</h3>
+<button class="text-primary text-sm font-bold flex items-center gap-1">
+                        History <span class="material-symbols-outlined text-sm">history</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Casual Leave Progress -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Casual Leave</span>
+<span class="text-xs font-bold text-slate-500">4 / 12 Days</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 33.33%"></div>
+</div>
+</div>
+<!-- Sick Leave Progress -->
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-100 dark:border-slate-700">
+<div class="flex justify-between items-center mb-2">
+<span class="text-sm font-semibold">Sick Leave</span>
+<span class="text-xs font-bold text-slate-500">2 / 6 Days</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 33.33%"></div>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 border-2 border-primary/30 text-primary font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined">add_box</span>
+                    Apply Leave
+                </button>
+</section>
+</main>
+<!-- Navy Bottom Navigation -->
+<nav class="absolute bottom-0 left-0 right-0 bg-[#0d1b2a] pt-3 pb-8 px-6 rounded-t-3xl flex justify-between items-center shadow-[0_-10px_20px_rgba(0,0,0,0.1)]">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">biotech</span>
+<span class="text-[10px] font-medium">Collections</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-white" href="#">
+<div class="relative">
+<span class="material-symbols-outlined fill-1">calendar_today</span>
+<div class="absolute -top-1 -right-1 size-2 bg-status-red rounded-full border-2 border-[#0d1b2a]"></div>
+</div>
+<span class="text-[10px] font-bold">Attendance</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+<span class="text-[10px] font-medium">Support</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-medium">Profile</span>
+</a>
+</nav>
+<!-- Home Indicator (iOS) -->
+<div class="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full"></div>
+</div>
+</body></html>
