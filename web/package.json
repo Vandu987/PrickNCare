@@ -1,0 +1,17 @@
+{
+  "name": "prickncare-web",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "dev:admin": "turbo dev --filter=admin",
+    "dev:client": "turbo dev --filter=client",
+    "build:admin": "turbo build --filter=admin",
+    "build:client": "turbo build --filter=client"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0"
+  },
+  "packageManager": "pnpm@10.15.1"
+}

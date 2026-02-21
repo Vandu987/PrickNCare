@@ -1,0 +1,11 @@
+{
+  "name": "@prickncare/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./tailwind/index.js",
+  "exports": {
+    "./tailwind": "./tailwind/index.js",
+    "./eslint": "./eslint/index.js",
+    "./typescript": "./typescript/tsconfig.json"
+  }
+}

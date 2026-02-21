@@ -24,6 +24,7 @@ htmlcov/
 # ========================
 node_modules/
 .next/
+.turbo/
 out/
 npm-debug.log*
 yarn-debug.log*
