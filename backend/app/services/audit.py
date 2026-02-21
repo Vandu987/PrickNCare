@@ -11,6 +11,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.masking import mask_dict
 from app.models.audit import AuditLog
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,12 @@ class AuditService:
         user_agent: str | None = None,
     ) -> AuditLog:
         """Create and flush an audit log entry."""
+        # Mask sensitive fields in change-tracking payloads
+        if old_value:
+            old_value = mask_dict(old_value)
+        if new_value:
+            new_value = mask_dict(new_value)
+
         entry = AuditLog(
             user_id=user_id,
             action=action,
