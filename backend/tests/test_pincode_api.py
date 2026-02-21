@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import io
 import uuid
 from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
@@ -59,9 +58,7 @@ def _make_zone(name: str = "Zone A", city: City | None = None) -> Zone:
     return zone
 
 
-def _make_pincode(
-    pincode: str = "400001", zone: Zone | None = None
-) -> Pincode:
+def _make_pincode(pincode: str = "400001", zone: Zone | None = None) -> Pincode:
     if zone is None:
         zone = _make_zone()
     p = MagicMock(spec=Pincode)
@@ -100,6 +97,7 @@ def _setup_overrides(user: User, mock_db: MockDB) -> None:
 
 def _setup_no_auth(mock_db: MockDB) -> None:
     """Setup DB override without auth for public endpoints."""
+
     async def _fake_db():
         yield mock_db
 
@@ -561,7 +559,11 @@ class TestCSVImport:
 
         _setup_overrides(ADMIN_USER, mock_db)
 
-        csv_content = "city,zone,pincode,locality\nMumbai,Zone A,400001,Colaba\nMumbai,Zone A,400002,Andheri\n"
+        csv_content = (
+            "city,zone,pincode,locality\n"
+            "Mumbai,Zone A,400001,Colaba\n"
+            "Mumbai,Zone A,400002,Andheri\n"
+        )
 
         async with await _client() as ac:
             resp = await ac.post(

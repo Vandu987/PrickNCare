@@ -1,4 +1,4 @@
-"""City, Zone & Pincode CRUD endpoints — tasks 5.1, 5.2 & 5.3."""
+"""City, Zone, Pincode & Locality CRUD endpoints — tasks 5.1–5.4."""
 
 from __future__ import annotations
 
@@ -16,6 +16,7 @@ from app.core.database import get_db
 from app.models.users import User
 from app.models.zones import City, Locality, Pincode, Zone
 from app.schemas.zone import (
+    BulkLocalityCreate,
     BulkPincodeCreate,
     CityCreate,
     CityListResponse,
@@ -23,6 +24,9 @@ from app.schemas.zone import (
     CityServiceableUpdate,
     CityUpdate,
     ImportSummaryResponse,
+    LocalityCreate,
+    LocalityListResponse,
+    LocalityResponse,
     PincodeCreate,
     PincodeListResponse,
     PincodeResponse,
@@ -708,3 +712,164 @@ async def import_zones_csv(
         "errors": errors,
         "error_details": error_details,
     }
+
+
+# ── Locality CRUD endpoints — task 5.4 ──────────────────────────────────
+
+locality_router = APIRouter(prefix="/localities", tags=["localities"])
+
+
+def _locality_to_response(loc: Locality) -> dict:
+    return {
+        "id": loc.id,
+        "name": loc.name,
+        "pincode_id": loc.pincode_id,
+        "pincode": loc.pincode.pincode,
+        "zone_name": loc.pincode.zone.name,
+    }
+
+
+@locality_router.post(
+    "", response_model=LocalityResponse, status_code=status.HTTP_201_CREATED
+)
+async def create_locality(
+    body: LocalityCreate,
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(require_roles("super_admin")),
+) -> dict:
+    # Validate pincode exists
+    result = await db.execute(
+        select(Pincode)
+        .where(Pincode.id == body.pincode_id)
+        .options(selectinload(Pincode.zone))
+    )
+    pincode = result.scalar_one_or_none()
+    if pincode is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Pincode not found"
+        )
+
+    # Check uniqueness
+    existing = await db.execute(
+        select(Locality).where(
+            Locality.pincode_id == body.pincode_id,
+            func.lower(Locality.name) == body.name.strip().lower(),
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Locality '{body.name}' already exists for this pincode",
+        )
+
+    locality = Locality(name=body.name.strip(), pincode_id=body.pincode_id)
+    db.add(locality)
+    await db.commit()
+    await db.refresh(locality)
+
+    return {
+        "id": locality.id,
+        "name": locality.name,
+        "pincode_id": locality.pincode_id,
+        "pincode": pincode.pincode,
+        "zone_name": pincode.zone.name,
+    }
+
+
+@locality_router.post("/bulk", response_model=ImportSummaryResponse)
+async def bulk_create_localities(
+    body: BulkLocalityCreate,
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(require_roles("super_admin")),
+) -> dict:
+    created = 0
+    errors = 0
+    error_details: list[str] = []
+
+    for item in body.localities:
+        # Check pincode exists
+        pc_result = await db.execute(
+            select(Pincode).where(Pincode.id == item.pincode_id)
+        )
+        if pc_result.scalar_one_or_none() is None:
+            errors += 1
+            error_details.append(f"Pincode not found for locality '{item.name}'")
+            continue
+
+        # Skip duplicates
+        existing = await db.execute(
+            select(Locality).where(
+                Locality.pincode_id == item.pincode_id,
+                func.lower(Locality.name) == item.name.strip().lower(),
+            )
+        )
+        if existing.scalar_one_or_none() is not None:
+            errors += 1
+            error_details.append(f"Locality '{item.name}' already exists, skipped")
+            continue
+
+        locality = Locality(name=item.name.strip(), pincode_id=item.pincode_id)
+        db.add(locality)
+        created += 1
+
+    await db.commit()
+
+    return {
+        "total_rows": len(body.localities),
+        "created": created,
+        "errors": errors,
+        "error_details": error_details,
+    }
+
+
+@locality_router.get("", response_model=LocalityListResponse)
+async def list_localities(
+    pincode_id: uuid.UUID | None = Query(None),
+    pincode: str | None = Query(None),
+    search: str | None = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    db: AsyncSession = Depends(get_db),
+    _user: User = Depends(require_roles("super_admin", "city_admin")),
+) -> dict:
+    query = select(Locality).options(
+        selectinload(Locality.pincode).selectinload(Pincode.zone)
+    )
+    count_query = select(func.count()).select_from(Locality)
+
+    if pincode_id is not None:
+        query = query.where(Locality.pincode_id == pincode_id)
+        count_query = count_query.where(Locality.pincode_id == pincode_id)
+
+    if pincode is not None:
+        query = query.join(Pincode).where(Pincode.pincode == pincode)
+        count_query = count_query.join(Pincode).where(Pincode.pincode == pincode)
+
+    if search:
+        query = query.where(Locality.name.ilike(f"%{search}%"))
+        count_query = count_query.where(Locality.name.ilike(f"%{search}%"))
+
+    total = (await db.execute(count_query)).scalar_one()
+    result = await db.execute(query.offset(skip).limit(limit).order_by(Locality.name))
+    localities = list(result.scalars().all())
+
+    items = [_locality_to_response(loc) for loc in localities]
+    return {"items": items, "total": total}
+
+
+@locality_router.get("/by-pincode/{pincode}")
+async def get_localities_by_pincode(
+    pincode: str,
+    db: AsyncSession = Depends(get_db),
+) -> list[dict]:
+    """Get all localities for a pincode string. No auth required (for order forms)."""
+    result = await db.execute(
+        select(Locality)
+        .join(Pincode)
+        .where(Pincode.pincode == pincode)
+        .options(selectinload(Locality.pincode).selectinload(Pincode.zone))
+        .order_by(Locality.name)
+    )
+    localities = list(result.scalars().all())
+
+    return [_locality_to_response(loc) for loc in localities]

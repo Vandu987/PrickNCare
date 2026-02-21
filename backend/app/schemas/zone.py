@@ -127,3 +127,30 @@ class ImportSummaryResponse(BaseModel):
     created: int
     errors: int
     error_details: list[str]
+
+
+# ── Locality schemas ─────────────────────────────────────────────────────
+
+
+class LocalityCreate(BaseModel):
+    name: str
+    pincode_id: uuid.UUID
+
+
+class BulkLocalityCreate(BaseModel):
+    localities: list[LocalityCreate]
+
+
+class LocalityResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    name: str
+    pincode_id: uuid.UUID
+    pincode: str
+    zone_name: str
+
+
+class LocalityListResponse(BaseModel):
+    items: list[LocalityResponse]
+    total: int
