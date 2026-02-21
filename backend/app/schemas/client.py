@@ -73,6 +73,37 @@ class ClientListResponse(BaseModel):
 # ── Rate schemas (task 4.2) ──────────────────────────────────────────────
 
 
+# ── ClientUser schemas (task 4.3) ────────────────────────────────────────
+
+
+class ClientUserCreate(BaseModel):
+    email: str
+    phone: str
+    is_primary: bool = False
+
+
+class ClientUserResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    client_id: uuid.UUID
+    user_id: uuid.UUID
+    is_primary: bool
+    email: str
+    phone: str
+    is_active: bool
+
+
+class ClientUserListResponse(BaseModel):
+    items: list[ClientUserResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+# ── Rate schemas (task 4.2) ──────────────────────────────────────────────
+
+
 class ClientRateUpdate(BaseModel):
     rate_first_collection: Decimal | None = None
     rate_second_collection: Decimal | None = None

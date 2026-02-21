@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+import secrets
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -11,8 +13,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import require_roles
 from app.core.database import get_db
 from app.models.client_rate_history import ClientRateHistory
-from app.models.clients import Client
-from app.models.users import User
+from app.models.clients import Client, ClientUser
+from app.models.users import User, UserRole
 from app.schemas.client import (
     ClientCreate,
     ClientListResponse,
@@ -20,7 +22,12 @@ from app.schemas.client import (
     ClientRateUpdate,
     ClientResponse,
     ClientUpdate,
+    ClientUserCreate,
+    ClientUserListResponse,
+    ClientUserResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -263,3 +270,149 @@ async def get_client_rate_history(
         "page": (skip // limit) + 1,
         "page_size": limit,
     }
+
+
+# ── ClientUser endpoints (task 4.3) ─────────────────────────────────────
+
+
+def _client_user_to_response(cu: ClientUser) -> dict:
+    """Flatten ClientUser + User into ClientUserResponse shape."""
+    return {
+        "id": cu.id,
+        "client_id": cu.client_id,
+        "user_id": cu.user_id,
+        "is_primary": cu.is_primary,
+        "email": cu.user.email,
+        "phone": cu.user.phone,
+        "is_active": cu.user.is_active,
+    }
+
+
+@router.post(
+    "/{client_id}/users",
+    response_model=ClientUserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_client_user(
+    client_id: uuid.UUID,
+    body: ClientUserCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> dict:
+    # Verify client exists
+    result = await db.execute(select(Client).where(Client.id == client_id))
+    client = result.scalar_one_or_none()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    # Validate email uniqueness
+    existing = await db.execute(select(User).where(User.email == body.email))
+    if existing.scalar_one_or_none():
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Generate temp password
+    temp_password = secrets.token_urlsafe(12)
+    logger.info("Temp password for %s: %s", body.email, temp_password)
+
+    # Create user
+    user = User(
+        email=body.email,
+        phone=body.phone,
+        role=UserRole.CLIENT_USER,
+    )
+    user.set_password(temp_password)
+    db.add(user)
+    await db.flush()
+
+    # Create client-user link
+    client_user = ClientUser(
+        client_id=client_id,
+        user_id=user.id,
+        is_primary=body.is_primary,
+    )
+    db.add(client_user)
+    await db.commit()
+    await db.refresh(client_user)
+    await db.refresh(user)
+
+    return _client_user_to_response(client_user)
+
+
+@router.get("/{client_id}/users", response_model=ClientUserListResponse)
+async def list_client_users(
+    client_id: uuid.UUID,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_read_roles),
+) -> dict:
+    # Verify client exists
+    result = await db.execute(select(Client).where(Client.id == client_id))
+    if not result.scalar_one_or_none():
+        raise HTTPException(status_code=404, detail="Client not found")
+
+    # client_user can only see their own org
+    if current_user.role == UserRole.CLIENT_USER:
+        own_link = await db.execute(
+            select(ClientUser).where(
+                ClientUser.client_id == client_id,
+                ClientUser.user_id == current_user.id,
+            )
+        )
+        if not own_link.scalar_one_or_none():
+            raise HTTPException(status_code=403, detail="Insufficient permissions")
+
+    base = select(ClientUser).where(ClientUser.client_id == client_id)
+
+    count_q = (
+        select(func.count())
+        .select_from(ClientUser)
+        .where(ClientUser.client_id == client_id)
+    )
+    total = (await db.execute(count_q)).scalar_one()
+
+    items_q = base.offset(skip).limit(limit)
+    rows = (await db.execute(items_q)).scalars().all()
+
+    # Eagerly load user relationships
+    for cu in rows:
+        await db.refresh(cu, ["user"])
+
+    return {
+        "items": [_client_user_to_response(cu) for cu in rows],
+        "total": total,
+        "page": (skip // limit) + 1,
+        "page_size": limit,
+    }
+
+
+@router.delete(
+    "/{client_id}/users/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_client_user(
+    client_id: uuid.UUID,
+    user_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(_admin_roles),
+) -> None:
+    # Find client-user link
+    result = await db.execute(
+        select(ClientUser).where(
+            ClientUser.client_id == client_id,
+            ClientUser.user_id == user_id,
+        )
+    )
+    client_user = result.scalar_one_or_none()
+    if not client_user:
+        raise HTTPException(status_code=404, detail="Client user not found")
+
+    # Deactivate the user
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+    if user:
+        user.is_active = False
+
+    # Remove the link
+    await db.delete(client_user)
+    await db.commit()
