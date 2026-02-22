@@ -59,6 +59,10 @@ async def login(
     access_token, jti = create_access_token(str(user.id), user.role.value)
     refresh_token = await create_refresh_token(str(user.id), jti)
 
+    # Initialize session activity so first API call doesn't fail session check
+    from app.core.security import update_last_activity
+    await update_last_activity(str(user.id))
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -97,6 +101,9 @@ async def refresh(
     await revoke_refresh_token(data.user_id, data.jti)
     new_access, new_jti = create_access_token(str(user.id), user.role.value)
     new_refresh = await create_refresh_token(str(user.id), new_jti)
+
+    from app.core.security import update_last_activity
+    await update_last_activity(str(user.id))
 
     return TokenResponse(
         access_token=new_access,
