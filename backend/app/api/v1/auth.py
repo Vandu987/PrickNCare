@@ -1,6 +1,10 @@
 """Authentication endpoints: login, OTP, refresh, logout — tasks 3.3 & 3.4."""
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
