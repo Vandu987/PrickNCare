@@ -1,3 +1,4 @@
+from .attendance import Attendance, AttendanceStatus
 from .audit import AuditLog
 from .base import Base, TimestampMixin, UUIDMixin
 from .client_rate_history import ClientRateHistory
@@ -86,4 +87,6 @@ __all__ = [
     "DiscrepancyCategory",
     "NotificationLog",
     "NotificationTemplate",
+    "Attendance",
+    "AttendanceStatus",
 ]
