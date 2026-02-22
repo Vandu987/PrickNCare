@@ -73,9 +73,9 @@ const clientSchema = z.object({
   contact_email: z.string().email("Valid email required"),
   city: z.string().min(1, "City is required"),
   address: z.string().min(1, "Address is required"),
-  rate_first_collection: z.coerce.number().min(0, "Must be >= 0"),
-  rate_second_collection: z.coerce.number().min(0, "Must be >= 0"),
-  rate_priority: z.coerce.number().min(0, "Must be >= 0"),
+  rate_first_collection: z.number().min(0, "Must be >= 0"),
+  rate_second_collection: z.number().min(0, "Must be >= 0"),
+  rate_priority: z.number().min(0, "Must be >= 0"),
   status: z.enum(["active", "inactive", "suspended"]),
 });
 
