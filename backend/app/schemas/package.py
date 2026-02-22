@@ -43,6 +43,7 @@ class PackageResponse(BaseModel):
     sample_types: list[str]
     base_price: float
     is_active: bool
+    client_id: uuid.UUID | None = None
     created_at: datetime
     updated_at: datetime
 

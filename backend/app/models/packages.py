@@ -35,6 +35,9 @@ class Package(UUIDMixin, TimestampMixin, Base):
     sample_types: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     base_price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    client_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("clients.id", ondelete="CASCADE"), nullable=True, default=None, index=True
+    )  # NULL = master package, set = client-specific
 
     # Relationships
     order_packages: Mapped[list["OrderPackage"]] = relationship(

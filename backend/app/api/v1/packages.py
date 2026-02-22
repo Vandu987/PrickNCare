@@ -251,7 +251,7 @@ async def bulk_import_packages(
 async def create_package(
     body: PackageCreate,
     db: AsyncSession = Depends(get_db),
-    _user: User = Depends(_super_admin),
+    user: User = Depends(require_roles("super_admin", "client_user")),
 ) -> Package:
     # Check code uniqueness
     existing = await db.execute(select(Package).where(Package.code == body.code))
@@ -264,6 +264,18 @@ async def create_package(
     data = body.model_dump()
     # Convert SampleType enums to strings for JSON storage
     data["sample_types"] = [st.value for st in data["sample_types"]]
+
+    # Client users can only create packages scoped to their client
+    if user.role == UserRole.CLIENT_USER:
+        from app.models.clients import ClientUser
+        cu = await db.execute(
+            select(ClientUser.client_id).where(ClientUser.user_id == user.id).limit(1)
+        )
+        client_id = cu.scalar_one_or_none()
+        if not client_id:
+            raise HTTPException(status_code=403, detail="No client association found")
+        data["client_id"] = client_id
+
     package = Package(**data)
     db.add(package)
     await db.commit()
@@ -279,10 +291,23 @@ async def list_packages(
     sample_type: SampleType | None = Query(None),
     is_active: bool | None = Query(None),
     db: AsyncSession = Depends(get_db),
-    _user: User = Depends(require_roles("super_admin", "city_admin", "client_user")),
+    user: User = Depends(require_roles("super_admin", "city_admin", "client_user", "PHLEBOTOMIST")),
 ) -> dict:
     query = select(Package)
     count_query = select(func.count()).select_from(Package)
+
+    # Client users see master packages (client_id=NULL) + their own
+    if user.role == UserRole.CLIENT_USER:
+        from app.models.clients import ClientUser
+        cu = await db.execute(
+            select(ClientUser.client_id).where(ClientUser.user_id == user.id).limit(1)
+        )
+        client_id = cu.scalar_one_or_none()
+        scope = Package.client_id.is_(None)
+        if client_id:
+            scope = scope | (Package.client_id == client_id)
+        query = query.where(scope)
+        count_query = count_query.where(scope)
 
     if search:
         pattern = f"%{search}%"
