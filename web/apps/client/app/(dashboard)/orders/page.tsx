@@ -103,7 +103,7 @@ export default function OrdersPage() {
       if (dateFrom) params.scheduled_date_after = dateFrom;
       if (dateTo) params.scheduled_date_before = dateTo;
 
-      const { data } = await api.get("/orders/", { params });
+      const { data } = await api.get("/orders", { params });
       return data;
     },
   });

@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const { data: stats, isLoading: statsLoading } = useQuery<DashboardStats>({
     queryKey: ["dashboard-stats"],
     queryFn: async () => {
-      const { data } = await api.get("/orders/stats/");
+      const { data } = await api.get("/orders/stats");
       return data;
     },
   });
@@ -51,7 +51,7 @@ export default function DashboardPage() {
   >({
     queryKey: ["recent-orders"],
     queryFn: async () => {
-      const { data } = await api.get("/orders/", {
+      const { data } = await api.get("/orders", {
         params: { page_size: 10, ordering: "-created_at" },
       });
       return data;

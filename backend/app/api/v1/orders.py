@@ -576,6 +576,42 @@ async def bulk_assign_orders(
     return BulkAssignResult(success=success, failed=failed)
 
 
+@router.get("/stats")
+async def order_stats(
+    user: User = Depends(
+        require_roles("super_admin", "city_admin", "client_user")
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Return summary stats for orders visible to the current user."""
+    from sqlalchemy import func as fn
+
+    base = select(Order)
+    if user.role == UserRole.CLIENT_USER:
+        from app.models.clients import ClientUser
+        cu_q = select(ClientUser.client_id).where(ClientUser.user_id == user.id)
+        base = base.where(Order.client_id.in_(cu_q))
+
+    total = (await db.execute(select(fn.count()).select_from(base.subquery()))).scalar() or 0
+    pending = (await db.execute(
+        select(fn.count()).select_from(
+            base.where(Order.status == OrderStatus.PENDING).subquery()
+        )
+    )).scalar() or 0
+    completed = (await db.execute(
+        select(fn.count()).select_from(
+            base.where(Order.status == OrderStatus.COMPLETED).subquery()
+        )
+    )).scalar() or 0
+
+    return {
+        "total_orders": total,
+        "pending_orders": pending,
+        "completed_orders": completed,
+        "total_revenue": 0,
+    }
+
+
 @router.get(
     "/{order_id}",
     response_model=OrderDetailResponse,

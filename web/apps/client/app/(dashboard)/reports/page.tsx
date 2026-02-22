@@ -93,7 +93,7 @@ export default function ReportsPage() {
   >({
     queryKey: ["reports-daily", dateFrom, dateTo],
     queryFn: async () => {
-      const { data } = await api.get("/reports/daily-collection/", {
+      const { data } = await api.get("/reports/daily-collection", {
         params: queryParams,
       });
       return Array.isArray(data) ? data : data.results ?? [];
@@ -105,7 +105,7 @@ export default function ReportsPage() {
   >({
     queryKey: ["reports-revenue", dateFrom, dateTo],
     queryFn: async () => {
-      const { data } = await api.get("/reports/revenue/", {
+      const { data } = await api.get("/reports/revenue", {
         params: queryParams,
       });
       return Array.isArray(data) ? data : data.results ?? [];
@@ -117,7 +117,7 @@ export default function ReportsPage() {
   >({
     queryKey: ["reports-client", dateFrom, dateTo],
     queryFn: async () => {
-      const { data } = await api.get("/reports/client-wise/", {
+      const { data } = await api.get("/reports/client-wise", {
         params: queryParams,
       });
       return Array.isArray(data) ? data : data.results ?? [];
@@ -175,7 +175,7 @@ export default function ReportsPage() {
 
   async function handleExport() {
     try {
-      const { data } = await api.get("/reports/export/", {
+      const { data } = await api.get("/reports/export", {
         params: queryParams,
         responseType: "blob",
       });
