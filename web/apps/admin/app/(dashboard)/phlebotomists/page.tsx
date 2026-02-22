@@ -53,12 +53,14 @@ interface Phlebotomist {
 }
 
 interface PhlebotomistsResponse {
-  data: Phlebotomist[];
+  data?: Phlebotomist[];
+  items?: Phlebotomist[];
   total: number;
 }
 
 interface ZonesResponse {
-  data: Zone[];
+  data?: Zone[];
+  items?: Zone[];
 }
 
 // ---- Schema ----
@@ -111,7 +113,7 @@ export default function PhlebotomistsPage() {
     queryFn: fetchZones,
   });
 
-  const zones = zonesData?.data ?? [];
+  const zones = zonesData?.items ?? zonesData?.data ?? [];
 
   const createMutation = useMutation({
     mutationFn: createPhlebotomist,
@@ -335,7 +337,7 @@ export default function PhlebotomistsPage() {
       {isLoading ? (
         <div className="py-12 text-center text-gray-400">Loading…</div>
       ) : (
-        <DataTable columns={columns} data={phlebData?.data ?? []} />
+        <DataTable columns={columns} data={phlebData?.items ?? phlebData?.data ?? []} />
       )}
     </div>
   );

@@ -235,7 +235,7 @@ export default function BookingsPage() {
     queryFn: fetchClients,
   });
 
-  const phlebotomists = phlebsData?.data ?? [];
+  const phlebotomists = phlebsData?.items ?? .data ?? [];
   const clients = clientsData?.items ?? [];
   const bookings = bookingsData?.items ?? [];
 
