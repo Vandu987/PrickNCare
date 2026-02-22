@@ -19,6 +19,15 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const { data } = await api.post("/auth/login", { email, password });
+      // Check role — only admins allowed
+      try {
+        const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+        if (!['super_admin', 'SUPER_ADMIN', 'city_admin', 'CITY_ADMIN', 'admin'].includes(payload.role)) {
+          setError("Access denied. This portal is for administrators only. Clients should use app.prickncare.com");
+          setLoading(false);
+          return;
+        }
+      } catch { /* proceed if decode fails */ }
       localStorage.setItem("access_token", data.access_token);
       if (data.refresh_token) {
         localStorage.setItem("refresh_token", data.refresh_token);
