@@ -477,12 +477,12 @@ export default function NewOrderPage() {
                           <div className="absolute top-full z-10 mt-1 w-full rounded-md border bg-popover shadow-md">
                             {pincodeSuggestions.map((s, i) => (
                               <button
-                                key={`${s.pincode}-${s.locality}-${i}`}
+                                key={`${s.pincode}-${s.zone_name}-${i}`}
                                 type="button"
                                 className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
                                 onClick={() => selectPincode(s)}
                               >
-                                {s.pincode} — {s.locality}, {s.city}
+                                {s.pincode} — {s.zone_name}, {s.city_name}
                               </button>
                             ))}
                           </div>
@@ -511,10 +511,10 @@ export default function NewOrderPage() {
                           <SelectContent>
                             {localities.map((l, i) => (
                               <SelectItem
-                                key={`${l.locality}-${i}`}
-                                value={l.locality}
+                                key={`${l.locality ?? i}-${i}`}
+                                value={l.locality ?? ""}
                               >
-                                {l.locality}
+                                {l.locality ?? "Unknown"}
                               </SelectItem>
                             ))}
                           </SelectContent>
