@@ -121,7 +121,7 @@ async function updateRates(id: string, values: RateValues): Promise<Client> {
 
 async function fetchClientUsers(id: string): Promise<ClientUser[]> {
   const { data } = await api.get(`/clients/${id}/users`);
-  return data.data ?? data;
+  return data.items ?? data.data ?? data;
 }
 
 async function addClientUser(id: string, values: AddUserValues): Promise<ClientUser> {
