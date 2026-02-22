@@ -242,7 +242,7 @@ async def update_phlebotomist(
     return phlebotomist
 
 
-@router.delete("/{phlebotomist_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{phlebotomist_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_phlebotomist(
     phlebotomist_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

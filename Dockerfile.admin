@@ -1,0 +1,21 @@
+FROM node:20-alpine
+RUN corepack enable && corepack prepare pnpm@latest --activate
+WORKDIR /app
+
+# Copy workspace config
+COPY web/package.json web/pnpm-lock.yaml web/pnpm-workspace.yaml ./
+COPY web/packages ./packages
+COPY web/apps/admin ./apps/admin
+
+# Install all deps
+RUN pnpm install
+
+# Build
+WORKDIR /app/apps/admin
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_API_URL=/api
+RUN pnpm build || true
+
+EXPOSE 3000
+ENV PORT=3000
+CMD ["pnpm", "start"]

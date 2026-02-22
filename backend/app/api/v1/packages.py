@@ -369,7 +369,7 @@ async def update_package(
     return package
 
 
-@router.delete("/{package_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{package_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_package(
     package_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

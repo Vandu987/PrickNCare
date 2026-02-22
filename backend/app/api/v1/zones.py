@@ -200,7 +200,7 @@ async def toggle_city_serviceable(
     return city
 
 
-@router.delete("/{city_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{city_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_city(
     city_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -426,7 +426,7 @@ async def toggle_zone_active(
     return _zone_to_response(zone, pincode_count)
 
 
-@zone_router.delete("/{zone_id}", status_code=status.HTTP_204_NO_CONTENT)
+@zone_router.delete("/{zone_id}", status_code=status.HTTP_204_NO_CONTENT, response_model=None)
 async def delete_zone(
     zone_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
