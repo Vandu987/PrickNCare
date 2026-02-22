@@ -71,7 +71,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
     try {
       await _apiClient.post('/auth/otp/request', data: {
-        'phone_number': '+91$phoneNumber',
+        'phone': '+91$phoneNumber',
       });
       state = state.copyWith(
         status: AuthStatus.otpSent,
@@ -90,7 +90,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
     try {
       final response = await _apiClient.post('/auth/otp/verify', data: {
-        'phone_number': '+91$phoneNumber',
+        'phone': '+91$phoneNumber',
         'otp': otp,
       });
 
