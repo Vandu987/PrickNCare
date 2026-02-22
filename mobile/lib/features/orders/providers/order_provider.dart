@@ -100,7 +100,13 @@ class OrdersNotifier extends StateNotifier<OrdersState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final response = await _api.get('/orders/assigned');
-      final data = response.data as List<dynamic>? ?? [];
+      final rawData = response.data;
+      final List<dynamic> data;
+      if (rawData is Map<String, dynamic>) {
+        data = (rawData['items'] as List<dynamic>?) ?? [];
+      } else {
+        data = rawData as List<dynamic>? ?? [];
+      }
       final orders = data.map((e) => Order.fromJson(e as Map<String, dynamic>)).toList();
       state = state.copyWith(orders: orders, isLoading: false);
     } on DioException catch (e) {
