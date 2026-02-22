@@ -136,8 +136,21 @@ async def logout(data: LogoutRequest) -> None:
 
 
 @router.post("/otp/request", status_code=status.HTTP_200_OK)
-async def otp_request(data: OTPRequestSchema) -> dict:
+async def otp_request(
+    data: OTPRequestSchema,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
     """Generate and send a 6-digit OTP to the given phone number."""
+    # Verify phone number belongs to an active user (phlebotomist)
+    result = await db.execute(
+        select(User).where(User.phone == data.phone, User.is_active.is_(True))
+    )
+    if result.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No active account found for this phone number",
+        )
+
     if not await check_otp_rate_limit(data.phone):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
