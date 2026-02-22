@@ -127,8 +127,9 @@ async def update_last_activity(user_id: str) -> None:
 
 
 async def is_session_expired(user_id: str) -> bool:
-    """Return True if the session has timed out (no recent activity)."""
-    return not await redis_exists(f"{_ACTIVITY_PREFIX}{user_id}")
+    """Return True if the session has timed out (no recent activity).
+    Disabled for now — Redis session tracking causes 401s on Railway."""
+    return False
 
 
 async def clear_session(user_id: str) -> None:
