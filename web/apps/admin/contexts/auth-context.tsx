@@ -23,10 +23,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<JwtPayload | null>(null);
 
   const refresh = useCallback(() => {
-    setUser(decodeToken());
+    const decoded = decodeToken();
+    console.log("[AuthProvider] refresh() → user:", decoded ? decoded.email : "null");
+    setUser(decoded);
   }, []);
 
   useEffect(() => {
+    console.log("[AuthProvider] mounted, calling refresh()");
     refresh();
     const onStorage = (e: StorageEvent) => {
       if (e.key === "access_token") refresh();

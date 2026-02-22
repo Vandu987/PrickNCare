@@ -14,12 +14,15 @@ export default function DashboardLayout({
   const router = useRouter();
 
   useEffect(() => {
+    console.log("[DashboardLayout] isAuthenticated:", isAuthenticated);
     if (!isAuthenticated) {
+      console.log("[DashboardLayout] not authenticated → router.replace('/login')");
       router.replace("/login");
     }
   }, [isAuthenticated, router]);
 
   if (!isAuthenticated) {
+    console.log("[DashboardLayout] render → returning null (blank)");
     return null;
   }
 
