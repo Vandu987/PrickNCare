@@ -12,6 +12,7 @@ import '../features/orders/presentation/screens/order_detail_screen.dart';
 import '../features/collection/presentation/screens/collection_screen.dart';
 import '../features/attendance/screens/attendance_screen.dart';
 import '../features/maps/screens/navigation_screen.dart';
+import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/splash/presentation/screens/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -83,6 +84,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = state.pathParameters['id']!;
           return CollectionScreen(orderId: id);
         },
+      ),
+      GoRoute(
+        path: AppConstants.profileRoute,
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: AppConstants.navigationRoute,

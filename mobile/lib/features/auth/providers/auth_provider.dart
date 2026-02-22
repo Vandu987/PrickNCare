@@ -13,12 +13,14 @@ class AuthState {
   final AuthStatus status;
   final String? errorMessage;
   final String? phoneNumber;
+  final String? userName;
   final bool biometricAvailable;
 
   const AuthState({
     this.status = AuthStatus.initial,
     this.errorMessage,
     this.phoneNumber,
+    this.userName,
     this.biometricAvailable = false,
   });
 
@@ -26,12 +28,14 @@ class AuthState {
     AuthStatus? status,
     String? errorMessage,
     String? phoneNumber,
+    String? userName,
     bool? biometricAvailable,
   }) {
     return AuthState(
       status: status ?? this.status,
       errorMessage: errorMessage,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      userName: userName ?? this.userName,
       biometricAvailable: biometricAvailable ?? this.biometricAvailable,
     );
   }
