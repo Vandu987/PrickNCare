@@ -279,7 +279,7 @@ async def list_packages(
     sample_type: SampleType | None = Query(None),
     is_active: bool | None = Query(None),
     db: AsyncSession = Depends(get_db),
-    _user: User = Depends(require_roles("super_admin", "city_admin")),
+    _user: User = Depends(require_roles("super_admin", "city_admin", "client_user")),
 ) -> dict:
     query = select(Package)
     count_query = select(func.count()).select_from(Package)
