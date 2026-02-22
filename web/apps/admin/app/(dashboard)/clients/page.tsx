@@ -477,6 +477,7 @@ export default function ClientsPage() {
                         <FormControl>
                           <input
                             {...field}
+                            onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                             type="number"
                             min={0}
                             step={0.01}
@@ -496,6 +497,7 @@ export default function ClientsPage() {
                         <FormControl>
                           <input
                             {...field}
+                            onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                             type="number"
                             min={0}
                             step={0.01}
@@ -515,6 +517,7 @@ export default function ClientsPage() {
                         <FormControl>
                           <input
                             {...field}
+                            onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                             type="number"
                             min={0}
                             step={0.01}
