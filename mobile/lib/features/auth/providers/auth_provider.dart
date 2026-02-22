@@ -70,7 +70,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> requestOtp(String phoneNumber) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
     try {
-      await _apiClient.post('/auth/request-otp', data: {
+      await _apiClient.post('/auth/otp/request', data: {
         'phone_number': '+91$phoneNumber',
       });
       state = state.copyWith(
@@ -89,7 +89,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> verifyOtp(String phoneNumber, String otp) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
     try {
-      final response = await _apiClient.post('/auth/verify-otp', data: {
+      final response = await _apiClient.post('/auth/otp/verify', data: {
         'phone_number': '+91$phoneNumber',
         'otp': otp,
       });
