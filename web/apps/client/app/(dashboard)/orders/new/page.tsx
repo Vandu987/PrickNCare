@@ -71,10 +71,12 @@ type OrderFormValues = z.infer<typeof orderFormSchema>;
 // ── Interfaces ──
 
 interface PincodeResult {
+  id: string;
   pincode: string;
-  locality: string;
-  city: string;
-  state: string;
+  zone_name: string;
+  city_name: string;
+  locality?: string;
+  city?: string;
 }
 
 interface PricingBreakdown {
@@ -155,7 +157,8 @@ export default function NewOrderPage() {
       const { data } = await api.get("/pincodes/suggest", {
         params: { q: pincodeQuery },
       });
-      return data.results ?? data;
+      const results = data.results ?? data;
+      return results.map((r: PincodeResult) => ({ ...r, city: r.city_name ?? r.city, locality: r.zone_name ?? r.locality }));
     },
     enabled: pincodeQuery.length >= 3,
   });
@@ -213,14 +216,24 @@ export default function NewOrderPage() {
     }
   }
 
-  function selectPincode(result: PincodeResult) {
+  async function selectPincode(result: PincodeResult) {
     form.setValue("pincode", result.pincode);
-    form.setValue("city", result.city);
-    form.setValue("locality", result.locality);
-    setLocalities(
-      pincodeSuggestions.filter((s) => s.pincode === result.pincode)
-    );
+    form.setValue("city", result.city_name ?? result.city ?? "");
     setPincodeQuery("");
+    // Fetch localities for this pincode
+    try {
+      const { data } = await api.get(`/localities/by-pincode/${result.pincode}`);
+      const locs = (data ?? []).map((l: { name: string }) => ({
+        ...result,
+        locality: l.name,
+      }));
+      setLocalities(locs);
+      if (locs.length === 1) {
+        form.setValue("locality", locs[0].locality);
+      }
+    } catch {
+      setLocalities([{ ...result, locality: result.zone_name ?? "Default" }]);
+    }
   }
 
   // ── Package toggle for a patient ──
