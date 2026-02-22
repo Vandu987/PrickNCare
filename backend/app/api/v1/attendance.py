@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.dependencies import get_db
 from app.core.rbac import require_roles
 from app.models.attendance import Attendance, AttendanceStatus
-from app.models.user import User
+from app.models.users import User
 
 router = APIRouter(prefix="/attendance", tags=["attendance"])
 
