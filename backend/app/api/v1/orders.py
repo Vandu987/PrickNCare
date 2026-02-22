@@ -32,6 +32,12 @@ from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User, UserRole
 from app.models.zones import Pincode
 from app.schemas.order import (
+    AutoAssignRequest,
+    AutoAssignResult,
+    BulkAssignFailedItem,
+    BulkAssignRequest,
+    BulkAssignResult,
+    BulkAssignSuccessItem,
     BulkOrderUploadResult,
     BulkRowError,
     CollectionData,
@@ -275,6 +281,300 @@ async def list_orders(
     )
 
 
+@router.post(
+    "/auto-assign",
+    response_model=AutoAssignResult,
+)
+async def auto_assign_orders(
+    payload: AutoAssignRequest | None = None,
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> AutoAssignResult:
+    """Auto-assign PENDING orders using zone matching and workload balancing."""
+    from app.schemas.order import AutoAssignFailure
+
+    # 1. Fetch target orders
+    query = select(Order).where(Order.status == OrderStatus.PENDING)
+    if payload and payload.order_ids:
+        query = query.where(Order.id.in_(payload.order_ids))
+    query = query.order_by(
+        Order.appointment_date.asc(), Order.appointment_time_slot.asc()
+    )
+
+    result = await db.execute(query)
+    orders = list(result.scalars().all())
+
+    assigned_count = 0
+    failures: list[AutoAssignFailure] = []
+
+    for order in orders:
+        # 2. Resolve pincode → zone
+        pin_result = await db.execute(
+            select(Pincode).where(Pincode.id == order.pincode_id)
+        )
+        pincode_row = pin_result.scalar_one_or_none()
+        if pincode_row is None or pincode_row.zone_id is None:
+            failures.append(
+                AutoAssignFailure(
+                    order_id=order.id,
+                    booking_id=order.booking_id,
+                    reason="Pincode has no zone assigned",
+                )
+            )
+            continue
+
+        zone_id = pincode_row.zone_id
+
+        # 3. Find phlebotomists assigned to this zone
+        zone_phleb_result = await db.execute(
+            select(PhlebotomistZoneAssignment.phlebotomist_id).where(
+                PhlebotomistZoneAssignment.zone_id == zone_id
+            )
+        )
+        zone_phleb_ids = [r[0] for r in zone_phleb_result.all()]
+        if not zone_phleb_ids:
+            failures.append(
+                AutoAssignFailure(
+                    order_id=order.id,
+                    booking_id=order.booking_id,
+                    reason="No phlebotomists assigned to zone",
+                )
+            )
+            continue
+
+        # 4. Filter: is_available, is_active, not on leave
+        phleb_result = await db.execute(
+            select(Phlebotomist).where(
+                Phlebotomist.id.in_(zone_phleb_ids),
+                Phlebotomist.is_available.is_(True),
+            )
+        )
+        candidates = list(phleb_result.scalars().all())
+
+        eligible = []
+        for phleb in candidates:
+            # Check user is_active
+            user_result = await db.execute(select(User).where(User.id == phleb.user_id))
+            phleb_user = user_result.scalar_one_or_none()
+            if phleb_user is None or not phleb_user.is_active:
+                continue
+
+            # Check leave
+            leave_result = await db.execute(
+                select(PhlebotomistLeave).where(
+                    PhlebotomistLeave.phlebotomist_id == phleb.id,
+                    PhlebotomistLeave.date == order.appointment_date,
+                    PhlebotomistLeave.status == "approved",
+                )
+            )
+            if leave_result.scalar_one_or_none() is not None:
+                continue
+
+            eligible.append(phleb)
+
+        if not eligible:
+            failures.append(
+                AutoAssignFailure(
+                    order_id=order.id,
+                    booking_id=order.booking_id,
+                    reason="No eligible phlebotomists available",
+                )
+            )
+            continue
+
+        # 5. Workload balancing: pick the one with fewest orders on that day
+        best_phleb = None
+        best_count = float("inf")
+        for phleb in eligible:
+            count_result = await db.execute(
+                select(func.count())
+                .select_from(Order)
+                .where(
+                    Order.assigned_phlebotomist_id == phleb.id,
+                    Order.appointment_date == order.appointment_date,
+                    Order.status.in_(
+                        [
+                            OrderStatus.ASSIGNED,
+                            OrderStatus.ACCEPTED,
+                            OrderStatus.IN_TRANSIT,
+                            OrderStatus.COLLECTED,
+                            OrderStatus.COMPLETED,
+                        ]
+                    ),
+                )
+            )
+            workload = count_result.scalar_one()
+            if workload < best_count:
+                best_count = workload
+                best_phleb = phleb
+
+        # 6. Assign
+        order.assigned_phlebotomist_id = best_phleb.id  # type: ignore[union-attr]
+        order.status = OrderStatus.ASSIGNED
+        order.assigned_at = datetime.now(UTC)
+
+        history = OrderStatusHistory(
+            order_id=order.id,
+            status=OrderStatus.ASSIGNED,
+            changed_by=user.id,
+            notes=f"Auto-assigned to phlebotomist {best_phleb.id}",  # type: ignore[union-attr]
+        )
+        db.add(history)
+        assigned_count += 1
+
+    await db.commit()
+
+    return AutoAssignResult(
+        total_processed=len(orders),
+        assigned=assigned_count,
+        failed=len(failures),
+        failures=failures,
+    )
+
+
+@router.post(
+    "/bulk-assign",
+    response_model=BulkAssignResult,
+)
+async def bulk_assign_orders(
+    payload: BulkAssignRequest,
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> BulkAssignResult:
+    """Bulk-assign phlebotomists to orders. Each pair processed individually."""
+    success: list[BulkAssignSuccessItem] = []
+    failed: list[BulkAssignFailedItem] = []
+
+    for item in payload.assignments:
+        try:
+            # Fetch order
+            result = await db.execute(select(Order).where(Order.id == item.order_id))
+            order = result.scalar_one_or_none()
+            if order is None:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id, reason="Order not found"
+                    )
+                )
+                continue
+
+            if order.status != OrderStatus.PENDING:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id,
+                        reason=f"Order status is {order.status.value}, must be pending",
+                    )
+                )
+                continue
+
+            # Fetch phlebotomist
+            phleb_result = await db.execute(
+                select(Phlebotomist).where(Phlebotomist.id == item.phlebotomist_id)
+            )
+            phleb = phleb_result.scalar_one_or_none()
+            if phleb is None:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id, reason="Phlebotomist not found"
+                    )
+                )
+                continue
+
+            if not phleb.is_available:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id,
+                        reason="Phlebotomist is not available",
+                    )
+                )
+                continue
+
+            # Check user is_active
+            phleb_user_result = await db.execute(
+                select(User).where(User.id == phleb.user_id)
+            )
+            phleb_user = phleb_user_result.scalar_one_or_none()
+            if phleb_user is None or not phleb_user.is_active:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id,
+                        reason="Phlebotomist user account is not active",
+                    )
+                )
+                continue
+
+            # Zone validation
+            pincode_result = await db.execute(
+                select(Pincode).where(Pincode.id == order.pincode_id)
+            )
+            pincode_row = pincode_result.scalar_one()
+
+            zone_check = await db.execute(
+                select(PhlebotomistZoneAssignment).where(
+                    PhlebotomistZoneAssignment.phlebotomist_id == phleb.id,
+                    PhlebotomistZoneAssignment.zone_id == pincode_row.zone_id,
+                )
+            )
+            if zone_check.scalar_one_or_none() is None:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id,
+                        reason="Phlebotomist is not assigned to the order's zone",
+                    )
+                )
+                continue
+
+            # Leave check
+            leave_result = await db.execute(
+                select(PhlebotomistLeave).where(
+                    PhlebotomistLeave.phlebotomist_id == phleb.id,
+                    PhlebotomistLeave.date == order.appointment_date,
+                    PhlebotomistLeave.status == "approved",
+                )
+            )
+            if leave_result.scalar_one_or_none() is not None:
+                failed.append(
+                    BulkAssignFailedItem(
+                        order_id=item.order_id,
+                        reason="Phlebotomist is on leave for the appointment date",
+                    )
+                )
+                continue
+
+            # Assign
+            order.assigned_phlebotomist_id = phleb.id
+            order.status = OrderStatus.ASSIGNED
+            order.assigned_at = datetime.now(UTC)
+
+            history = OrderStatusHistory(
+                order_id=order.id,
+                status=OrderStatus.ASSIGNED,
+                changed_by=user.id,
+                notes=f"Bulk assigned to phlebotomist {phleb.id}",
+            )
+            db.add(history)
+
+            # Get phlebotomist name
+            phleb_name = (
+                phleb_user.full_name
+                if hasattr(phleb_user, "full_name")
+                else phleb_user.email
+            )
+            success.append(
+                BulkAssignSuccessItem(
+                    order_id=item.order_id, phlebotomist_name=phleb_name
+                )
+            )
+
+        except Exception as exc:
+            failed.append(BulkAssignFailedItem(order_id=item.order_id, reason=str(exc)))
+
+    if success:
+        await db.commit()
+
+    return BulkAssignResult(success=success, failed=failed)
+
+
 @router.get(
     "/{order_id}",
     response_model=OrderDetailResponse,
@@ -452,6 +752,113 @@ async def assign_order(
         status=OrderStatus.ASSIGNED,
         changed_by=user.id,
         notes=f"Manually assigned to phlebotomist {phleb.id}",
+    )
+    db.add(history)
+
+    await db.commit()
+    await db.refresh(order)
+    return order
+
+
+@router.post(
+    "/{order_id}/reroute",
+    response_model=OrderResponse,
+)
+async def reroute_order(
+    order_id: uuid.UUID,
+    payload: RerouteRequest,
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> Order:
+    """Re-route an order to a different phlebotomist."""
+
+    # 1. Fetch order
+    result = await db.execute(select(Order).where(Order.id == order_id))
+    order = result.scalar_one_or_none()
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+
+    # 2. Order must be ASSIGNED or ACCEPTED
+    if order.status not in (OrderStatus.ASSIGNED, OrderStatus.ACCEPTED):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Order status is {order.status.value}, must be assigned or accepted",
+        )
+
+    # 3. Fetch new phlebotomist
+    phleb_result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == payload.new_phlebotomist_id)
+    )
+    phleb = phleb_result.scalar_one_or_none()
+    if phleb is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Phlebotomist not found",
+        )
+
+    # 4. Check is_available
+    if not phleb.is_available:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is not available",
+        )
+
+    # 5. Check user is_active
+    phleb_user_result = await db.execute(select(User).where(User.id == phleb.user_id))
+    phleb_user = phleb_user_result.scalar_one_or_none()
+    if phleb_user is None or not phleb_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist user account is not active",
+        )
+
+    # 6. Zone validation
+    pincode_result = await db.execute(
+        select(Pincode).where(Pincode.id == order.pincode_id)
+    )
+    pincode_row = pincode_result.scalar_one()
+
+    zone_check = await db.execute(
+        select(PhlebotomistZoneAssignment).where(
+            PhlebotomistZoneAssignment.phlebotomist_id == phleb.id,
+            PhlebotomistZoneAssignment.zone_id == pincode_row.zone_id,
+        )
+    )
+    if zone_check.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is not assigned to the order's zone",
+        )
+
+    # 7. Leave check
+    leave_result = await db.execute(
+        select(PhlebotomistLeave).where(
+            PhlebotomistLeave.phlebotomist_id == phleb.id,
+            PhlebotomistLeave.date == order.appointment_date,
+            PhlebotomistLeave.status == "approved",
+        )
+    )
+    if leave_result.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is on leave for the appointment date",
+        )
+
+    # 8. Update assignment
+    old_phleb_id = order.assigned_phlebotomist_id
+    order.assigned_phlebotomist_id = phleb.id
+    order.status = OrderStatus.ASSIGNED
+    order.assigned_at = datetime.now(UTC)
+
+    # 9. Log history with reroute reason
+    history = OrderStatusHistory(
+        order_id=order.id,
+        status=OrderStatus.ASSIGNED,
+        changed_by=user.id,
+        notes=f"Rerouted from {old_phleb_id} to {phleb.id}: {payload.reason}",
     )
     db.add(history)
 

@@ -161,6 +161,52 @@ class RejectReason(BaseModel):
     reason: str
 
 
+class AutoAssignFailure(BaseModel):
+    order_id: uuid.UUID
+    booking_id: str
+    reason: str
+
+
+class AutoAssignRequest(BaseModel):
+    order_ids: list[uuid.UUID] | None = None
+
+
+class AutoAssignResult(BaseModel):
+    total_processed: int
+    assigned: int
+    failed: int
+    failures: list[AutoAssignFailure] = []
+
+
+class RerouteRequest(BaseModel):
+    new_phlebotomist_id: uuid.UUID
+    reason: str
+
+
+class BulkAssignItem(BaseModel):
+    order_id: uuid.UUID
+    phlebotomist_id: uuid.UUID
+
+
+class BulkAssignRequest(BaseModel):
+    assignments: list[BulkAssignItem]
+
+
+class BulkAssignSuccessItem(BaseModel):
+    order_id: uuid.UUID
+    phlebotomist_name: str
+
+
+class BulkAssignFailedItem(BaseModel):
+    order_id: uuid.UUID
+    reason: str
+
+
+class BulkAssignResult(BaseModel):
+    success: list[BulkAssignSuccessItem]
+    failed: list[BulkAssignFailedItem]
+
+
 class CollectionData(BaseModel):
     payment_amount: float
     payment_mode: str
