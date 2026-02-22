@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Request a Business Demo | Prick &amp; Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13ecc8",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#10221f",
+                        "navy-deep": "#0a1917", // Derived from primary hue
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<!-- Mobile Wrapper -->
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-light dark:bg-background-dark overflow-x-hidden">
+<!-- Header Navigation -->
+<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-50 border-b border-primary/10">
+<button class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center justify-center hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">Request Demo</h2>
+</div>
+<!-- Hero Section (Navy/Teal Accent) -->
+<div class="bg-navy-deep p-6 text-white overflow-hidden relative">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="relative z-10">
+<h1 class="text-3xl font-bold leading-tight tracking-tight mb-4">See Prick &amp; Care in Action</h1>
+<p class="text-primary/90 font-medium mb-6">Empowering diagnostic labs and hospitals with next-gen phlebotomy logistics.</p>
+<!-- Benefit Items -->
+<div class="space-y-4 mb-8">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">monitoring</span>
+<p class="text-slate-100 text-sm leading-snug">Real-time tracking of all samples with integrated temperature monitoring.</p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">payments</span>
+<p class="text-slate-100 text-sm leading-snug">Custom pricing structures optimized for high-volume diagnostic facilities.</p>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">verified_user</span>
+<p class="text-slate-100 text-sm leading-snug">Hospital-grade reliability &amp; HIPAA-compliant data security at every step.</p>
+</div>
+</div>
+<!-- Testimonial Mini-Card -->
+<div class="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
+<p class="text-slate-200 italic text-sm mb-3">"Prick &amp; Care transformed our outpatient workflow completely. Our turnaround times improved by 40%."</p>
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-lg">person</span>
+</div>
+<div>
+<p class="text-white text-xs font-bold">Director of Operations</p>
+<p class="text-slate-400 text-[10px]">City General Hospital</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Form Section -->
+<div class="flex-1 bg-white dark:bg-background-dark rounded-t-3xl -mt-6 relative z-20 px-6 pt-8 pb-12 shadow-2xl">
+<div class="max-w-md mx-auto">
+<div class="mb-8">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Get Started</h3>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Fill out the form below and our team will contact you within 24 hours.</p>
+</div>
+<form class="space-y-5">
+<!-- Full Name -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base" placeholder="Dr. Sarah Jenkins" type="text"/>
+</div>
+<!-- Work Email -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Work Email</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base" placeholder="s.jenkins@hospital.org" type="email"/>
+</div>
+<!-- Phone Number -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Phone Number</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<!-- Lab/Hospital Name -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Lab / Hospital Name</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base" placeholder="Central Diagnostic Lab" type="text"/>
+</div>
+<!-- City -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">City</label>
+<input class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base" placeholder="New York, NY" type="text"/>
+</div>
+<!-- Monthly Volume Dropdown -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Monthly Sample Volume</label>
+<div class="relative">
+<select class="w-full appearance-none rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 pr-10 text-base">
+<option disabled="" selected="" value="">Select volume range</option>
+<option value="0-500">0 - 500 samples</option>
+<option value="500-2000">500 - 2,000 samples</option>
+<option value="2000-5000">2,000 - 5,000 samples</option>
+<option value="5000+">5,000+ samples</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Specific Requirements -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Specific Requirements</label>
+<textarea class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary transition-all p-3 text-base resize-none" placeholder="Tell us about your current challenges..." rows="3"></textarea>
+</div>
+<!-- CTA Button -->
+<div class="pt-4">
+<button class="w-full bg-primary hover:bg-primary/90 text-navy-deep font-bold py-4 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98]" type="submit">
+<span>Schedule My Demo</span>
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<p class="text-center text-[11px] text-slate-400 mt-4 leading-relaxed px-4">
+                            By clicking, you agree to our Terms of Service and Privacy Policy. We value your data security.
+                        </p>
+</div>
+</form>
+</div>
+</div>
+<!-- Trust Logos (Subtle) -->
+<div class="bg-white dark:bg-background-dark px-6 pb-12 border-t border-slate-100 dark:border-slate-900">
+<p class="text-center text-[10px] uppercase tracking-widest text-slate-400 mb-6 mt-8 font-bold">Trusted by leading institutions</p>
+<div class="flex justify-center items-center gap-8 opacity-40 grayscale filter dark:invert">
+<img alt="Partner Logo 1" class="h-6" data-alt="Abstract medical company logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOiIJwctF8Xj5RlsP1xCem7wuS-5mmOEuMk9bqg06LCEOb6QkyvhSQKH8zaE9CR3Dt40sj7H2qTfNqOoZWczFzrifZQC3aNBcRa764W8kdNqRy7h0pYTt06vZ1jMUvdSkiB89haSAv6jXhuiIzaM1z1cXTO49YvUwDU20xZ6celw7jDG7WIgi1-VyGpBidZ5hUyQQjAmVhRVT_jISJx8iVMAE4mqY1gXS7QNeo4juVaYKLnC-_6AmKy9csVRuB4c6fN2gA4tH7gBU"/>
+<img alt="Partner Logo 2" class="h-6" data-alt="Abstract biotech company logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTuEhVq-vUV-D4JGlJ1kY7cwsI4qvglscXeyyaDkx8mP4M-GaT4qmDyyjhjIeDEA8XSqKpnAaH8r6mqzeBJ2j6BhyNd6prLnIay16naM3u1rAe0GZHWDv13FC3TswGLcPXSlp9CjuqqE2JnZXO9dGz8ehd0RcneLhQp6oWG4QOXO2Q_jeVWplqNLD8hfhLNpHcoxewbiBTZwc1i6QhyNdNqo9YNwJySk39Y-l66knRfgwqACBC3-CbMeBnORQFlsoNlgjAGuohNA4"/>
+<img alt="Partner Logo 3" class="h-6" data-alt="Abstract hospital system logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvTBZx-1-Kyc8Tz3bABnhxFPTuBp5Ka6XmS74Mx3Lm9xKoTFzMN4ERc7rMJ41YlHTsKmW-de42mIYgKtd2kgyE-dg9xKAg99OHj-1styoIZi18LfidZJEX8qCNXDV5Lsewte-VT81bjiDxuu1QDI56qcrpGT8c9pbU1lfsMO-QVpEEScqflINYAM1ojfWouIXpH6VvtkkkRymLnsZVpzPNzaCHVrrccQupbP-9XlufAfhxIlHxg93S05XDeSqW99qGxq9yJOx-f5k"/>
+</div>
+</div>
+</div>
+</body></html>

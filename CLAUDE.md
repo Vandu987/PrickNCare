@@ -78,6 +78,7 @@ These are the approved designs — match layout, spacing, colors, and components
 - **Flutter App (Task 13):** Screens `01-*` to `20-*` → See `mobile-flutter.md` for mapping
 - **Admin Panel (Task 12):** Screens `A01-*` to `A10-*` → See `frontend-nextjs.md` for mapping
 - **Client Portal (Task 11):** Screens `C01-*` to `C08-*` → See `frontend-nextjs.md` for mapping
+- **Marketing Website:** Screens `W01-*` to `W07-*` → See `frontend-nextjs.md` for mapping
 
 ## Project Structure
 ```
