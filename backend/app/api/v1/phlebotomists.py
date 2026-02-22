@@ -548,6 +548,7 @@ async def list_leaves(
 @router.delete(
     "/{phlebotomist_id}/leave/{leave_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
 )
 async def cancel_leave(
     phlebotomist_id: uuid.UUID,

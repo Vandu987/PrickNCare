@@ -389,6 +389,7 @@ async def list_client_users(
 @router.delete(
     "/{client_id}/users/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
 )
 async def delete_client_user(
     client_id: uuid.UUID,
