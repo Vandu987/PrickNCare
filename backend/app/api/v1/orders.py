@@ -50,6 +50,7 @@ from app.schemas.order import (
     OrderResponse,
     OrderStatusUpdate,
     RejectReason,
+    RerouteRequest,
     StatusHistoryResponse,
 )
 
@@ -785,7 +786,10 @@ async def reroute_order(
     if order.status not in (OrderStatus.ASSIGNED, OrderStatus.ACCEPTED):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Order status is {order.status.value}, must be assigned or accepted",
+            detail=(
+                f"Order status is {order.status.value},"
+                " must be assigned or accepted"
+            ),
         )
 
     # 3. Fetch new phlebotomist
