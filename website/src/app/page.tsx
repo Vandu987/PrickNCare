@@ -237,7 +237,7 @@ export default function HomePage() {
       </section>
 
       {/* Navy CTA Section */}
-      <section className="px-4 py-16 bg-[#0a1a17] text-white">
+      <section className="px-4 py-16 bg-navy text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-black mb-6 leading-tight">Ready to scale your lab operations?</h2>
           <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto">

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -8,15 +9,15 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
       <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="bg-primary p-1.5 rounded-lg">
-            <span className="material-symbols-outlined text-navy-accent text-2xl">
-              biotech
-            </span>
-          </div>
-          <span className="text-xl font-bold tracking-tight text-navy-accent leading-none">
-            Prick &amp; Care
-          </span>
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/logo.jpeg"
+            alt="Prick & Care"
+            width={160}
+            height={56}
+            className="h-12 w-auto object-contain"
+            priority
+          />
         </Link>
         <div className="flex items-center gap-3">
           {/* Desktop nav links */}

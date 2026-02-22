@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-primary: #13ecc8;
-  --color-background-light: #f6f8f8;
-  --color-background-dark: #10221f;
-  --color-navy-accent: #0d1b19;
-  --color-navy-deep: #0a1917;
+  /* Logo brand colors — Navy Blue + Teal/Mint + Red accent */
+  --color-primary: #2DC5A2;          /* Logo teal/mint — "& CARE" green */
+  --color-primary-dark: #1FA886;     /* Darker teal for hover states */
+  --color-navy: #1B3B6F;             /* Logo navy blue — "PRICK" text */
+  --color-navy-accent: #1B3B6F;      /* Alias for navy — used across components */
+  --color-navy-deep: #132A52;        /* Deeper navy for dark sections */
+  --color-brand-red: #DC2626;        /* Blood drop red accent from logo */
+  --color-background-light: #F4F8F6; /* Slightly teal-tinted off-white */
+  --color-background-dark: #1B3B6F;  /* Navy for dark CTA sections */
   --font-display: "Inter", sans-serif;
   --radius: 0.5rem;
   --radius-lg: 1rem;

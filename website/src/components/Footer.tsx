@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -6,11 +7,14 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-16">
           <div className="col-span-2">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-primary p-1.5 rounded-lg">
-                <span className="material-symbols-outlined text-navy-accent text-2xl">biotech</span>
-              </div>
-              <span className="text-2xl font-bold tracking-tight text-navy-accent">Prick &amp; Care</span>
+            <div className="mb-6">
+              <Image
+                src="/logo.jpeg"
+                alt="Prick & Care"
+                width={180}
+                height={64}
+                className="h-14 w-auto object-contain"
+              />
             </div>
             <p className="text-slate-500 text-sm leading-relaxed max-w-xs mb-6">
               Empowering diagnostic labs and hospitals with technology-driven, reliable phlebotomy and logistics solutions.
