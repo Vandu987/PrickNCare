@@ -70,6 +70,10 @@ class OrderCreate(BaseModel):
         return v
 
 
+class OrderAssignRequest(BaseModel):
+    phlebotomist_id: uuid.UUID
+
+
 class OrderStatusUpdate(BaseModel):
     status: str
     reason: str | None = None
@@ -122,3 +126,50 @@ class OrderListResponse(BaseModel):
     skip: int
     limit: int
     has_more: bool
+
+
+class BulkRowError(BaseModel):
+    row: int
+    errors: list[str]
+
+
+class BulkOrderUploadResult(BaseModel):
+    total_rows: int
+    successful: int
+    failed: int
+    errors: list[BulkRowError]
+    created_order_ids: list[uuid.UUID]
+
+
+class OrderCancelRequest(BaseModel):
+    reason: str
+
+
+class OrderRescheduleRequest(BaseModel):
+    new_date: date
+    new_time_slot: str
+
+    @field_validator("new_date")
+    @classmethod
+    def date_in_future(cls, v: date) -> date:
+        if v < date.today():
+            raise ValueError("new_date must be in the future")
+        return v
+
+
+class RejectReason(BaseModel):
+    reason: str
+
+
+class CollectionData(BaseModel):
+    payment_amount: float
+    payment_mode: str
+    photo_url: str | None = None
+    signature_url: str | None = None
+
+    @field_validator("payment_mode")
+    @classmethod
+    def payment_mode_valid(cls, v: str) -> str:
+        if v not in ("cash", "online", "prepaid"):
+            raise ValueError("payment_mode must be cash, online, or prepaid")
+        return v
