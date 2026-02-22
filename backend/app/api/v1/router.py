@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1.accessioning import router as accessioning_router
+from app.api.v1.attendance import router as attendance_router
 from app.api.v1.audit import router as audit_router
 from app.api.v1.auth import router as auth_router
 from app.api.v1.clients import router as clients_router
@@ -40,3 +41,4 @@ router.include_router(reconciliation_router)
 router.include_router(reports_router)
 router.include_router(files_router)
 router.include_router(audit_router)
+router.include_router(attendance_router)
