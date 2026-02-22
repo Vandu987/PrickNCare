@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     OTP_EXPIRE_MINUTES: int = 5
     OTP_LENGTH: int = 6
     OTP_MAX_ATTEMPTS: int = 3
-    OTP_RATE_LIMIT_PER_HOUR: int = 3
+    OTP_RATE_LIMIT_PER_HOUR: int = 20
 
     # SMS Gateway
     SMS_PROVIDER: str = "msg91"  # msg91 | twilio
