@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import csv
+import io
+import re
 import uuid
 from datetime import UTC, date, datetime
 
@@ -23,6 +26,7 @@ from app.models.orders import (
     PatientTitle,
     PaymentMode,
 )
+from app.models.packages import Package
 from app.models.phlebotomist_leaves import PhlebotomistLeave
 from app.models.phlebotomists import Phlebotomist, PhlebotomistZoneAssignment
 from app.models.users import User, UserRole
@@ -348,6 +352,112 @@ async def update_order_status(
     await db.commit()
     await db.refresh(history)
     return history
+
+
+@router.put(
+    "/{order_id}/assign",
+    response_model=OrderResponse,
+)
+async def assign_order(
+    order_id: uuid.UUID,
+    payload: OrderAssignRequest,
+    user: User = Depends(require_roles("super_admin", "city_admin")),
+    db: AsyncSession = Depends(get_db),
+) -> Order:
+    """Manually assign a phlebotomist to an order with full validation."""
+
+    # 1. Fetch order
+    result = await db.execute(select(Order).where(Order.id == order_id))
+    order = result.scalar_one_or_none()
+    if order is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found",
+        )
+
+    # 2. Order must be PENDING
+    if order.status != OrderStatus.PENDING:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Order status is {order.status.value}, must be pending",
+        )
+
+    # 3. Fetch phlebotomist
+    phleb_result = await db.execute(
+        select(Phlebotomist).where(Phlebotomist.id == payload.phlebotomist_id)
+    )
+    phleb = phleb_result.scalar_one_or_none()
+    if phleb is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Phlebotomist not found",
+        )
+
+    # 4. Check is_available
+    if not phleb.is_available:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is not available",
+        )
+
+    # 5. Check user is_active
+    phleb_user_result = await db.execute(select(User).where(User.id == phleb.user_id))
+    phleb_user = phleb_user_result.scalar_one_or_none()
+    if phleb_user is None or not phleb_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist user account is not active",
+        )
+
+    # 6. Zone validation
+    pincode_result = await db.execute(
+        select(Pincode).where(Pincode.id == order.pincode_id)
+    )
+    pincode_row = pincode_result.scalar_one()
+
+    zone_check = await db.execute(
+        select(PhlebotomistZoneAssignment).where(
+            PhlebotomistZoneAssignment.phlebotomist_id == phleb.id,
+            PhlebotomistZoneAssignment.zone_id == pincode_row.zone_id,
+        )
+    )
+    if zone_check.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is not assigned to the order's zone",
+        )
+
+    # 7. Leave check for appointment date
+    leave_result = await db.execute(
+        select(PhlebotomistLeave).where(
+            PhlebotomistLeave.phlebotomist_id == phleb.id,
+            PhlebotomistLeave.date == order.appointment_date,
+            PhlebotomistLeave.status == "approved",
+        )
+    )
+    if leave_result.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Phlebotomist is on leave for the appointment date",
+        )
+
+    # 8. Assign and update status
+    order.assigned_phlebotomist_id = phleb.id
+    order.status = OrderStatus.ASSIGNED
+    order.assigned_at = datetime.now(UTC)
+
+    # 9. Log status change
+    history = OrderStatusHistory(
+        order_id=order.id,
+        status=OrderStatus.ASSIGNED,
+        changed_by=user.id,
+        notes=f"Manually assigned to phlebotomist {phleb.id}",
+    )
+    db.add(history)
+
+    await db.commit()
+    await db.refresh(order)
+    return order
 
 
 @router.get(
