@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/app_config.dart';
+import '../services/offline_service.dart';
+import 'offline_interceptor.dart';
 
 class ApiClient {
   late final Dio _dio;
 
-  ApiClient({required SharedPreferences prefs}) {
+  ApiClient({required SharedPreferences prefs, OfflineService? offlineService}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.baseUrl,
@@ -57,6 +58,11 @@ class ApiClient {
         },
       ),
     );
+
+    // Offline interceptor — queues mutating requests when offline
+    if (offlineService != null) {
+      _dio.interceptors.add(OfflineInterceptor(offlineService));
+    }
 
     // Logging in debug mode
     _dio.interceptors.add(LogInterceptor(

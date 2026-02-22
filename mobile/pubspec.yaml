@@ -48,6 +48,9 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
 
+  # Connectivity
+  connectivity_plus: ^6.1.1
+
   # Utilities
   intl: ^0.20.1
   url_launcher: ^6.3.2
