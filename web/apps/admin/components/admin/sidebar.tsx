@@ -15,6 +15,8 @@ import {
   ChevronRight,
   Droplets,
   Building2,
+  FlaskConical,
+  Receipt,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
@@ -27,14 +29,24 @@ interface NavItem {
   roles?: UserRole[];
 }
 
+/*
+ * Role-based visibility:
+ *   super_admin  → everything
+ *   admin        → dashboard, bookings, phlebotomists, service-areas, accessioning, reconciliation, reports, clients, patients
+ *   lab_manager  → dashboard, bookings, phlebotomists, service-areas, accessioning, reconciliation, reports
+ *   support      → dashboard, bookings, reports
+ *   phlebotomist → dashboard, bookings (own), reports (own)
+ */
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/", icon: LayoutDashboard },
   { title: "Bookings", href: "/bookings", icon: CalendarDays },
-  { title: "Clients", href: "/clients", icon: Building2 },
-  { title: "Patients", href: "/patients", icon: Users },
-  { title: "Phlebotomists", href: "/phlebotomists", icon: TestTube },
-  { title: "Service Areas", href: "/service-areas", icon: MapPin },
-  { title: "Reports", href: "/reports", icon: BarChart3, roles: ["super_admin", "admin", "lab_manager"] },
+  { title: "Clients", href: "/clients", icon: Building2, roles: ["super_admin", "admin"] },
+  { title: "Patients", href: "/patients", icon: Users, roles: ["super_admin", "admin"] },
+  { title: "Phlebotomists", href: "/phlebotomists", icon: TestTube, roles: ["super_admin", "admin", "lab_manager"] },
+  { title: "Service Areas", href: "/service-areas", icon: MapPin, roles: ["super_admin", "admin", "lab_manager"] },
+  { title: "Accessioning", href: "/accessioning", icon: FlaskConical, roles: ["super_admin", "admin", "lab_manager"] },
+  { title: "Reconciliation", href: "/reconciliation", icon: Receipt, roles: ["super_admin", "admin", "lab_manager"] },
+  { title: "Reports", href: "/reports", icon: BarChart3 },
   { title: "Settings", href: "/settings", icon: Settings, roles: ["super_admin", "admin"] },
 ];
 
