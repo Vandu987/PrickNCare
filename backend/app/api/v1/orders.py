@@ -282,6 +282,27 @@ async def list_orders(
     )
 
 
+@router.get(
+    "/assigned",
+    response_model=OrderListResponse,
+)
+async def list_assigned_orders(
+    status: OrderStatus | None = None,
+    skip: int = 0,
+    limit: int = 20,
+    user: User = Depends(require_roles("phlebotomist")),
+    db: AsyncSession = Depends(get_db),
+) -> OrderListResponse:
+    """Alias for phlebotomist: list orders assigned to the current user."""
+    return await list_orders(
+        status=status,
+        skip=skip,
+        limit=limit,
+        user=user,
+        db=db,
+    )
+
+
 @router.post(
     "/auto-assign",
     response_model=AutoAssignResult,
