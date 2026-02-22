@@ -86,7 +86,7 @@ class SampleAccessioning(UUIDMixin, TimestampMixin, Base):
         "User", foreign_keys=[accessioned_by]
     )
 
-    __table_args__ = (Index("ix_sample_accessionings_status", "status"),)
+    __table_args__: tuple = ()
 
     def __init__(self, **kwargs: Any) -> None:
         kwargs.setdefault("id", uuid.uuid4())

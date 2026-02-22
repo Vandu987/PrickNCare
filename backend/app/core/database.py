@@ -31,6 +31,10 @@ def _build_engine() -> AsyncEngine:
         max_overflow=20,
         pool_pre_ping=True,  # health-check connections before use
         echo=settings.DEBUG,
+        connect_args={
+            "statement_cache_size": 0,
+            "prepared_statement_cache_size": 0,
+        },
     )
 
 
