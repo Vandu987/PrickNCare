@@ -40,5 +40,6 @@ export function hasRole(required: UserRole | UserRole[]): boolean {
 export function logout() {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  document.cookie = "access_token=; path=/; max-age=0";
   window.location.href = "/login";
 }
