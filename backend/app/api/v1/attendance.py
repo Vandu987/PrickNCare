@@ -10,7 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.dependencies import get_db
-from app.core.rbac import require_roles
+from app.api.deps import require_roles
 from app.models.attendance import Attendance, AttendanceStatus
 from app.models.users import User
 
