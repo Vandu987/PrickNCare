@@ -1,7 +1,7 @@
 class AppConfig {
   static const String appName = 'PricknCare';
-  static const String baseUrl = 'http://localhost:8000/api/v1';
-  static const String wsUrl = 'ws://localhost:8000/ws';
+  static const String baseUrl = 'https://api.prickncare.com/api/v1';
+  static const String wsUrl = 'wss://api.prickncare.com/ws';
 
   // Google Maps
   static const String googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
