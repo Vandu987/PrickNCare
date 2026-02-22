@@ -20,10 +20,9 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/dashboard/new-order", label: "New Order", icon: PlusCircle },
-  { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
-  { href: "/dashboard/reports", label: "Reports", icon: BarChart3 },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/orders/new", label: "New Order", icon: PlusCircle },
+  { href: "/orders", label: "Orders", icon: ClipboardList },
+  { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
 export function Sidebar() {
