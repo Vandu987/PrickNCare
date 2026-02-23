@@ -191,7 +191,7 @@ export default function BookingDetailPage() {
     queryFn: fetchPhlebotomists,
   });
 
-  const phlebotomists = phlebsData?.items ?? .data ?? [];
+  const phlebotomists = phlebsData?.data ?? [];
 
   const filteredPhlebs = useMemo(() => {
     if (!booking?.zone) return phlebotomists;
