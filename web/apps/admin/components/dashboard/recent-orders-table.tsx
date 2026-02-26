@@ -68,25 +68,27 @@ export function RecentOrdersTable({ orders, isLoading }: RecentOrdersTableProps)
               </TableRow>
             </TableHeader>
             <TableBody>
-              {orders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">#{order.id.slice(0, 8)}</TableCell>
-                  <TableCell>{order.patient_name}</TableCell>
-                  <TableCell>{order.test_name}</TableCell>
+              {orders.map((order, idx) => (
+                <TableRow key={order.id ?? idx}>
+                  <TableCell className="font-medium">#{String(order.id ?? "").slice(0, 8)}</TableCell>
+                  <TableCell>{order.patient_name ?? "-"}</TableCell>
+                  <TableCell>{order.test_name ?? "-"}</TableCell>
                   <TableCell>
                     <Badge className={statusColors[order.status] ?? ""} variant="outline">
-                      {formatStatus(order.status)}
+                      {formatStatus(order.status ?? "pending")}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(order.scheduled_at).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {order.scheduled_at
+                      ? new Date(order.scheduled_at).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "-"}
                   </TableCell>
-                  <TableCell className="text-right">₹{order.amount.toLocaleString("en-IN")}</TableCell>
+                  <TableCell className="text-right">₹{(order.amount ?? 0).toLocaleString("en-IN")}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -124,7 +124,7 @@ async function assignPhlebotomist(orderId: string, phlebotomistId: string) {
 }
 
 async function updateOrderStatus(orderId: string, status: string, notes?: string) {
-  const { data } = await api.patch(`/orders/${orderId}/status`, { status, notes });
+  const { data } = await api.put(`/orders/${orderId}/status`, { status, notes });
   return data;
 }
 
@@ -132,40 +132,44 @@ async function updateOrderStatus(orderId: string, status: string, notes?: string
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
-  confirmed: "bg-blue-100 text-blue-800",
   assigned: "bg-indigo-100 text-indigo-800",
-  "in-progress": "bg-purple-100 text-purple-800",
+  accepted: "bg-blue-100 text-blue-800",
+  in_transit: "bg-purple-100 text-purple-800",
+  collected: "bg-teal-100 text-teal-800",
+  uncollected: "bg-orange-100 text-orange-800",
   completed: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
-  "sample-collected": "bg-teal-100 text-teal-800",
-  "report-ready": "bg-emerald-100 text-emerald-800",
+  nsa: "bg-gray-100 text-gray-800",
+  sample_rejected: "bg-red-100 text-red-800",
+  sample_hold: "bg-amber-100 text-amber-800",
 };
 
 const priorityColors: Record<string, string> = {
   normal: "bg-gray-100 text-gray-700",
-  urgent: "bg-orange-100 text-orange-800",
-  stat: "bg-red-100 text-red-800",
+  high: "bg-orange-100 text-orange-800",
 };
 
 const STATUS_TRANSITIONS: Record<string, string[]> = {
-  pending: ["confirmed", "cancelled"],
-  confirmed: ["assigned", "cancelled"],
-  assigned: ["in-progress", "cancelled"],
-  "in-progress": ["sample-collected", "cancelled"],
-  "sample-collected": ["completed"],
-  completed: ["report-ready"],
-  "report-ready": [],
+  pending: ["assigned", "cancelled", "nsa"],
+  assigned: ["accepted", "cancelled"],
+  accepted: ["in_transit", "cancelled"],
+  in_transit: ["collected", "uncollected"],
+  collected: ["completed", "sample_rejected", "sample_hold"],
+  uncollected: ["pending"],
+  completed: [],
   cancelled: [],
+  nsa: [],
+  sample_rejected: [],
+  sample_hold: ["completed"],
 };
 
 const STATUS_ORDER = [
   "pending",
-  "confirmed",
   "assigned",
-  "in-progress",
-  "sample-collected",
+  "accepted",
+  "in_transit",
+  "collected",
   "completed",
-  "report-ready",
 ];
 
 // ── Page Component ─────────────────────────────────────
