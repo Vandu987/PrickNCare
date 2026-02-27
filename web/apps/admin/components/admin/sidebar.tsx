@@ -17,6 +17,7 @@ import {
   Building2,
   FlaskConical,
   Receipt,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
@@ -53,9 +54,11 @@ const navItems: NavItem[] = [
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const pathname = usePathname();
   const { hasRole } = useAuth();
 
@@ -67,14 +70,29 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <aside
       className={cn(
         "flex flex-col border-r bg-white transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
+        // Mobile: fixed overlay sidebar
+        "max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-50 max-lg:w-64",
+        mobileOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full",
+        // Desktop
+        collapsed ? "lg:w-16" : "lg:w-64"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center border-b px-4">
-        <Droplets className="h-8 w-8 text-primary-600 shrink-0" />
-        {!collapsed && (
-          <span className="ml-2 text-lg font-bold text-gray-900">PricknCare</span>
+      <div className="flex h-16 items-center justify-between border-b px-4">
+        <div className="flex items-center">
+          <Droplets className="h-8 w-8 text-primary-600 shrink-0" />
+          {!collapsed && (
+            <span className="ml-2 text-lg font-bold text-gray-900">PricknCare</span>
+          )}
+        </div>
+        {/* Mobile close button */}
+        {onMobileClose && (
+          <button
+            onClick={onMobileClose}
+            className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 lg:hidden"
+          >
+            <X className="h-5 w-5" />
+          </button>
         )}
       </div>
 
@@ -86,12 +104,13 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onMobileClose}
               className={cn(
                 "flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary-50 text-primary-700"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                collapsed && "justify-center px-2"
+                collapsed && "lg:justify-center lg:px-2"
               )}
               title={collapsed ? item.title : undefined}
             >

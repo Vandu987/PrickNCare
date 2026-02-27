@@ -143,13 +143,16 @@ async function bulkAssignPhlebotomist(orderIds: string[], phlebotomistId: string
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
-  confirmed: "bg-blue-100 text-blue-800",
   assigned: "bg-indigo-100 text-indigo-800",
-  "in-progress": "bg-purple-100 text-purple-800",
+  accepted: "bg-blue-100 text-blue-800",
+  in_transit: "bg-purple-100 text-purple-800",
+  collected: "bg-teal-100 text-teal-800",
+  uncollected: "bg-orange-100 text-orange-800",
   completed: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
-  "sample-collected": "bg-teal-100 text-teal-800",
-  "report-ready": "bg-emerald-100 text-emerald-800",
+  nsa: "bg-gray-100 text-gray-800",
+  sample_rejected: "bg-red-100 text-red-800",
+  sample_hold: "bg-amber-100 text-amber-800",
 };
 
 const priorityColors: Record<string, string> = {
@@ -160,13 +163,16 @@ const priorityColors: Record<string, string> = {
 
 const ORDER_STATUSES = [
   "pending",
-  "confirmed",
   "assigned",
-  "in-progress",
-  "sample-collected",
+  "accepted",
+  "in_transit",
+  "collected",
+  "uncollected",
   "completed",
-  "report-ready",
   "cancelled",
+  "nsa",
+  "sample_rejected",
+  "sample_hold",
 ];
 
 // ── Page Component ─────────────────────────────────────
@@ -446,10 +452,10 @@ export default function BookingsPage() {
       {/* Search + Filters */}
       <div className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1 max-w-sm">
+          <div className="relative flex-1 sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <input
-              placeholder="Search by booking ID, patient name..."
+              placeholder="Search by booking ID, patient..."
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
@@ -458,38 +464,40 @@ export default function BookingsPage() {
               className="w-full rounded-md border border-gray-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setPage(1);
-            }}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">All Statuses</option>
-            {ORDER_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s.charAt(0).toUpperCase() + s.slice(1).replace("-", " ")}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filterPriority}
-            onChange={(e) => {
-              setFilterPriority(e.target.value);
-              setPage(1);
-            }}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">All Priorities</option>
-            <option value="normal">Normal</option>
-            <option value="urgent">Urgent</option>
-            <option value="stat">STAT</option>
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => {
+                setFilterStatus(e.target.value);
+                setPage(1);
+              }}
+              className="flex-1 sm:flex-none rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">All Statuses</option>
+              {ORDER_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filterPriority}
+              onChange={(e) => {
+                setFilterPriority(e.target.value);
+                setPage(1);
+              }}
+              className="flex-1 sm:flex-none rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              <option value="">All Priorities</option>
+              <option value="normal">Normal</option>
+              <option value="urgent">Urgent</option>
+              <option value="stat">STAT</option>
+            </select>
+          </div>
         </div>
 
         {showFilters && (
-          <div className="flex flex-wrap gap-3 rounded-md border border-gray-200 bg-gray-50 p-4">
+          <div className="grid grid-cols-2 gap-3 rounded-md border border-gray-200 bg-gray-50 p-3 sm:flex sm:flex-wrap sm:p-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-gray-600">Date From</label>
               <input
@@ -593,8 +601,8 @@ export default function BookingsPage() {
         <>
           <DataTable columns={columns} data={bookings} />
           {bookingsData && bookingsData.total_pages > 1 && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
+              <p className="text-xs sm:text-sm text-gray-500">
                 Page {bookingsData.page} of {bookingsData.total_pages} ({bookingsData.total} total)
               </p>
               <div className="flex gap-2">

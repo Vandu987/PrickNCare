@@ -52,13 +52,13 @@ export function DataTable<TData, TValue>({
           className="max-w-sm rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
       )}
-      <div className="rounded-md border">
-        <table className="w-full caption-bottom text-sm">
+      <div className="rounded-md border overflow-x-auto">
+        <table className="w-full caption-bottom text-sm min-w-[600px]">
           <thead className="[&_tr]:border-b">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="border-b transition-colors hover:bg-gray-50">
                 {hg.headers.map((header) => (
-                  <th key={header.id} className="h-12 px-4 text-left align-middle font-medium text-gray-500">
+                  <th key={header.id} className="h-10 sm:h-12 px-2 sm:px-4 text-left align-middle font-medium text-gray-500 text-xs sm:text-sm whitespace-nowrap">
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}
@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <tr key={row.id} className="border-b transition-colors hover:bg-gray-50">
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="p-4 align-middle">
+                    <td key={cell.id} className="p-2 sm:p-4 align-middle text-xs sm:text-sm">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Bell, Search, LogOut, User, Settings } from "lucide-react";
+import { Bell, Search, LogOut, User, Settings, Menu } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,13 +12,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/auth-context";
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAuth();
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-white px-6">
-      <div className="flex items-center space-x-4">
-        <div className="relative">
+    <header className="flex h-16 items-center justify-between border-b bg-white px-4 md:px-6">
+      <div className="flex items-center space-x-3">
+        {/* Mobile hamburger menu */}
+        <button
+          onClick={onMenuClick}
+          className="rounded-md p-2 text-gray-400 hover:bg-gray-50 hover:text-gray-600 lg:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="relative hidden sm:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
