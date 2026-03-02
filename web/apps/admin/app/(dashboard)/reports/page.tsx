@@ -56,7 +56,8 @@ export default function ReportsPage() {
       const res = await api.get(endpoint, {
         params: { from: dateFrom, to: dateTo },
       });
-      setData(res.data ?? defaultDashboard);
+      const raw = res.data?.data ?? res.data ?? defaultDashboard;
+      setData({ ...defaultDashboard, ...raw });
     } catch {
       // Use empty data on error
       setData(defaultDashboard);
@@ -151,7 +152,7 @@ export default function ReportsPage() {
             <CardTitle className="text-sm font-medium text-gray-500">Total Bookings</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{data.totalBookings.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{(data.totalBookings ?? 0).toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card>
@@ -159,7 +160,7 @@ export default function ReportsPage() {
             <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">₹{data.totalRevenue.toLocaleString()}</p>
+            <p className="text-2xl font-bold">₹{(data.totalRevenue ?? 0).toLocaleString()}</p>
           </CardContent>
         </Card>
         <Card>
@@ -167,7 +168,7 @@ export default function ReportsPage() {
             <CardTitle className="text-sm font-medium text-gray-500">Completion Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{data.completionRate}%</p>
+            <p className="text-2xl font-bold">{data.completionRate ?? 0}%</p>
           </CardContent>
         </Card>
         <Card>
@@ -175,13 +176,13 @@ export default function ReportsPage() {
             <CardTitle className="text-sm font-medium text-gray-500">Avg Turnaround</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{data.avgTurnaround}</p>
+            <p className="text-2xl font-bold">{data.avgTurnaround ?? "0h"}</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Charts */}
-      {data.chartData.length > 0 && (
+      {(data.chartData ?? []).length > 0 && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
@@ -226,7 +227,7 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {data.chartData.length === 0 && !loading && (
+      {(data.chartData ?? []).length === 0 && !loading && (
         <Card>
           <CardContent className="py-12 text-center text-gray-500">
             No data available for the selected date range.

@@ -15,6 +15,7 @@ import {
   Phone,
   Mail,
   MapPin,
+  Pencil,
 } from "lucide-react";
 import api from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
@@ -148,7 +149,7 @@ const statusColors: Record<string, string> = {
 
 // ── Tab Components ─────────────────────────────────────
 
-function InfoTab({ client }: { client: Client }) {
+function InfoTab({ client, readOnly }: { client: Client; readOnly?: boolean }) {
   const queryClient = useQueryClient();
   const form = useForm<ClientEditValues>({
     resolver: zodResolver(clientEditSchema),
@@ -169,6 +170,48 @@ function InfoTab({ client }: { client: Client }) {
       queryClient.invalidateQueries({ queryKey: ["client", client.id] });
     },
   });
+
+  if (readOnly) {
+    const fields = [
+      { label: "Organization Name", value: client.name },
+      { label: "Contact Person", value: client.contact_person },
+      { label: "Phone", value: client.contact_phone },
+      { label: "Email", value: client.contact_email },
+      { label: "City", value: client.city },
+      { label: "Address", value: client.address },
+      { label: "Status", value: client.status },
+      { label: "Created", value: client.created_at ? new Date(client.created_at).toLocaleDateString("en-IN") : "—" },
+    ];
+    return (
+      <div className="rounded-lg border bg-white p-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {fields.map((f) => (
+            <div key={f.label}>
+              <p className="text-xs font-medium text-gray-500">{f.label}</p>
+              <p className="mt-1 text-sm text-gray-900">{f.value || "—"}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 rounded-md border bg-gray-50 p-4">
+          <h3 className="mb-3 text-sm font-semibold text-gray-700">Rate Configuration</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-xs font-medium text-gray-500">1st Collection</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900">₹{client.rate_first_collection}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500">2nd Collection</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900">₹{client.rate_second_collection}</p>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-gray-500">Priority</p>
+              <p className="mt-1 text-sm font-semibold text-gray-900">₹{client.rate_priority}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Form {...form}>
@@ -756,6 +799,7 @@ export default function ClientDetailPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const id = params.id as string;
+  const isViewMode = searchParams.get("mode") !== "edit";
   const initialTab = (searchParams.get("tab") as TabKey) || "info";
   const [activeTab, setActiveTab] = useState<TabKey>(
     tabs.some((t) => t.key === initialTab) ? initialTab : "info"
@@ -822,6 +866,14 @@ export default function ClientDetailPage() {
             </div>
           </div>
         </div>
+        {isViewMode && (
+          <Link
+            href={`/clients/${id}?mode=edit`}
+            className="inline-flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
+          >
+            <Pencil className="h-4 w-4" /> Edit
+          </Link>
+        )}
       </div>
 
       {/* Tabs */}
@@ -845,7 +897,7 @@ export default function ClientDetailPage() {
 
       {/* Tab content */}
       <div>
-        {activeTab === "info" && <InfoTab client={client} />}
+        {activeTab === "info" && <InfoTab client={client} readOnly={isViewMode} />}
         {activeTab === "rates" && <RatesTab client={client} />}
         {activeTab === "users" && <UsersTab clientId={client.id} />}
       </div>

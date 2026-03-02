@@ -67,7 +67,7 @@ interface ZonesResponse {
 
 const addPhlebotomistSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  phone: z.string().min(10, "Valid phone is required"),
+  phone: z.string().regex(/^\d{10}$/, "Enter 10-digit mobile number"),
   email: z.string().email("Valid email is required"),
   zone_ids: z.array(z.string()).optional(),
 });
@@ -87,7 +87,8 @@ function fetchZones() {
 }
 
 function createPhlebotomist(data: AddPhlebotomistForm) {
-  return api.post("/phlebotomists", data).then((r) => r.data);
+  const employee_id = `PHL${Date.now().toString().slice(-6)}`;
+  return api.post("/phlebotomists", { ...data, phone: `+91${data.phone}`, employee_id }).then((r) => r.data);
 }
 
 // ---- Component ----
@@ -173,14 +174,14 @@ export default function PhlebotomistsPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() =>
-                router.push(`/phlebotomists/${row.original.id}`)
+                router.push(`/phlebotomists/${row.original.id}?mode=view`)
               }
             >
               <Eye className="mr-2 h-4 w-4" /> View
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                router.push(`/phlebotomists/${row.original.id}`)
+                router.push(`/phlebotomists/${row.original.id}?mode=edit`)
               }
             >
               <Pencil className="mr-2 h-4 w-4" /> Edit
@@ -239,11 +240,15 @@ export default function PhlebotomistsPage() {
                     <FormItem>
                       <FormLabel>Phone</FormLabel>
                       <FormControl>
-                        <input
-                          {...field}
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                          placeholder="Phone number"
-                        />
+                        <div className="flex">
+                          <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-sm text-gray-500">+91</span>
+                          <input
+                            {...field}
+                            maxLength={10}
+                            className="w-full rounded-r-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            placeholder="10-digit mobile number"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -270,33 +275,43 @@ export default function PhlebotomistsPage() {
                 <FormField
                   control={form.control}
                   name="zone_ids"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Zones (optional)</FormLabel>
-                      <FormControl>
-                        <select
-                          multiple
-                          value={field.value ?? []}
-                          onChange={(e) =>
-                            field.onChange(
-                              Array.from(
-                                e.target.selectedOptions,
-                                (o) => o.value
-                              )
-                            )
-                          }
-                          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                        >
-                          {zones.map((z) => (
-                            <option key={z.id} value={z.id}>
-                              {z.name}
-                            </option>
-                          ))}
-                        </select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    const selected = field.value ?? [];
+                    const toggle = (id: string) => {
+                      field.onChange(
+                        selected.includes(id)
+                          ? selected.filter((v) => v !== id)
+                          : [...selected, id]
+                      );
+                    };
+                    return (
+                      <FormItem>
+                        <FormLabel>Zones (optional)</FormLabel>
+                        <FormControl>
+                          <div className="max-h-40 overflow-y-auto rounded-md border border-gray-300 p-2 space-y-1">
+                            {zones.length === 0 && (
+                              <p className="text-xs text-gray-400 py-1">No zones available</p>
+                            )}
+                            {zones.map((z) => (
+                              <label
+                                key={z.id}
+                                className="flex items-center gap-2 rounded px-2 py-1.5 text-sm cursor-pointer hover:bg-gray-50"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selected.includes(z.id)}
+                                  onChange={() => toggle(z.id)}
+                                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                />
+                                {z.name}
+                              </label>
+                            ))}
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <DialogFooter>
                   <Button

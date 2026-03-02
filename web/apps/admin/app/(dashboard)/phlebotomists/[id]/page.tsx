@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -56,8 +56,6 @@ interface Phlebotomist {
   name: string;
   phone: string;
   email: string;
-  address?: string;
-  date_of_birth?: string;
   status: "active" | "inactive";
   zones: Zone[];
   documents: Document[];
@@ -83,8 +81,6 @@ const profileSchema = z.object({
   name: z.string().min(1, "Name is required"),
   phone: z.string().min(10, "Valid phone is required"),
   email: z.string().email("Valid email is required"),
-  address: z.string().optional(),
-  date_of_birth: z.string().optional(),
   status: z.enum(["active", "inactive"]),
 });
 
@@ -93,7 +89,7 @@ type ProfileForm = z.infer<typeof profileSchema>;
 // ---- API helpers ----
 
 function fetchPhlebotomist(id: string) {
-  return api.get<{ data: Phlebotomist }>(`/phlebotomists/${id}`).then((r) => r.data.data);
+  return api.get(`/phlebotomists/${id}`).then((r) => r.data?.data ?? r.data);
 }
 
 function updatePhlebotomist(id: string, data: ProfileForm) {
@@ -101,7 +97,7 @@ function updatePhlebotomist(id: string, data: ProfileForm) {
 }
 
 function fetchAllZones() {
-  return api.get<ZonesResponse>("/zones").then((r) => r.data.data);
+  return api.get("/zones").then((r) => r.data?.data ?? r.data?.items ?? r.data);
 }
 
 function assignZone(phlebId: string, zoneId: string) {
@@ -131,10 +127,10 @@ function deleteDocument(docId: string) {
 
 function fetchPerformance(phlebId: string) {
   return api
-    .get<{ data: PerformanceStats }>(`/reports/phlebotomist-performance`, {
+    .get(`/reports/phlebotomist-performance`, {
       params: { phlebotomist_id: phlebId },
     })
-    .then((r) => r.data.data);
+    .then((r) => r.data?.data ?? r.data);
 }
 
 // ---- Profile Tab ----
@@ -142,9 +138,11 @@ function fetchPerformance(phlebId: string) {
 function ProfileTab({
   phleb,
   onSaved,
+  readOnly = false,
 }: {
   phleb: Phlebotomist;
   onSaved: () => void;
+  readOnly?: boolean;
 }) {
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
@@ -152,8 +150,6 @@ function ProfileTab({
       name: phleb.name,
       phone: phleb.phone,
       email: phleb.email,
-      address: phleb.address ?? "",
-      date_of_birth: phleb.date_of_birth ?? "",
       status: phleb.status,
     },
   });
@@ -162,6 +158,47 @@ function ProfileTab({
     mutationFn: (data: ProfileForm) => updatePhlebotomist(phleb.id, data),
     onSuccess: onSaved,
   });
+
+  if (readOnly) {
+    return (
+      <Card className="p-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-xs font-medium text-gray-500">Name</p>
+            <p className="mt-1 text-sm text-gray-900">{phleb.name}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500">Phone</p>
+            <p className="mt-1 text-sm text-gray-900">{phleb.phone}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500">Email</p>
+            <p className="mt-1 text-sm text-gray-900">{phleb.email}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500">Status</p>
+            <Badge variant={phleb.status === "active" ? "default" : "outline"} className="mt-1">
+              {phleb.status}
+            </Badge>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500">Zones</p>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {phleb.zones?.length ? phleb.zones.map((z: Zone) => (
+                <Badge key={z.id} variant="secondary">{z.name}</Badge>
+              )) : <span className="text-sm text-gray-400">No zones</span>}
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-gray-500">Created</p>
+            <p className="mt-1 text-sm text-gray-900">
+              {phleb.created_at ? new Date(phleb.created_at).toLocaleDateString("en-IN") : "—"}
+            </p>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-6">
@@ -211,32 +248,6 @@ function ProfileTab({
           />
           <FormField
             control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address</FormLabel>
-                <FormControl>
-                  <input {...field} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="date_of_birth"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of Birth</FormLabel>
-                <FormControl>
-                  <input {...field} type="date" className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="status"
             render={({ field }) => (
               <FormItem>
@@ -274,8 +285,9 @@ function ZonesTab({ phleb }: { phleb: Phlebotomist }) {
     queryFn: fetchAllZones,
   });
 
-  const assignedIds = new Set(phleb.zones?.map((z) => z.id) ?? []);
-  const availableZones = (allZones ?? []).filter((z) => !assignedIds.has(z.id));
+  const zonesList: Zone[] = Array.isArray(allZones) ? allZones : (allZones as any)?.items ?? (allZones as any)?.data ?? [];
+  const assignedIds = new Set(phleb.zones?.map((z: Zone) => z.id) ?? []);
+  const availableZones = zonesList.filter((z: Zone) => !assignedIds.has(z.id));
 
   const assignMutation = useMutation({
     mutationFn: (zoneId: string) => assignZone(phleb.id, zoneId),
@@ -313,7 +325,7 @@ function ZonesTab({ phleb }: { phleb: Phlebotomist }) {
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
             >
               <option value="">Select a zone</option>
-              {availableZones.map((z) => (
+              {availableZones.map((z: Zone) => (
                 <option key={z.id} value={z.id}>
                   {z.name}
                 </option>
@@ -498,7 +510,9 @@ function PerformanceTab({ phlebId }: { phlebId: string }) {
 export default function PhlebotomistDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const isViewMode = searchParams.get("mode") !== "edit";
 
   const { data: phleb, isLoading } = useQuery({
     queryKey: ["phlebotomist", params.id],
@@ -540,6 +554,7 @@ export default function PhlebotomistDetailPage() {
         <TabsContent value="profile">
           <ProfileTab
             phleb={phleb}
+            readOnly={isViewMode}
             onSaved={() =>
               queryClient.invalidateQueries({
                 queryKey: ["phlebotomist", params.id],

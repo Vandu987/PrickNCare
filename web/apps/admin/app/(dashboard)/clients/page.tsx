@@ -122,12 +122,12 @@ function ActionsCell({ client }: { client: Client }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href={`/clients/${client.id}`}>
+          <Link href={`/clients/${client.id}?mode=view`}>
             <Eye className="mr-2 h-4 w-4" /> View
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={`/clients/${client.id}?tab=edit`}>
+          <Link href={`/clients/${client.id}?mode=edit`}>
             <Pencil className="mr-2 h-4 w-4" /> Edit
           </Link>
         </DropdownMenuItem>

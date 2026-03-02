@@ -9,7 +9,6 @@ import {
   MoreHorizontal,
   Eye,
   UserPlus,
-  Calendar,
   Filter,
   CheckSquare,
 } from "lucide-react";
@@ -114,9 +113,10 @@ async function fetchBookings(params: {
   return data.data ?? data;
 }
 
-async function fetchPhlebotomists(): Promise<{ data: PhlebotomistOption[] }> {
+async function fetchPhlebotomists(): Promise<PhlebotomistOption[]> {
   const { data } = await api.get("/phlebotomists?status=active");
-  return data;
+  const raw = data?.data ?? data?.items ?? data;
+  return Array.isArray(raw) ? raw : [];
 }
 
 async function fetchClients(): Promise<{ items: Client[] }> {
@@ -125,7 +125,7 @@ async function fetchClients(): Promise<{ items: Client[] }> {
 }
 
 async function assignPhlebotomist(orderId: string, phlebotomistId: string) {
-  const { data } = await api.post(`/orders/${orderId}/assign`, {
+  const { data } = await api.put(`/orders/${orderId}/assign`, {
     phlebotomist_id: phlebotomistId,
   });
   return data;
@@ -133,8 +133,10 @@ async function assignPhlebotomist(orderId: string, phlebotomistId: string) {
 
 async function bulkAssignPhlebotomist(orderIds: string[], phlebotomistId: string) {
   const { data } = await api.post("/orders/bulk-assign", {
-    order_ids: orderIds,
-    phlebotomist_id: phlebotomistId,
+    assignments: orderIds.map((id) => ({
+      order_id: id,
+      phlebotomist_id: phlebotomistId,
+    })),
   });
   return data;
 }
@@ -241,7 +243,7 @@ export default function BookingsPage() {
     queryFn: fetchClients,
   });
 
-  const phlebotomists = phlebsData?.data ?? [];
+  const phlebotomists = phlebsData ?? [];
   const clients = clientsData?.items ?? [];
   const bookings = bookingsData?.items ?? [];
 
@@ -254,6 +256,9 @@ export default function BookingsPage() {
       setAssignOpen(false);
       setAssignBooking(null);
       setAssignPhlebId("");
+    },
+    onError: (error: any) => {
+      console.error("Assign error:", error?.response?.status, error?.response?.data);
     },
   });
 
@@ -290,7 +295,7 @@ export default function BookingsPage() {
   const filteredPhlebsForAssign = useMemo(() => {
     if (!assignBooking?.zone) return phlebotomists;
     return phlebotomists.filter(
-      (p) => p.zones?.some((z) => z.id === assignBooking.zone?.id) ?? false
+      (p: PhlebotomistOption) => p.zones?.some((z: { id: string; name: string }) => z.id === assignBooking.zone?.id) ?? false
     );
   }, [assignBooking, phlebotomists]);
 
@@ -551,7 +556,7 @@ export default function BookingsPage() {
                 className="rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">All Phlebotomists</option>
-                {phlebotomists.map((p) => (
+                {phlebotomists.map((p: PhlebotomistOption) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -662,7 +667,7 @@ export default function BookingsPage() {
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">Select...</option>
-                  {filteredPhlebsForAssign.map((p) => (
+                  {filteredPhlebsForAssign.map((p: PhlebotomistOption) => (
                     <option key={p.id} value={p.id}>
                       {p.name} — {p.phone}
                     </option>
@@ -681,7 +686,7 @@ export default function BookingsPage() {
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">Select...</option>
-                  {phlebotomists.map((p) => (
+                  {phlebotomists.map((p: PhlebotomistOption) => (
                     <option key={p.id} value={p.id}>
                       {p.name} — {p.phone}
                     </option>
@@ -689,7 +694,13 @@ export default function BookingsPage() {
                 </select>
               )}
               {assignMutation.isError && (
-                <p className="text-sm text-red-600">Assignment failed. Please try again.</p>
+                <p className="text-sm text-red-600">
+                  {(() => {
+                    const err = assignMutation.error as any;
+                    const rd = err?.response?.data;
+                    return rd?.error?.message ?? rd?.detail ?? rd?.message ?? err?.message ?? "Assignment failed.";
+                  })()}
+                </p>
               )}
             </div>
           )}
@@ -734,7 +745,7 @@ export default function BookingsPage() {
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 <option value="">Select...</option>
-                {phlebotomists.map((p) => (
+                {phlebotomists.map((p: PhlebotomistOption) => (
                   <option key={p.id} value={p.id}>
                     {p.name} — {p.phone}
                   </option>
@@ -742,7 +753,13 @@ export default function BookingsPage() {
               </select>
             </div>
             {bulkAssignMutation.isError && (
-              <p className="text-sm text-red-600">Bulk assignment failed. Please try again.</p>
+              <p className="text-sm text-red-600">
+                {(() => {
+                  const err = bulkAssignMutation.error as any;
+                  const rd = err?.response?.data;
+                  return rd?.error?.message ?? rd?.detail ?? rd?.message ?? err?.message ?? "Bulk assignment failed.";
+                })()}
+              </p>
             )}
           </div>
           <DialogFooter>
