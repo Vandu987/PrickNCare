@@ -49,12 +49,20 @@ def upgrade() -> None:
         sa.Column("amount", sa.Numeric(10, 2), nullable=False),
         sa.Column(
             "mode",
-            sa.Enum(name="order_payment_mode", create_type=False),
+            sa.Enum(
+                "cash", "upi", "card", "wallet", "postpaid",
+                name="order_payment_mode",
+                create_type=False,
+            ),
             nullable=False,
         ),
         sa.Column(
             "status",
-            sa.Enum(name="order_payment_status", create_type=False),
+            sa.Enum(
+                "pending", "collected", "verified", "reconciled",
+                name="order_payment_status",
+                create_type=False,
+            ),
             nullable=False,
             server_default="collected",
         ),

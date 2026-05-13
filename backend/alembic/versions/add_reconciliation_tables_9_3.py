@@ -49,7 +49,11 @@ def upgrade() -> None:
         sa.Column("net_discrepancy", sa.Numeric(10, 2), nullable=False),
         sa.Column(
             "status",
-            sa.Enum(name="reconciliation_status", create_type=False),
+            sa.Enum(
+                "draft", "confirmed", "disputed",
+                name="reconciliation_status",
+                create_type=False,
+            ),
             nullable=False,
             server_default="confirmed",
         ),
@@ -94,7 +98,16 @@ def upgrade() -> None:
         ),
         sa.Column(
             "type",
-            sa.Enum(name="discrepancy_category", create_type=False),
+            sa.Enum(
+                "fuel_allowance",
+                "cash_shortage",
+                "overage",
+                "patient_refund",
+                "incentive_adjustment",
+                "other",
+                name="discrepancy_category",
+                create_type=False,
+            ),
             nullable=False,
         ),
         sa.Column("amount", sa.Numeric(10, 2), nullable=False),
