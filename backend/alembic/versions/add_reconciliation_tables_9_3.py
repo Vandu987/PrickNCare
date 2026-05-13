@@ -6,6 +6,7 @@ Create Date: 2026-02-22 02:13:00.000000
 """
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
 from alembic import op
@@ -49,7 +50,7 @@ def upgrade() -> None:
         sa.Column("net_discrepancy", sa.Numeric(10, 2), nullable=False),
         sa.Column(
             "status",
-            sa.Enum(
+            postgresql.ENUM(
                 "draft", "confirmed", "disputed",
                 name="reconciliation_status",
                 create_type=False,
@@ -98,7 +99,7 @@ def upgrade() -> None:
         ),
         sa.Column(
             "type",
-            sa.Enum(
+            postgresql.ENUM(
                 "fuel_allowance",
                 "cash_shortage",
                 "overage",
