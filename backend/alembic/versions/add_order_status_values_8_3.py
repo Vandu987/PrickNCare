@@ -6,7 +6,9 @@ Revision ID: task_8_3_status
 from alembic import op
 
 revision = "task_8_3_status"
-down_revision = None  # standalone — uses IF NOT EXISTS
+# Depend on the initial schema so the `order_status` enum exists before
+# we ALTER TYPE on it.
+down_revision = "cc0cbcff92ab"
 branch_labels = None
 depends_on = None
 
