@@ -49,7 +49,7 @@ def upgrade() -> None:
         sa.Column("net_discrepancy", sa.Numeric(10, 2), nullable=False),
         sa.Column(
             "status",
-            reconciliation_status,
+            sa.Enum(name="reconciliation_status", create_type=False),
             nullable=False,
             server_default="confirmed",
         ),
@@ -92,7 +92,11 @@ def upgrade() -> None:
             nullable=False,
             index=True,
         ),
-        sa.Column("type", discrepancy_category, nullable=False),
+        sa.Column(
+            "type",
+            sa.Enum(name="discrepancy_category", create_type=False),
+            nullable=False,
+        ),
         sa.Column("amount", sa.Numeric(10, 2), nullable=False),
         sa.Column("notes", sa.Text, nullable=True),
         sa.Column(

@@ -47,10 +47,14 @@ def upgrade() -> None:
             index=True,
         ),
         sa.Column("amount", sa.Numeric(10, 2), nullable=False),
-        sa.Column("mode", order_payment_mode, nullable=False),
+        sa.Column(
+            "mode",
+            sa.Enum(name="order_payment_mode", create_type=False),
+            nullable=False,
+        ),
         sa.Column(
             "status",
-            order_payment_status,
+            sa.Enum(name="order_payment_status", create_type=False),
             nullable=False,
             server_default="collected",
         ),
