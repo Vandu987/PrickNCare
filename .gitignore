@@ -81,3 +81,11 @@ Thumbs.db
 # ========================
 logs/
 *.log
+
+# ========================
+# Secrets — never commit
+# ========================
+.coolify-token
+.coolify-config.json
+.coolify-secrets.txt
+.secrets/
