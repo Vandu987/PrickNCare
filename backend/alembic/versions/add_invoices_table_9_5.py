@@ -6,6 +6,7 @@ Create Date: 2026-02-22 02:06:00.000000
 """
 
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
 from alembic import op
@@ -35,7 +36,7 @@ def upgrade() -> None:
         sa.Column("total", sa.Numeric(12, 2), nullable=False, server_default="0"),
         sa.Column(
             "status",
-            sa.Enum("pending", "paid", name="invoice_status", create_type=False),
+            postgresql.ENUM("pending", "paid", name="invoice_status", create_type=False),
             nullable=False,
             server_default="pending",
         ),

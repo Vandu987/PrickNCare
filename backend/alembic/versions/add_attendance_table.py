@@ -6,6 +6,7 @@ Revises: task94_verify
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import UUID
 
 revision = "add_attendance"
@@ -24,7 +25,7 @@ def upgrade() -> None:
         sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
         sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True),
         sa.Column("date", sa.Date, nullable=False, index=True),
-        sa.Column("status", sa.Enum("checked_in", "checked_out", name="attendance_status_enum", create_type=False), nullable=False, server_default="checked_in"),
+        sa.Column("status", postgresql.ENUM("checked_in", "checked_out", name="attendance_status_enum", create_type=False), nullable=False, server_default="checked_in"),
         sa.Column("check_in_time", sa.DateTime(timezone=True), nullable=False),
         sa.Column("check_in_latitude", sa.Float, nullable=False),
         sa.Column("check_in_longitude", sa.Float, nullable=False),
