@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision = "task94_verify"
-down_revision = "add_reconciliation_tables_9_3"
+down_revision = "9a3b4c5d6e7f"
 branch_labels = None
 depends_on = None
 

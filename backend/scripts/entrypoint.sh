@@ -2,7 +2,7 @@
 set -e
 
 echo ">>> Running Alembic migrations..."
-alembic upgrade head
+alembic upgrade heads
 
 if [ "${SEED_ADMIN_ON_START:-false}" = "true" ]; then
     echo ">>> Seeding admin user (SEED_ADMIN_ON_START=true)..."
